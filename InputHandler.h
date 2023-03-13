@@ -2,8 +2,10 @@
 
 #include <string>
 #include <memory>
+#include <unordered_set>
 
 namespace Utils {
+	
 	class InputHandler {
 	public:
 		explicit InputHandler(std::string input) noexcept;
@@ -13,7 +15,6 @@ namespace Utils {
 		[[nodiscard]] bool isValidInput() const noexcept;
 
 	private:
-		struct impl;
-		std::unique_ptr<impl> m_pImpl;
+		std::string m_input;
 	};
 }

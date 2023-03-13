@@ -134,7 +134,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Marvin.cpp" />
     <ClCompile Include="RobotSimulator.cpp" />
-    <ClCompile Include="RobotWorld.cpp" />
+    <ClCompile Include="RobotGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE" />
@@ -146,7 +146,7 @@
     <ClInclude Include="Marvin.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="RobotSimulator.h" />
-    <ClInclude Include="RobotWorld.h" />
+    <ClInclude Include="RobotGrid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

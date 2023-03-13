@@ -1,54 +1,18 @@
-// Marvin.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <limits>
 #include <string>
-#include "Marvin.h"
+#include <csignal>
+
+#include "RobotSimulator.h"
 
 int main()
 {
-  /*  std::cout << "do something: ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::string input;
-    while (std::getline(std::cin, input));
-    std::cout << '\n' << input;*/
+    RobotWorldSimulator::RobotGrid grid(5, 5);
+    RobotWorldSimulator::RobotSimulator robot_simulate(grid);
 
-    using RobotDirection = RobotFactory::RobotLocation::DIRECTION;
-
-    RobotFactory::Marvin marvin({ 1,2, "RobotDirection::SOUTH" });
-    marvin.move();
-    marvin.rotate();
-    marvin.rotate(RobotFactory::ROTATE_DIRECTION::RIGHT);
-    std::cout << "Location(xy): " << marvin.location().x_coordinate << marvin.location().y_coordinate << marvin.currentDirection() << '\n';
-
-    RobotFactory::Marvin m2(marvin);
-    m2.move();
-    std::cout << "Location(xy): " << m2.location().x_coordinate << m2.location().y_coordinate << m2.currentDirection() << '\n';
-
-    RobotFactory::Marvin m3({ 0,0, "RobotDirection::NORTH" });
-    m3 = m2;
-    m3.move();
-    std::cout << "Location(xy): " << m3.location().x_coordinate << m3.location().y_coordinate << m3.currentDirection() << '\n';
-
-    RobotFactory::Marvin m4({ 1,1, "RobotDirection::NORTH" });
-    m4 = std::move(RobotFactory::Marvin({ 0,0, "RobotDirection::NORTH" }));
-    std::cout << "Location(xy): " << m4.location().x_coordinate << m4.location().y_coordinate << m4.currentDirection() << '\n';
-
-
-    RobotFactory::Robot* robot = new RobotFactory::Marvin({ 2,1, "RobotDirection::WEST" });
-    robot->move();
-    robot->rotate(RobotFactory::ROTATE_DIRECTION::RIGHT);
-    robot->rotate();
-    std::cout << "Location(xy): " << robot->location().x_coordinate << robot->location().y_coordinate << robot->currentDirection();
-    delete robot;
-
-    auto robot2 = std::make_unique<RobotFactory::Marvin>(RobotFactory::RobotLocation{ 3, 3, "RobotDirection::NORTH" });
-    robot2->move();
-    std::cout << "Location(xy): " << robot2->location().x_coordinate << robot2->location().y_coordinate << robot2->currentDirection();
-
+    robot_simulate.start();
     
-
+    return 0;
 
 }
 

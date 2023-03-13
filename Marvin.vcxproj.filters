@@ -27,7 +27,7 @@
     <ClCompile Include="RobotSimulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RobotWorld.cpp">
+    <ClCompile Include="RobotGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputHandler.cpp">
@@ -51,7 +51,7 @@
     <ClInclude Include="RobotCommandHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RobotWorld.h">
+    <ClInclude Include="RobotGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputHandler.h">
