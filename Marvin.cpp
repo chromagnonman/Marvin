@@ -3,13 +3,15 @@
 
 namespace RobotFactory {
 
+	size_t Robot::m_ID{ 0 };
+
 	Marvin::Marvin(const RobotLocation& location) noexcept :
 		Robot{ location }
 	{
 	}
 
-	Marvin::Marvin(const RobotLocation& location, std::string name) noexcept :
-		Robot{ location, std::move(name) }
+	Marvin::Marvin(const RobotLocation& location, std::string robot_name) noexcept :
+		Robot{ location, std::move(robot_name) }
 	{
 	}
 

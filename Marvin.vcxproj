@@ -129,8 +129,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="InputHandler.cpp" />
-    <ClCompile Include="RobotCommandHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Marvin.cpp" />
     <ClCompile Include="RobotSimulator.cpp" />
@@ -141,8 +139,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="InputHandler.h" />
-    <ClInclude Include="RobotCommandHandler.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Marvin.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="RobotSimulator.h" />

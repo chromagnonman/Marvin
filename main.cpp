@@ -2,13 +2,12 @@
 
 int main()
 {
-    RobotWorldSimulator::RobotGrid grid(5, 5);
-    RobotWorldSimulator::RobotSimulator simulator(grid);
+    RobotWorldSimulator::RobotGrid robot_excursion;
+    RobotWorldSimulator::RobotSimulator simulate(robot_excursion);
 
-    simulator.start();
+    simulate.start();
     
     return 0;
-
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

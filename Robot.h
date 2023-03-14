@@ -17,7 +17,6 @@ namespace RobotFactory
 		RIGHT
 	};
 
-	//static std::unordered_set<std::string> direction{ "NORTH", "SOUTH", "EAST", "WEST" };
 	namespace ROBOT_DIRECTION {
 		static constexpr auto NORTH = "NORTH";
 		static constexpr auto SOUTH = "SOUTH";
@@ -25,6 +24,7 @@ namespace RobotFactory
 		static constexpr auto WEST = "WEST";
 	}
 
+	static std::unordered_set<std::string> directions{ ROBOT_DIRECTION::NORTH, ROBOT_DIRECTION::SOUTH, ROBOT_DIRECTION::EAST, ROBOT_DIRECTION::WEST };
 	/**
 	* @brief A Robot abstract class that provides a typical robot interface.
 	*/
@@ -32,20 +32,23 @@ namespace RobotFactory
 	public:
 		Robot() noexcept
 		{
-			++m_robotID;
+			++m_ID;
+			m_robotID = m_ID;
 		}
 
 		Robot(const RobotLocation& location) noexcept : 
 			m_location{location}
 		{ 
-			++m_robotID; 
+			++m_ID;
+			m_robotID = m_ID;
 		}
 
 		Robot(const RobotLocation& location, std::string&& name) noexcept : 
 			m_location{location},
 			m_name{ name }
 		{
-			++m_robotID;
+			++m_ID;
+			m_robotID = m_ID;
 		}
 
 		virtual ~Robot() = default;
@@ -75,7 +78,8 @@ namespace RobotFactory
 
 	protected:
 		RobotLocation m_location;
-		std::string m_name{ "R2D2" };
-		size_t m_robotID{ 000 };
+		std::string m_name{ "Marvin" };
+		size_t m_robotID;
+		static size_t m_ID;
 	};
 }

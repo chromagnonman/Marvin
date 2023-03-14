@@ -1,41 +1,38 @@
 #include "RobotSimulator.h"
-#include "Robot.h"
 #include "Marvin.h"
 //#include "RobotCommandHandler.h"
+#include "Utils.h"
 
 #include <iostream>
 #include <vector>
 #include <csignal>
 #include <algorithm>
 #include <sstream>
-
-// TODO: Use unordered_set to look up a robot using its ID.
-//namespace {
-//
-//	struct HashKey {
-//		size_t operator()(const RobotFactory::Marvin& robot) const noexcept {
-//			// We'll just use the robot's unique id
-//			return robot.Id();
-//		}
-//	};
-//
-//	struct Comparator {
-//		bool operator()(const RobotFactory::Marvin& robot1, const RobotFactory::Marvin& robot2) const noexcept {
-//			return robot1.Id() != robot2.Id();
-//		}
-//	};
-//}
-
-namespace {
-	volatile std::sig_atomic_t signal_status;
-}
-
-void signal_handler(int signal)
-{
-	signal_status = signal;
-}
+#include <execution>
+#include <algorithm>
+#include <functional>
 
 namespace RobotWorldSimulator {
+
+	volatile std::sig_atomic_t signal_status;
+
+	void signal_handler(int signal)
+	{
+		signal_status = signal;
+	}
+
+	struct HashKey {
+		size_t operator()(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept {
+			// We'll just utilize the robot's unique id
+			return robot->Id();
+		}
+	};
+
+	struct Comparator {
+		bool operator()(const std::shared_ptr<RobotFactory::Robot>& robot1, const std::shared_ptr<RobotFactory::Robot>& robot2) const noexcept {
+			return robot1->Id() != robot2->Id();
+		}
+	};
 
 	struct RobotSimulator::impl {
 
@@ -52,13 +49,14 @@ namespace RobotWorldSimulator {
 
 	private:
 		RobotGrid& m_grid;
-		// TODO: Use set to look up a robot using its ID.
-		//std::unordered_set<RobotFactory::Marvin, HashKey, Comparator> m_robots;
-		std::vector<std::shared_ptr<RobotFactory::Robot>> m_robots;
+		std::unordered_set<std::shared_ptr<RobotFactory::Robot>, HashKey, Comparator> m_robots;
+
+		void execute(std::string& command) noexcept;
 	};
 
 	RobotSimulator::impl::impl(RobotGrid& grid) noexcept : m_grid{ grid }
 	{
+		m_robots.reserve(RobotWorldSimulator::DEFAULT_NUMBER_OF_ROBOTS);
 	}
 
 	void RobotSimulator::impl::start() noexcept
@@ -67,43 +65,91 @@ namespace RobotWorldSimulator {
 
 		std::signal(SIGINT, signal_handler);
 
-		std::cout << "Usage: PLACE X,Y, NORTH\n";
-		std::string input{};
-		std::stringstream ss;
+		std::string command{};
+		
+		//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	    //std::cin.imbue(std::locale{"en_US.UTF8"});
 
-		while (std::getline(std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'), input)) {
-			//std::cin.uppercase()
-			std::replace(input.begin(), input.end(), ',', ' ');
-			ss << input;
-			std::cout << input<< std::endl;
-			input = "";
+		Utils::showMenu();
+
+		while (std::getline(std::cin, command)) {
+
+			execute(command);
 		}
 
-		end();
+		std::cout << "\nRobot excursion ended!\n";
+	}
+
+	void RobotSimulator::impl::execute(std::string& input) noexcept
+	{
+		// Replace extraneous characters with spaces
+		std::replace_if(std::execution::par_unseq, input.begin(), input.end(), [](const unsigned char c) noexcept {
+			return !isalnum(c);
+			}, ' ');
+
+		std::string command{};
+		std::string direction{};
+		size_t x{ 0 };
+		size_t y{ 0 };
+
+		{ // Extract the command from the input stream including the parameters
+			std::stringstream input_stream{ input };
+			input_stream >> command >> x >> y >> direction;
+		}
+
+		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
+		{
+			// Check if direction is valid
+			place({ x, y, Utils::getDirection(direction) });
+		}
+		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
+		{
+			rotateLeft();
+		}
+		else if (_stricmp(command.c_str(), COMMAND::RIGHT) == 0)
+		{
+			rotateRight();
+		}
+		else if (_stricmp(command.c_str(), COMMAND::MOVE) == 0)
+		{
+			move();
+		}
+		else if (_stricmp(command.c_str(), COMMAND::REPORT) == 0)
+		{
+			report();
+		}
+		else
+		{
+			std::cerr << "\nInvalid command!\n";
+		}
 	}
 
 	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location) noexcept
 	{
-		const auto robot = std::make_shared<RobotFactory::Marvin>(location);
+		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location);
 
-		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << "," 
-			<< location.y_coordinate << ")" << "direction: " << location.direction;
+		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nName: " << robot->name()
+			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
+			<< ")" << "\ndirection: " << location.direction << '\n';
 
-		m_robots.push_back(robot);
+		m_robots.insert(robot);
 		m_grid.addRobot(robot);
-		std::cout << "Number of robots: " << m_robots.size();
+
+		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
 	}
 
 	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
 	{
 		const auto robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
-		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << ","
-			<< location.y_coordinate << ")" << "direction: " << location.direction;
+		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nName: " << robot->name()
+			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
+			<< ")" << "\ndirection: " << location.direction << '\n';
 
-		m_robots.push_back(robot);
+		m_robots.insert(robot);
 		m_grid.addRobot(robot);
-		std::cout << "Number of robots: " << m_robots.size();
+
+		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
 	}
 
 	void RobotSimulator::impl::report() const noexcept
@@ -112,15 +158,15 @@ namespace RobotWorldSimulator {
 		for (const auto& robot : m_robots)
 		{
 			std::cout << "\nRobot ID: " << robot->Id();
-			std::cout << "\nRobot name: " << (robot->name().empty()) ? "unanmed" : robot->name();
+			std::cout << "\nRobot name: " << robot->name();
 			std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
-				<< ")," << robot->location().direction;
+				<< ")," << robot->location().direction << '\n';
 		}
 	}
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		std::cout << "\nMoving robot(s)";
+		std::cout << "\nRobot(s) moved\n";
 		for (auto& robot : m_robots)
 		{
 			const auto current_location = robot->location();
@@ -140,7 +186,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		std::cout << "\nRotating left...";
+		std::cout << "\nRobot turned left\n";
 		for (auto& robot : m_robots)
 		{
 			robot->rotate();
@@ -149,7 +195,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		std::cout << "\nRotating right...";
+		std::cout << "\nRobot shifted right.\n";
 		for (auto& robot : m_robots)
 		{
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);

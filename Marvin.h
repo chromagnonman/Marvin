@@ -13,7 +13,7 @@ namespace RobotFactory {
 	class Marvin : public Robot {
 	public:
 		Marvin(const RobotLocation& location) noexcept;
-		Marvin(const RobotLocation&, std::string name) noexcept;
+		Marvin(const RobotLocation&, std::string robot_name) noexcept;
 		Marvin(const Marvin&) noexcept;
 		Marvin& operator=(const Marvin&) noexcept;
 		virtual ~Marvin();
