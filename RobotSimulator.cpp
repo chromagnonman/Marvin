@@ -43,7 +43,8 @@ namespace RobotWorldSimulator {
 		void rotateLeft() noexcept;
 		void rotateRight() noexcept;
 		void end() noexcept;
-
+		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
+		
 	private:
 		RobotGrid& m_grid;
 		std::unordered_set<std::shared_ptr<RobotFactory::Robot>, HashKey, Comparator> m_robots;
@@ -205,6 +206,13 @@ namespace RobotWorldSimulator {
 		m_robots.clear();
 	}
 
+	std::shared_ptr<RobotFactory::Robot> RobotSimulator::impl::getRobot(const RobotFactory::RobotLocation& location) noexcept
+	{
+		return m_grid.getRobot(location);
+	}
+
+
+
 	RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
 	{
 	}
@@ -249,5 +257,10 @@ namespace RobotWorldSimulator {
 	void RobotSimulator::end() noexcept
 	{
 		m_pImpl->end();
+	}
+
+	std::shared_ptr<RobotFactory::Robot> RobotSimulator::getRobot(const RobotFactory::RobotLocation& location) noexcept
+	{
+		return m_pImpl->getRobot(location);
 	}
 }

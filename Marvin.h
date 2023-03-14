@@ -8,7 +8,6 @@ namespace RobotFactory {
 	/**
 	* @brief Defines a type called Marvin - a chronically depressed robot.
 	*/
-
 	class Marvin : public Robot {
 	public:
 		Marvin(const RobotLocation& location) noexcept;

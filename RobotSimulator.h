@@ -29,6 +29,7 @@ namespace RobotWorldSimulator {
 		void move() noexcept;
 		void rotateLeft() noexcept;
 		void rotateRight() noexcept;
+		
 		// TODO: Support issuing commands to a particular robot
 		void move(size_t robot_ID) noexcept;
 		void rotateLeft(size_t robot_ID) noexcept;
@@ -39,6 +40,9 @@ namespace RobotWorldSimulator {
 		void end() noexcept;
 		void end(size_t robot_ID) noexcept;
 
+		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
+		std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
+		std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
 	private:
 		struct impl;
 		std::unique_ptr<impl> m_pImpl;
