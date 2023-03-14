@@ -15,6 +15,9 @@ namespace RobotWorldSimulator{
 	static constexpr size_t DEFAULT_HEIGHT = 10;
 	static constexpr size_t DEFAULT_NUMBER_OF_ROBOTS = 10;
 
+	/**
+	* @brief Provides a 2D grid environment for Marvin - the paranoid android to explore.
+	*/
 	class RobotGrid {
 	public:
 		RobotGrid(size_t width = DEFAULT_WIDTH, size_t height = DEFAULT_HEIGHT) noexcept;
@@ -23,11 +26,16 @@ namespace RobotWorldSimulator{
 		virtual ~RobotGrid() noexcept;
 
 		void addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+
 		void updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+
+		void resize(size_t width, size_t height) noexcept;
+
 		[[nodiscard]] bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
-		[[nodiscard]] const GridSize& getGridSize() const noexcept;
-		void resizeGrid(size_t width, size_t height) noexcept;
-		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) const noexcept;
+
+		[[nodiscard]] const GridSize& getSize() const noexcept;
+
+		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) const noexcept;
 
 	private:
 		struct impl;

@@ -6,8 +6,8 @@ TEST(RobotGridTest, DefaultGridSize) {
 
 	RobotWorldSimulator::RobotGrid grid;
 
-	EXPECT_EQ(grid.getGridSize().height, RobotWorldSimulator::DEFAULT_HEIGHT);
-	EXPECT_EQ(grid.getGridSize().width, RobotWorldSimulator::DEFAULT_WIDTH);
+	EXPECT_EQ(grid.getSize().height, RobotWorldSimulator::DEFAULT_HEIGHT);
+	EXPECT_EQ(grid.getSize().width, RobotWorldSimulator::DEFAULT_WIDTH);
 
 	EXPECT_TRUE(grid.isOffTheGrid({ 11, 11, "NORTH"}));
 	EXPECT_FALSE(grid.isOffTheGrid({ 10, 10, "SOUTH" }));
@@ -17,8 +17,8 @@ TEST(RobotGridTest, CustomGridSize) {
 
 	RobotWorldSimulator::RobotGrid grid{ 5,5 };
 
-	EXPECT_EQ(grid.getGridSize().height, 5);
-	EXPECT_EQ(grid.getGridSize().width, 5);
+	EXPECT_EQ(grid.getSize().height, 5);
+	EXPECT_EQ(grid.getSize().width, 5);
 
 	EXPECT_TRUE(grid.isOffTheGrid({ 11, 11, "NORTH" }));
 	EXPECT_FALSE(grid.isOffTheGrid({ 5, 5, "SOUTH" }));
@@ -29,12 +29,12 @@ TEST(RobotGridTest, ResizeGrid) {
 	// Initialize to 5 X 5
 	RobotWorldSimulator::RobotGrid grid{ 5,5 };
 
-	EXPECT_EQ(grid.getGridSize().height, 5);
-	EXPECT_EQ(grid.getGridSize().width, 5);
+	EXPECT_EQ(grid.getSize().height, 5);
+	EXPECT_EQ(grid.getSize().width, 5);
 
 	EXPECT_TRUE(grid.isOffTheGrid({ 10, 10, "NORTH" }));
 
-	grid.resizeGrid(10, 10);
+	grid.resize(10, 10);
 
 	EXPECT_FALSE(grid.isOffTheGrid({ 10, 10, "NORTH" }));
 }

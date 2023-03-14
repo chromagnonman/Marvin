@@ -35,7 +35,7 @@ namespace RobotWorldSimulator {
 		void rotateRight(size_t robot_ID) noexcept;
 		void report(size_t robot_ID) noexcept;
 
-		// TODO: Modify this to end the robot's meandering
+		// TODO: Modify these to end the robot's meandering
 		void end() noexcept;
 		void end(size_t robot_ID) noexcept;
 

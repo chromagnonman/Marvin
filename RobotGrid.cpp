@@ -12,10 +12,15 @@ namespace RobotWorldSimulator {
 		impl(GridSize&& gridSz) noexcept;
 
 		void addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+
 		void updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+
 		bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
-		const GridSize& getGridSize() const noexcept;
-		void resizeGrid(const GridSize& gridSz) noexcept;
+
+		const GridSize& getSize() const noexcept;
+
+		void resize(const GridSize& gridSz) noexcept;
+
 		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) const noexcept;
 
 	private:
@@ -24,7 +29,7 @@ namespace RobotWorldSimulator {
 
 	};
 
-	void RobotGrid::impl::resizeGrid(const GridSize& gridSz) noexcept
+	void RobotGrid::impl::resize(const GridSize& gridSz) noexcept
 	{
 		m_grid.resize(gridSz.height);
 		for (size_t i = 0; i < gridSz.height; i++)
@@ -38,7 +43,7 @@ namespace RobotWorldSimulator {
 	RobotGrid::impl::impl(GridSize&& gridSz) noexcept : m_gridSz{ gridSz }
 	{
 		// Initialize grid for random access
-		resizeGrid(gridSz);
+		resize(gridSz);
 	}
 
 	bool RobotGrid::impl::isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept
@@ -75,7 +80,7 @@ namespace RobotWorldSimulator {
 		return nullptr;
 	}
 
-	const GridSize& RobotGrid::impl::getGridSize() const noexcept
+	const GridSize& RobotGrid::impl::getSize() const noexcept
 	{
 		return m_gridSz;
 	}
@@ -120,14 +125,14 @@ namespace RobotWorldSimulator {
 		return m_pImpl->isOffTheGrid(location);
 	}
 
-	const GridSize& RobotGrid::getGridSize() const noexcept
+	const GridSize& RobotGrid::getSize() const noexcept
 	{
-		return m_pImpl->getGridSize();
+		return m_pImpl->getSize();
 	}
 
-	void RobotGrid::resizeGrid(size_t width, size_t height) noexcept
+	void RobotGrid::resize(size_t width, size_t height) noexcept
 	{
-		m_pImpl->resizeGrid(GridSize{ width, height });
+		m_pImpl->resize(GridSize{ width, height });
 	}
 
 	std::shared_ptr<RobotFactory::Robot> RobotGrid::getRobot(const RobotFactory::RobotLocation& location) const noexcept
