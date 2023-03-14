@@ -1,15 +1,13 @@
-#include "RobotSimulator.h"
-#include "Marvin.h"
-#include "Utils.h"
-
 #include <iostream>
 #include <vector>
 #include <csignal>
-#include <algorithm>
 #include <sstream>
 #include <execution>
 #include <algorithm>
-#include <functional>
+
+#include "RobotSimulator.h"
+#include "Marvin.h"
+#include "Utils.h"
 
 namespace RobotWorldSimulator {
 

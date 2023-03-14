@@ -1,6 +1,9 @@
-#include "RobotGrid.h"
+
 #include <vector>
 #include <iostream>
+
+#include "RobotGrid.h"
+
 
 namespace RobotWorldSimulator {
 

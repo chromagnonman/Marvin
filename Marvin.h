@@ -2,7 +2,6 @@
 
 #include "Robot.h"
 #include "RobotGrid.h"
-#include <memory>
 
 namespace RobotFactory {
 

@@ -1,15 +1,10 @@
 #pragma once
 
-#include "Robot.h"
-#include "RobotGrid.h"
-
 #include <memory>
 #include <unordered_set>
 
-
-/**
-* @brief 
-*/
+#include "Robot.h"
+#include "RobotGrid.h"
 
 namespace RobotWorldSimulator {
 
@@ -20,8 +15,6 @@ namespace RobotWorldSimulator {
 		static constexpr auto RIGHT = "RIGHT";
 		static constexpr auto REPORT = "REPORT";
 	}
-
-	//static std::unordered_set<std::string> commands{ COMMAND::PLACE, COMMAND::MOVE, COMMAND::LEFT, COMMAND::RIGHT, COMMAND::REPORT };
 
 
 	class RobotSimulator {

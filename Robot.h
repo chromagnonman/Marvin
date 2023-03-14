@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 
 namespace RobotFactory
 {
@@ -24,7 +23,6 @@ namespace RobotFactory
 		static constexpr auto WEST = "WEST";
 	}
 
-	static std::unordered_set<std::string> directions{ ROBOT_DIRECTION::NORTH, ROBOT_DIRECTION::SOUTH, ROBOT_DIRECTION::EAST, ROBOT_DIRECTION::WEST };
 	/**
 	* @brief A Robot abstract class that provides a typical robot interface.
 	*/

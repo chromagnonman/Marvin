@@ -1,5 +1,4 @@
 #include "Marvin.h"
-#include <iostream>
 
 namespace RobotFactory {
 
