@@ -7,9 +7,9 @@ namespace RobotFactory
 {
 	
 	struct RobotLocation {
-		size_t x_coordinate;
-		size_t y_coordinate;
-		std::string direction;
+		size_t x_coordinate{};
+		size_t y_coordinate{};
+		std::string direction{};
 	};
 
 	enum class ROBOT_ROTATION : size_t {
