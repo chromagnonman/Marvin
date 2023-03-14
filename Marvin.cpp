@@ -39,19 +39,19 @@ namespace RobotFactory {
 
 	void Marvin::move() noexcept
 	{
-		if (m_location.direction == "NORTH")
+		if (m_location.direction == ROBOT_DIRECTION::NORTH)
 		{
 			m_location.y_coordinate++;
 		}
-		else if (m_location.direction == "SOUTH")
+		else if (m_location.direction == ROBOT_DIRECTION::SOUTH)
 		{
 			m_location.y_coordinate--;
 		}
-		else if (m_location.direction == "EAST")
+		else if (m_location.direction == ROBOT_DIRECTION::EAST)
 		{
 			m_location.x_coordinate++;
 		}
-		else if (m_location.direction == "WEST")
+		else if (m_location.direction == ROBOT_DIRECTION::WEST)
 		{
 			m_location.x_coordinate--;
 		}
@@ -59,21 +59,21 @@ namespace RobotFactory {
 
 	void Marvin::rotate(const ROBOT_ROTATION& rotate_direction) noexcept
 	{
-		if (m_location.direction == "NORTH") 
+		if (m_location.direction == ROBOT_DIRECTION::NORTH)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = "WEST" : m_location.direction = "EAST";
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::WEST : m_location.direction = ROBOT_DIRECTION::EAST;
 		}
-		else if (m_location.direction == "SOUTH") 
+		else if (m_location.direction == ROBOT_DIRECTION::SOUTH)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = "EAST" : m_location.direction = "WEST";
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::EAST : m_location.direction = ROBOT_DIRECTION::WEST;
 		}
-		else if (m_location.direction == "EAST")
+		else if (m_location.direction == ROBOT_DIRECTION::EAST)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = "NORTH" : m_location.direction = "SOUTH";
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::NORTH : m_location.direction = ROBOT_DIRECTION::SOUTH;
 		}
-		else if (m_location.direction == "WEST")
+		else if (m_location.direction == ROBOT_DIRECTION::WEST)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = "SOUTH" : m_location.direction = "NORTH";
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::SOUTH : m_location.direction = ROBOT_DIRECTION::NORTH;
 		}
 	}
 }

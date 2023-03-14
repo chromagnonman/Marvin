@@ -7,14 +7,6 @@ namespace RobotFactory
 {
 	
 	struct RobotLocation {
-
-		/*enum class DIRECTION : size_t {
-			SOUTH = 0,
-			WEST,
-			EAST,
-			NORTH
-		};*/
-
 		size_t x_coordinate;
 		size_t y_coordinate;
 		std::string direction;
@@ -25,7 +17,13 @@ namespace RobotFactory
 		RIGHT
 	};
 
-	static std::unordered_set<std::string> direction{ "NORTH", "SOUTH", "EAST", "WEST" };
+	//static std::unordered_set<std::string> direction{ "NORTH", "SOUTH", "EAST", "WEST" };
+	namespace ROBOT_DIRECTION {
+		static constexpr auto NORTH = "NORTH";
+		static constexpr auto SOUTH = "SOUTH";
+		static constexpr auto EAST = "EAST";
+		static constexpr auto WEST = "WEST";
+	}
 
 	/**
 	* @brief A Robot abstract class that provides a typical robot interface.

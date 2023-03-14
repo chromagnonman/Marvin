@@ -25,23 +25,25 @@ namespace RobotWorldSimulator {
 
 	bool RobotGrid::impl::isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept
 	{
-		return (location.x_coordinate > m_gridSz.width && location.y_coordinate > m_gridSz.height)
-			|| (location.x_coordinate < 0 && location.y_coordinate < 0);
+		return location.x_coordinate > m_gridSz.width || location.y_coordinate > m_gridSz.height
+			|| location.x_coordinate < 0 || location.y_coordinate < 0;
 	}
 
 	void RobotGrid::impl::addRobot(std::shared_ptr<RobotFactory::Robot> robot) noexcept
 	{
-		std::cout << "addRobot\n";
+		std::cout << "\naddRobot";
 		const auto location = robot->location();
 
-		if (!isOffTheGrid(location)) {
+		if (!isOffTheGrid(location)) // TODO: Also check if location is already occupied by another robot.
+		{
 			m_grid[location.x_coordinate][location.y_coordinate] = robot;
 		}
 	}
 
 	void RobotGrid::impl::updateLocation(const RobotFactory::RobotLocation& prev_location, std::shared_ptr<RobotFactory::Robot> robot) noexcept
 	{
-		std::cout << "Update robot location\n";
+		std::cout << "\nUpdate robot location";
+		// TODO: Also check if location is already occupied by another robot.
 		m_grid[prev_location.x_coordinate][prev_location.y_coordinate] = nullptr;
 		m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = robot;
 	}
@@ -78,13 +80,13 @@ namespace RobotWorldSimulator {
 
 	void RobotGrid::addRobot(std::shared_ptr<RobotFactory::Robot> robot) noexcept
 	{
-		std::cout << "addRobot\n";
+		std::cout << "\naddRobot";
 		m_pImpl->addRobot(robot);
 	}
 
 	void RobotGrid::updateLocation(const RobotFactory::RobotLocation& prev_location, std::shared_ptr<RobotFactory::Robot> robot) noexcept
 	{
-		std::cout << "moveRobot\n";
+		std::cout << "\nmoveRobot";
 		m_pImpl->updateLocation(prev_location, robot);
 	}
 
@@ -96,7 +98,7 @@ namespace RobotWorldSimulator {
 	const GridSize& RobotGrid::getGridSize() const noexcept
 	{
 		return m_pImpl->getGridSize();
-		std::cout << "getGridSize\n";
+		std::cout << "\ngetGridSize";
 	}
 
 

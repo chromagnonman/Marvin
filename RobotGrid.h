@@ -11,9 +11,12 @@ namespace RobotWorldSimulator{
 		size_t height;
 	};
 
+	static constexpr size_t default_width = 5;
+	static constexpr size_t default_height = 5;
+
 	class RobotGrid {
 	public:
-		RobotGrid(size_t width = 5, size_t height = 5) noexcept;
+		RobotGrid(size_t width = default_width, size_t height = default_height) noexcept;
 		RobotGrid(const RobotGrid&) noexcept;
 		RobotGrid& operator=(const RobotGrid&) noexcept;
 		virtual ~RobotGrid() noexcept;

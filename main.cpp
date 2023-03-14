@@ -1,16 +1,11 @@
-#include <iostream>
-#include <limits>
-#include <string>
-#include <csignal>
-
 #include "RobotSimulator.h"
 
 int main()
 {
     RobotWorldSimulator::RobotGrid grid(5, 5);
-    RobotWorldSimulator::RobotSimulator robot_simulate(grid);
+    RobotWorldSimulator::RobotSimulator simulator(grid);
 
-    robot_simulate.start();
+    simulator.start();
     
     return 0;
 

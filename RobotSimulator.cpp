@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 #include <csignal>
+#include <algorithm>
+#include <sstream>
 
 // TODO: Use unordered_set to look up a robot using its ID.
 //namespace {
@@ -61,16 +63,20 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::start() noexcept
 	{
-		std::cout << "Robot excursion started!\n";
+		std::cout << "Robot excursion started!" << std::endl;
 
 		std::signal(SIGINT, signal_handler);
 
-		std::cout << "do something: ";
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		std::string input;
-		    
-		while (std::getline(std::cin, input)) {
-			std::cout << '\n' << input;
+		std::cout << "Usage: PLACE X,Y, NORTH\n";
+		std::string input{};
+		std::stringstream ss;
+
+		while (std::getline(std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'), input)) {
+			//std::cin.uppercase()
+			std::replace(input.begin(), input.end(), ',', ' ');
+			ss << input;
+			std::cout << input<< std::endl;
+			input = "";
 		}
 
 		end();
@@ -80,8 +86,8 @@ namespace RobotWorldSimulator {
 	{
 		const auto robot = std::make_shared<RobotFactory::Marvin>(location);
 
-		std::cout << "Robot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << "," 
-			<< location.y_coordinate << ")";
+		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << "," 
+			<< location.y_coordinate << ")" << "direction: " << location.direction;
 
 		m_robots.push_back(robot);
 		m_grid.addRobot(robot);
@@ -92,8 +98,8 @@ namespace RobotWorldSimulator {
 	{
 		const auto robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
-		std::cout << "Robot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << ","
-			<< location.y_coordinate << ")";
+		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nLocation(" << location.x_coordinate << ","
+			<< location.y_coordinate << ")" << "direction: " << location.direction;
 
 		m_robots.push_back(robot);
 		m_grid.addRobot(robot);
@@ -105,22 +111,22 @@ namespace RobotWorldSimulator {
 		std::cout << "Robot info:\n";
 		for (const auto& robot : m_robots)
 		{
-			std::cout << "Robot ID: " << robot->Id() << '\n';
-			std::cout << "Robot name: " << (robot->name().empty() ? "unanmed" : robot->name()) << "\n";
-			std::cout << "Robot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate 
-				<< ")," << robot->location().direction << '\n';
+			std::cout << "\nRobot ID: " << robot->Id();
+			std::cout << "\nRobot name: " << (robot->name().empty()) ? "unanmed" : robot->name();
+			std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
+				<< ")," << robot->location().direction;
 		}
 	}
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		std::cout << "Moving robot(s)\n";
+		std::cout << "\nMoving robot(s)";
 		for (auto& robot : m_robots)
 		{
 			const auto current_location = robot->location();
 			robot->move();
 
-			if (!m_grid.isOffTheGrid(robot->location()))
+			if (!m_grid.isOffTheGrid(robot->location())) // TODO: Also check if location is already occupied by another robot.
 			{
 				m_grid.updateLocation(current_location, robot);
 			}
@@ -134,7 +140,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		std::cout << "Rotating left...\n";
+		std::cout << "\nRotating left...";
 		for (auto& robot : m_robots)
 		{
 			robot->rotate();
@@ -143,7 +149,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		std::cout << "Rotating right...\n";
+		std::cout << "\nRotating right...";
 		for (auto& robot : m_robots)
 		{
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
@@ -172,9 +178,9 @@ namespace RobotWorldSimulator {
 		m_pImpl->place(location);
 	}
 
-	void RobotSimulator::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
+	void RobotSimulator::place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept
 	{
-		m_pImpl->place(location, name);
+		m_pImpl->place(location, robot_name);
 	}
 
 	void RobotSimulator::report() const noexcept
