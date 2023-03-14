@@ -16,6 +16,7 @@ namespace RobotWorldSimulator {
 		bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
 		const GridSize& getGridSize() const noexcept;
 		void resizeGrid(const GridSize& gridSz) noexcept;
+		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) const noexcept;
 
 	private:
 		std::vector<std::vector<std::shared_ptr<RobotFactory::Robot>>> m_grid;
@@ -30,6 +31,8 @@ namespace RobotWorldSimulator {
 		{
 			m_grid[i].resize(gridSz.width);
 		}
+
+		m_gridSz = gridSz;
 	}
 
 	RobotGrid::impl::impl(GridSize&& gridSz) noexcept : m_gridSz{ gridSz }
@@ -60,6 +63,16 @@ namespace RobotWorldSimulator {
 		// TODO: Also check if location is already occupied by another robot.
 		m_grid[prev_location.x_coordinate][prev_location.y_coordinate] = nullptr;
 		m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = robot;
+	}
+
+	std::shared_ptr<RobotFactory::Robot> RobotGrid::impl::getRobot(const RobotFactory::RobotLocation& location) const noexcept
+	{
+		if (!isOffTheGrid(location))
+		{
+			return m_grid[location.x_coordinate][location.y_coordinate];
+		}
+
+		return nullptr;
 	}
 
 	const GridSize& RobotGrid::impl::getGridSize() const noexcept
@@ -117,6 +130,10 @@ namespace RobotWorldSimulator {
 		m_pImpl->resizeGrid(GridSize{ width, height });
 	}
 
+	std::shared_ptr<RobotFactory::Robot> RobotGrid::getRobot(const RobotFactory::RobotLocation& location) const noexcept
+	{
+		return m_pImpl->getRobot(location);
+	}
 
 
 }

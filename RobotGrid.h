@@ -27,6 +27,7 @@ namespace RobotWorldSimulator{
 		[[nodiscard]] bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
 		[[nodiscard]] const GridSize& getGridSize() const noexcept;
 		void resizeGrid(size_t width, size_t height) noexcept;
+		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) const noexcept;
 
 	private:
 		struct impl;
