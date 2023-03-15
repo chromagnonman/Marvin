@@ -47,7 +47,7 @@ namespace TestRobotGrid {
 		RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
 		const std::string name{ "NEO" };
 
-		const auto robot = std::make_shared<RobotFactory::Marvin>(location, name);
+		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
 		grid.addRobot(robot);
 
@@ -62,7 +62,7 @@ namespace TestRobotGrid {
 		RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
 		const std::string name{ "NEO" };
 
-		const auto robot = std::make_shared<RobotFactory::Marvin>(location, name);
+		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
 		grid.addRobot(robot);
 
@@ -81,5 +81,23 @@ namespace TestRobotGrid {
 		EXPECT_EQ(matrix2.x_coordinate, new_location.x_coordinate);
 		EXPECT_EQ(matrix2.y_coordinate, new_location.y_coordinate);
 		EXPECT_EQ(matrix2.direction, new_location.direction);
+	}
+
+	TEST(TestRobotGrid, RobotOffTheGrid)
+	{
+		RobotWorldSimulator::RobotGrid grid; // Default size is 10x10
+		RobotFactory::RobotLocation location{ 20, 20, "NORTH" };
+
+		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location);
+		
+		EXPECT_TRUE(grid.isOffTheGrid(robot));
+
+		// Robot's location should be set to 0
+		EXPECT_EQ(robot->location().x_coordinate, 0);
+		EXPECT_EQ(robot->location().y_coordinate, 0);
+		
+		robot->move(); // Move up Y should be incremented
+		EXPECT_FALSE(grid.isOffTheGrid(robot));
+		EXPECT_GT(robot->location().y_coordinate, 0);
 	}
 }

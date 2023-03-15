@@ -25,12 +25,14 @@ namespace RobotWorldSimulator{
 		RobotGrid& operator=(const RobotGrid&) noexcept;
 		virtual ~RobotGrid() noexcept;
 
-		void addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+		void addRobot(std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
 
 		void updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
 
 		void resize(size_t width, size_t height) noexcept;
 
+		[[nodiscard]] bool isOffTheGrid(std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+		
 		[[nodiscard]] bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
 
 		[[nodiscard]] const GridSize& getSize() const noexcept;

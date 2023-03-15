@@ -11,9 +11,11 @@ namespace RobotWorldSimulator {
 
 		impl(GridSize&& gridSz) noexcept;
 
-		void addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+		void addRobot(std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
 
 		void updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
+
+		bool isOffTheGrid(std::shared_ptr<RobotFactory::Robot>& robot) noexcept;
 
 		bool isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept;
 
@@ -46,19 +48,30 @@ namespace RobotWorldSimulator {
 		resize(gridSz);
 	}
 
+	bool RobotGrid::impl::isOffTheGrid(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	{
+		if (robot->location().x_coordinate > m_gridSz.width || robot->location().y_coordinate > m_gridSz.height
+			|| robot->location().x_coordinate < 0 || robot->location().y_coordinate < 0)
+		{
+			// Set to 0,0 if robot is outside the grid.
+			robot->setLocation({ 0, 0, robot->location().direction });
+			return true;
+		}
+
+		return false;
+	}
+
 	bool RobotGrid::impl::isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept
 	{
 		return location.x_coordinate > m_gridSz.width || location.y_coordinate > m_gridSz.height
 			|| location.x_coordinate < 0 || location.y_coordinate < 0;
 	}
 
-	void RobotGrid::impl::addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	void RobotGrid::impl::addRobot(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
-		const auto location = robot->location();
-
-		if (!isOffTheGrid(location)) // TODO: Also check if location is already occupied by another robot.
+		if (!isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
 		{
-			m_grid[location.x_coordinate][location.y_coordinate] = robot;
+			m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = robot;
 		}
 	}
 
@@ -110,7 +123,7 @@ namespace RobotWorldSimulator {
 
 	RobotGrid::~RobotGrid() = default;
 
-	void RobotGrid::addRobot(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	void RobotGrid::addRobot(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
 		m_pImpl->addRobot(robot);
 	}
@@ -118,6 +131,11 @@ namespace RobotWorldSimulator {
 	void RobotGrid::updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
 		m_pImpl->updateLocation(prev_location, robot);
+	}
+
+	bool RobotGrid::isOffTheGrid(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	{
+		return m_pImpl->isOffTheGrid(robot);
 	}
 
 	bool RobotGrid::isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept

@@ -134,7 +134,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
 	{
-		const auto robot = std::make_shared<RobotFactory::Marvin>(location, name);
+		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
 		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nName: " << robot->name()
 			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
@@ -166,7 +166,7 @@ namespace RobotWorldSimulator {
 			const auto current_location = robot->location();
 			robot->move();
 
-			if (!m_grid.isOffTheGrid(robot->location())) // TODO: Also check if location is already occupied by another robot.
+			if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
 			{
 				m_grid.updateLocation(current_location, robot);
 			}
