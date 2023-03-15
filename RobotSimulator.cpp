@@ -19,19 +19,6 @@ namespace RobotWorldSimulator {
 		signal_status = signal;
 	}
 
-	//struct HashKey {
-	//	size_t operator()(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept {
-	//		// We'll just utilize the robot's unique id
-	//		return robot->Id();
-	//	}
-	//};
-
-	//struct Comparator {
-	//	bool operator()(const std::shared_ptr<RobotFactory::Robot>& robot1, const std::shared_ptr<RobotFactory::Robot>& robot2) const noexcept {
-	//		return robot1->Id() != robot2->Id();
-	//	}
-	//};
-
 	struct RobotSimulator::impl {
 
 		impl(RobotGrid& world) noexcept;
@@ -49,7 +36,6 @@ namespace RobotWorldSimulator {
 		
 	private:
 		RobotGrid& m_grid;
-		//std::unordered_set<std::shared_ptr<RobotFactory::Robot>, HashKey, Comparator> m_robots;
 		std::unordered_map<size_t, std::shared_ptr<RobotFactory::Robot>> m_robots;
 
 		void execute(std::string& command) noexcept;
