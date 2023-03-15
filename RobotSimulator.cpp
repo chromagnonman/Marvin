@@ -148,9 +148,9 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::report() const noexcept
 	{
-		std::cout << "Robot info:\n";
 		for (const auto& [_, robot] : m_robots)
 		{
+			std::cout << "Robot info:\n";
 			std::cout << "\nRobot ID: " << robot->Id();
 			std::cout << "\nRobot name: " << robot->name();
 			std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
@@ -160,9 +160,9 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		std::cout << "\nRobot(s) moved\n";
 		for (auto& [_, robot] : m_robots)
 		{
+			std::cout << "\nRobot(s) moved\n";
 			const auto current_location = robot->location();
 			robot->move();
 
@@ -180,18 +180,18 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		std::cout << "\nRobot turned left\n";
 		for (auto& [_, robot] : m_robots)
 		{
+			std::cout << "\nRobot turned left\n";
 			robot->rotate();
 		}
 	}
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		std::cout << "\nRobot shifted right.\n";
 		for (auto& [_, robot] : m_robots)
 		{
+			std::cout << "\nRobot shifted right.\n";
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 		}
 	}
