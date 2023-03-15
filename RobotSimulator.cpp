@@ -162,12 +162,12 @@ namespace RobotWorldSimulator {
 	{
 		for (auto& [_, robot] : m_robots)
 		{
-			std::cout << "\nRobot(s) moved\n";
 			const auto current_location = robot->location();
 			robot->move();
 
 			if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
 			{
+				std::cout << "\nRobot(s) moved\n";
 				m_grid.updateLocation(current_location, robot);
 			}
 			else
