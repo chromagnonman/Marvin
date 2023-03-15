@@ -84,6 +84,13 @@ namespace RobotWorldSimulator {
 			input_stream >> command >> x >> y >> direction;
 		}
 
+		// If XY is off the grid, set them to 0
+		if (x >= m_grid.getSize().width || y >= m_grid.getSize().height)
+		{
+			x = 0;
+			y = 0;
+		}
+
 		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
 		{
 			// Check if direction is valid
