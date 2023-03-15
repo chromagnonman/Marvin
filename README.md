@@ -34,7 +34,7 @@ Prequisites:
 - You might also need to update the `Additional Library Directories`.
 
 	![IncludeDirectories](IncludeDirectories.png)
-- Lastly, you will probably need to set the Runtime Library to `Multi-threaded (/MT)`.
+- Lastly, you will probably need to set the `Runtime Library` to `Multi-threaded (/MT)`.
 
 	![RuntimeLibrary](RuntimeLibrary.png)
 	
