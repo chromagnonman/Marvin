@@ -50,8 +50,8 @@ namespace RobotWorldSimulator {
 
 	bool RobotGrid::impl::isOffTheGrid(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
-		if (robot->location().x_coordinate >= m_gridSz.width || robot->location().y_coordinate >= m_gridSz.height
-			|| robot->location().x_coordinate <= 0 || robot->location().y_coordinate <= 0)
+		if (robot->location().x_coordinate > m_gridSz.width || robot->location().y_coordinate > m_gridSz.height
+			|| robot->location().x_coordinate < 0 || robot->location().y_coordinate < 0)
 		{
 			// Set to 0,0 if robot is outside the grid.
 			robot->setLocation({ 0, 0, robot->location().direction });
@@ -63,8 +63,8 @@ namespace RobotWorldSimulator {
 
 	bool RobotGrid::impl::isOffTheGrid(const RobotFactory::RobotLocation& location) const noexcept
 	{
-		return location.x_coordinate >= m_gridSz.width || location.y_coordinate >= m_gridSz.height
-			|| location.x_coordinate <= 0 || location.y_coordinate <= 0;
+		return location.x_coordinate > m_gridSz.width || location.y_coordinate > m_gridSz.height
+			|| location.x_coordinate < 0 || location.y_coordinate < 0;
 	}
 
 	void RobotGrid::impl::addRobot(std::shared_ptr<RobotFactory::Robot>& robot) noexcept
