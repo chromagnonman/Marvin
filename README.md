@@ -13,7 +13,7 @@ A simple Toy Robot console application written in C++. User can issue commands t
 ## Getting started
 Prequisites:
 - This is a Windows console application. Your machine should be running on Windows 11 or newer.
-- Install the latest Visual Studio IDE available online - the community edition should be sufficient.
+- Install the latest Visual Studio IDE available online with C++ 17 compiler or newer. The community edition should be sufficient.
 - Download the code or simply clone it:
 	```
 	git@github.com:chromagnonman/Marvin.git
@@ -31,10 +31,10 @@ Prequisites:
   of the `RobotSimulatorTest` project.
 
 	![Linker](Linker.png)
-- You might also need to update the Additional Libray Directories.
+- You might also need to update the Additional Library Directories.
 
 	![IncludeDirectories](IncludeDirectories.png)
-- Lastly, you probably need to set the Runtime Library to `Multi-threaded (/MT)`.
+- Lastly, you will probably need to set the Runtime Library to `Multi-threaded (/MT)`.
 
 	![RuntimeLibrary](RuntimeLibrary.png)
 	
