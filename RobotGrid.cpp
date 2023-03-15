@@ -77,7 +77,6 @@ namespace RobotWorldSimulator {
 
 	void RobotGrid::impl::updateLocation(const RobotFactory::RobotLocation& prev_location, const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
-		std::cout << "\nUpdated robot location.\n";
 		// TODO: Also check if location is already occupied by another robot.
 		m_grid[prev_location.x_coordinate][prev_location.y_coordinate] = nullptr;
 		m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = robot;

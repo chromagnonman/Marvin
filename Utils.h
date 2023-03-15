@@ -31,8 +31,9 @@ namespace Utils {
 	}
 
 	void showMenu() noexcept
-	{
-		std::cout << "\nUsage: PLACE X,Y, NORTH";
+	{	
+		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
+		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST)";
 		std::cout << "\n       MOVE";
 		std::cout << "\n       LEFT";
 		std::cout << "\n       RIGHT";

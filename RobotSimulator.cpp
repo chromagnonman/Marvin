@@ -48,8 +48,6 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::start() noexcept
 	{
-		std::cout << "Robot excursion started!" << std::endl;
-
 		std::signal(SIGINT, signal_handler);
 
 		std::string command{};
@@ -63,8 +61,6 @@ namespace RobotWorldSimulator {
 
 			execute(command);
 		}
-
-		std::cout << "\nRobot excursion ended!\n";
 	}
 
 	void RobotSimulator::impl::execute(std::string& input) noexcept
@@ -84,9 +80,10 @@ namespace RobotWorldSimulator {
 			input_stream >> command >> x >> y >> direction;
 		}
 
-		// If XY is off the grid, set them to 0
+		// If XY is greater than or equal to the default size, reset the location to zero. 
 		if (x >= m_grid.getSize().width || y >= m_grid.getSize().height)
 		{
+			// TODO: Resize the grid
 			x = 0;
 			y = 0;
 		}
@@ -150,7 +147,6 @@ namespace RobotWorldSimulator {
 	{
 		for (const auto& [_, robot] : m_robots)
 		{
-			std::cout << "Robot info:\n";
 			std::cout << "\nRobot ID: " << robot->Id();
 			std::cout << "\nRobot name: " << robot->name();
 			std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
@@ -160,14 +156,14 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		for (auto& [_, robot] : m_robots)
+		for (auto& [id, robot] : m_robots)
 		{
 			const auto current_location = robot->location();
 			robot->move();
 
 			if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
 			{
-				std::cout << "\nRobot(s) moved\n";
+				std::cout << "\nRobot[" << id << "] moved one unit forward heading " << robot->location().direction << '\n';
 				m_grid.updateLocation(current_location, robot);
 			}
 			else
@@ -180,18 +176,18 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		for (auto& [_, robot] : m_robots)
+		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot turned left\n";
+			std::cout << "\nRobot[" << id << "] turned left\n";
 			robot->rotate();
 		}
 	}
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		for (auto& [_, robot] : m_robots)
+		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot shifted right.\n";
+			std::cout << "\nRobot[" << id << "] shifted right.\n";
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 		}
 	}
