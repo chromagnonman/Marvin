@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <unordered_set>
 
 #include "Robot.h"
 #include "RobotGrid.h"
@@ -41,8 +40,10 @@ namespace RobotWorldSimulator {
 		void end(size_t robot_ID) noexcept;
 
 		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
-		std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
 		std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
+		// TODO:
+		std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
+
 	private:
 		struct impl;
 		std::unique_ptr<impl> m_pImpl;

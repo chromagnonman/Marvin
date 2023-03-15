@@ -4,6 +4,7 @@
 #include <sstream>
 #include <execution>
 #include <algorithm>
+#include <unordered_map>
 
 #include "RobotSimulator.h"
 #include "Marvin.h"
@@ -18,18 +19,18 @@ namespace RobotWorldSimulator {
 		signal_status = signal;
 	}
 
-	struct HashKey {
-		size_t operator()(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept {
-			// We'll just utilize the robot's unique id
-			return robot->Id();
-		}
-	};
+	//struct HashKey {
+	//	size_t operator()(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept {
+	//		// We'll just utilize the robot's unique id
+	//		return robot->Id();
+	//	}
+	//};
 
-	struct Comparator {
-		bool operator()(const std::shared_ptr<RobotFactory::Robot>& robot1, const std::shared_ptr<RobotFactory::Robot>& robot2) const noexcept {
-			return robot1->Id() != robot2->Id();
-		}
-	};
+	//struct Comparator {
+	//	bool operator()(const std::shared_ptr<RobotFactory::Robot>& robot1, const std::shared_ptr<RobotFactory::Robot>& robot2) const noexcept {
+	//		return robot1->Id() != robot2->Id();
+	//	}
+	//};
 
 	struct RobotSimulator::impl {
 
@@ -44,10 +45,12 @@ namespace RobotWorldSimulator {
 		void rotateRight() noexcept;
 		void end() noexcept;
 		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
+		std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
 		
 	private:
 		RobotGrid& m_grid;
-		std::unordered_set<std::shared_ptr<RobotFactory::Robot>, HashKey, Comparator> m_robots;
+		//std::unordered_set<std::shared_ptr<RobotFactory::Robot>, HashKey, Comparator> m_robots;
+		std::unordered_map<size_t, std::shared_ptr<RobotFactory::Robot>> m_robots;
 
 		void execute(std::string& command) noexcept;
 	};
@@ -130,7 +133,7 @@ namespace RobotWorldSimulator {
 			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
 			<< ")" << "\ndirection: " << location.direction << '\n';
 
-		m_robots.insert(robot);
+		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
 		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
@@ -144,7 +147,7 @@ namespace RobotWorldSimulator {
 			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
 			<< ")" << "\ndirection: " << location.direction << '\n';
 
-		m_robots.insert(robot);
+		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
 		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
@@ -153,7 +156,7 @@ namespace RobotWorldSimulator {
 	void RobotSimulator::impl::report() const noexcept
 	{
 		std::cout << "Robot info:\n";
-		for (const auto& robot : m_robots)
+		for (const auto& [_, robot] : m_robots)
 		{
 			std::cout << "\nRobot ID: " << robot->Id();
 			std::cout << "\nRobot name: " << robot->name();
@@ -165,7 +168,7 @@ namespace RobotWorldSimulator {
 	void RobotSimulator::impl::move() noexcept
 	{
 		std::cout << "\nRobot(s) moved\n";
-		for (auto& robot : m_robots)
+		for (auto& [_, robot] : m_robots)
 		{
 			const auto current_location = robot->location();
 			robot->move();
@@ -185,7 +188,7 @@ namespace RobotWorldSimulator {
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
 		std::cout << "\nRobot turned left\n";
-		for (auto& robot : m_robots)
+		for (auto& [_, robot] : m_robots)
 		{
 			robot->rotate();
 		}
@@ -194,7 +197,7 @@ namespace RobotWorldSimulator {
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
 		std::cout << "\nRobot shifted right.\n";
-		for (auto& robot : m_robots)
+		for (auto& [_, robot] : m_robots)
 		{
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 		}
@@ -211,7 +214,16 @@ namespace RobotWorldSimulator {
 		return m_grid.getRobot(location);
 	}
 
+	std::shared_ptr<RobotFactory::Robot> RobotSimulator::impl::getRobot(const size_t robot_id) noexcept
+	{
+		const auto found_robot = m_robots.find(robot_id);
+		if (found_robot != m_robots.end())
+		{
+			return found_robot->second;
+		}
 
+		return nullptr;
+	}
 
 	RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
 	{
@@ -262,5 +274,10 @@ namespace RobotWorldSimulator {
 	std::shared_ptr<RobotFactory::Robot> RobotSimulator::getRobot(const RobotFactory::RobotLocation& location) noexcept
 	{
 		return m_pImpl->getRobot(location);
+	}
+
+	std::shared_ptr<RobotFactory::Robot> RobotSimulator::getRobot(const size_t robot_id) noexcept
+	{
+		return m_pImpl->getRobot(robot_id);
 	}
 }
