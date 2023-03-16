@@ -80,7 +80,6 @@ namespace RobotWorldSimulator {
 
 		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
 		{
-			// Check if direction is valid
 			place({ x, y, Utils::getDirection(direction) });
 		}
 		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
@@ -114,7 +113,7 @@ namespace RobotWorldSimulator {
 		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
-		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
+		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
 	}
 
 	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
@@ -126,7 +125,7 @@ namespace RobotWorldSimulator {
 		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
-		std::cout << "\nNumber of robots: " << m_robots.size() << '\n';
+		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
 	}
 
 	void RobotSimulator::impl::report() const noexcept
