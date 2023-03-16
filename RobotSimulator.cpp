@@ -12,13 +12,6 @@
 
 namespace RobotWorldSimulator {
 
-	volatile std::sig_atomic_t signal_status;
-
-	void signal_handler(int signal)
-	{
-		signal_status = signal;
-	}
-
 	struct RobotSimulator::impl {
 
 		impl(RobotGrid& world) noexcept;
@@ -48,7 +41,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::start() noexcept
 	{
-		std::signal(SIGINT, signal_handler);
+		std::signal(SIGINT, Utils::signal_handler);
 
 		std::string command{};
 		

@@ -7,7 +7,14 @@
 
 namespace Utils {
 
-	static std::string getDirection(const std::string& direction) noexcept
+	volatile std::sig_atomic_t signal_status;
+
+	void signal_handler(int signal)
+	{
+		signal_status = signal;
+	}
+
+	std::string getDirection(const std::string& direction) noexcept
 	{
 		using namespace RobotFactory::ROBOT_DIRECTION;
 		if (_stricmp(direction.c_str(), NORTH) == 0)
@@ -30,7 +37,7 @@ namespace Utils {
 		return NORTH;
 	}
 
-	static void showMenu() noexcept
+	void showMenu() noexcept
 	{	
 		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
 		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST)";
@@ -41,7 +48,7 @@ namespace Utils {
 		std::cout << "\n\n> ";
 	}
 
-	static void showReport(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	void showReport(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
 	{
 		std::cout << "\nRobot ID: " << robot->Id();
 		std::cout << "\nRobot name: " << robot->name();

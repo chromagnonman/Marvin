@@ -15,7 +15,6 @@ namespace RobotWorldSimulator {
 		static constexpr auto REPORT = "REPORT";
 	}
 
-
 	class RobotSimulator {
 	public:
 		explicit RobotSimulator(RobotGrid& world) noexcept;
