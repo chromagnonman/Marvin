@@ -168,6 +168,7 @@ namespace RobotWorldSimulator {
 			}
 			else
 			{
+				std::cout << "\nRobot[" << id << "] is already at the edge of the grid facing " << robot->location().direction << '\n';
 				// Revert to previous location
 				robot->setLocation(current_location);
 			}
@@ -178,8 +179,8 @@ namespace RobotWorldSimulator {
 	{
 		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot[" << id << "] turned left facing" << robot->location().direction << '\n';
 			robot->rotate();
+			std::cout << "\nRobot[" << id << "] turned left facing " << robot->location().direction << '\n';
 		}
 	}
 
@@ -187,8 +188,8 @@ namespace RobotWorldSimulator {
 	{
 		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot[" << id << "] shifted right facing" << robot->location().direction << '\n';
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
+			std::cout << "\nRobot[" << id << "] shifted right facing " << robot->location().direction << '\n';
 		}
 	}
 
