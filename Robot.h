@@ -30,23 +30,20 @@ namespace RobotFactory
 	public:
 		Robot() noexcept
 		{
-			++m_ID;
-			m_robotID = m_ID;
+			m_robotID = ++m_ID;
 		}
 
 		Robot(const RobotLocation& location) noexcept : 
 			m_location{location}
 		{ 
-			++m_ID;
-			m_robotID = m_ID;
+			m_robotID = ++m_ID;
 		}
 
 		Robot(const RobotLocation& location, std::string&& name) noexcept : 
 			m_location{location},
 			m_name{ name }
 		{
-			++m_ID;
-			m_robotID = m_ID;
+			m_robotID = ++m_ID;
 		}
 
 		virtual ~Robot() = default;
