@@ -52,9 +52,6 @@ namespace RobotWorldSimulator {
 
 		std::string command{};
 		
-		//std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	    //std::cin.imbue(std::locale{"en_US.UTF8"});
-
 		Utils::showMenu();
 
 		while (std::getline(std::cin, command)) {
