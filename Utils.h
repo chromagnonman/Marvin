@@ -30,7 +30,7 @@ namespace Utils {
 		return NORTH;
 	}
 
-	void showMenu() noexcept
+	static void showMenu() noexcept
 	{	
 		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
 		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST)";
@@ -39,5 +39,13 @@ namespace Utils {
 		std::cout << "\n       RIGHT";
 		std::cout << "\n       REPORT";
 		std::cout << "\n\n> ";
+	}
+
+	static void showReport(const std::shared_ptr<RobotFactory::Robot>& robot) noexcept
+	{
+		std::cout << "\nRobot ID: " << robot->Id();
+		std::cout << "\nRobot name: " << robot->name();
+		std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
+			<< ")," << robot->location().direction << '\n';
 	}
 }

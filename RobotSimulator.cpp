@@ -119,9 +119,7 @@ namespace RobotWorldSimulator {
 	{
 		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location);
 
-		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nName: " << robot->name()
-			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
-			<< ")" << "\ndirection: " << location.direction << '\n';
+		Utils::showReport(robot);
 
 		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
@@ -133,9 +131,7 @@ namespace RobotWorldSimulator {
 	{
 		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
-		std::cout << "\nRobot[" << robot->Id() << "] created." << "\nName: " << robot->name()
-			<< "\nLocation: (" << location.x_coordinate << "," << location.y_coordinate
-			<< ")" << "\ndirection: " << location.direction << '\n';
+		Utils::showReport(robot);
 
 		m_robots.insert(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
@@ -147,10 +143,7 @@ namespace RobotWorldSimulator {
 	{
 		for (const auto& [_, robot] : m_robots)
 		{
-			std::cout << "\nRobot ID: " << robot->Id();
-			std::cout << "\nRobot name: " << robot->name();
-			std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
-				<< ")," << robot->location().direction << '\n';
+			Utils::showReport(robot);
 		}
 	}
 
