@@ -178,7 +178,7 @@ namespace RobotWorldSimulator {
 	{
 		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot[" << id << "] turned left\n";
+			std::cout << "\nRobot[" << id << "] turned left facing" << robot->location().direction << '\n';
 			robot->rotate();
 		}
 	}
@@ -187,7 +187,7 @@ namespace RobotWorldSimulator {
 	{
 		for (auto& [id, robot] : m_robots)
 		{
-			std::cout << "\nRobot[" << id << "] shifted right.\n";
+			std::cout << "\nRobot[" << id << "] shifted right facing" << robot->location().direction << '\n';
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 		}
 	}

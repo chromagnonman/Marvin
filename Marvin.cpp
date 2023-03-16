@@ -62,19 +62,19 @@ namespace RobotFactory {
 	{
 		if (m_location.direction == ROBOT_DIRECTION::NORTH)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::WEST : m_location.direction = ROBOT_DIRECTION::EAST;
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? ROBOT_DIRECTION::WEST : ROBOT_DIRECTION::EAST;
 		}
 		else if (m_location.direction == ROBOT_DIRECTION::SOUTH)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::EAST : m_location.direction = ROBOT_DIRECTION::WEST;
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? ROBOT_DIRECTION::EAST : ROBOT_DIRECTION::WEST;
 		}
 		else if (m_location.direction == ROBOT_DIRECTION::EAST)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::NORTH : m_location.direction = ROBOT_DIRECTION::SOUTH;
+			(rotate_direction == ROBOT_ROTATION::LEFT) ? ROBOT_DIRECTION::NORTH : ROBOT_DIRECTION::SOUTH;
 		}
 		else if (m_location.direction == ROBOT_DIRECTION::WEST)
 		{
-			(rotate_direction == ROBOT_ROTATION::LEFT) ? m_location.direction = ROBOT_DIRECTION::SOUTH : m_location.direction = ROBOT_DIRECTION::NORTH;
+			m_location.direction = (rotate_direction == ROBOT_ROTATION::LEFT) ?  ROBOT_DIRECTION::SOUTH : ROBOT_DIRECTION::NORTH;
 		}
 	}
 }
