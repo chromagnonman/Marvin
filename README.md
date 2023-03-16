@@ -1,5 +1,5 @@
 # Marvin (The Paranoid Android)
-A simple Toy Robot console application written in C++. A user can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
+A simple toy robot console application written in C++. A user can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
 
 ![Menu](Menu.png)
 
@@ -21,7 +21,7 @@ Prequisites:
 ## Running the application
 -  Open the entire solution or project by double-clicking on the `.sln` or `.vcxproj` file. Pressing `CTRL + F5` should run the console application.
 
-## Executing the Unit Tests
+## Executing the unit tests
 - The solution also contains `RobotSimulatorTest` project utilizing the Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
 
 	![TestExplorer](TestExplorer.png)
