@@ -45,7 +45,7 @@ namespace RobotWorldSimulator {
 
 		std::string command{};
 		
-		Utils::showMenu();
+		Utils::showUsage();
 
 		while (std::getline(std::cin, command)) {
 
@@ -61,13 +61,14 @@ namespace RobotWorldSimulator {
 			}, ' ');
 
 		std::string command{};
+		std::string name{};
 		std::string direction{};
 		size_t x{ 0 };
 		size_t y{ 0 };
 
 		{ // Extract the command from the input stream including the parameters
 			std::stringstream input_stream{ input };
-			input_stream >> command >> x >> y >> direction;
+			input_stream >> command >> x >> y >> direction >> name;
 		}
 
 		// If XY is greater than or equal to the default size, reset the location to zero. 
@@ -80,7 +81,7 @@ namespace RobotWorldSimulator {
 
 		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
 		{
-			place({ x, y, Utils::getDirection(direction) });
+			(name.empty()) ? place({ x, y, Utils::getDirection(direction) }) : place({ x, y, Utils::getDirection(direction) }, name);
 		}
 		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
 		{
@@ -110,7 +111,7 @@ namespace RobotWorldSimulator {
 
 		Utils::showReport(robot);
 
-		m_robots.insert(std::make_pair(robot->Id(), robot));
+		m_robots.emplace(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
 		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
@@ -122,7 +123,7 @@ namespace RobotWorldSimulator {
 
 		Utils::showReport(robot);
 
-		m_robots.insert(std::make_pair(robot->Id(), robot));
+		m_robots.emplace(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
 
 		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
@@ -130,6 +131,8 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::report() const noexcept
 	{
+		Utils::checkGrid(m_robots);
+
 		for (const auto& [_, robot] : m_robots)
 		{
 			Utils::showReport(robot);
@@ -138,19 +141,21 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		for (auto& [id, robot] : m_robots)
+		Utils::checkGrid(m_robots);
+
+		for (auto& [_, robot] : m_robots)
 		{
 			const auto current_location = robot->location();
 			robot->move();
 
 			if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
 			{
-				std::cout << "\nRobot[" << id << "] moved one unit forward heading " << robot->location().direction << '\n';
+				std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << '\n';
 				m_grid.updateLocation(current_location, robot);
 			}
 			else
 			{
-				std::cout << "\nRobot[" << id << "] is already at the edge of the grid facing " << robot->location().direction << '\n';
+				std::cout << '\n' << robot->name() << " is already at the edge of the grid, facing " << robot->location().direction << '\n';
 				// Revert to previous location
 				robot->setLocation(current_location);
 			}
@@ -159,19 +164,23 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		for (auto& [id, robot] : m_robots)
+		Utils::checkGrid(m_robots);
+
+		for (auto& [_, robot] : m_robots)
 		{
 			robot->rotate();
-			std::cout << "\nRobot[" << id << "] turned left facing " << robot->location().direction << '\n';
+			std::cout << '\n' << robot->name() << " turned left facing " << robot->location().direction << '\n';
 		}
 	}
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		for (auto& [id, robot] : m_robots)
+		Utils::checkGrid(m_robots);
+
+		for (auto& [_, robot] : m_robots)
 		{
 			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-			std::cout << "\nRobot[" << id << "] shifted right facing " << robot->location().direction << '\n';
+			std::cout << '\n' << robot->name() << " shifted right facing " << robot->location().direction << '\n';
 		}
 	}
 

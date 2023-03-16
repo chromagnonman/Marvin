@@ -37,10 +37,19 @@ namespace Utils {
 		return NORTH;
 	}
 
-	void showMenu() noexcept
+	void checkGrid(const std::unordered_map<size_t, std::shared_ptr<RobotFactory::Robot>>& robots) noexcept
+	{
+		if (robots.empty())
+		{
+			std::cout << "\nThere are not robots in the grid.\n";
+			return;
+		}
+	}
+
+	void showUsage() noexcept
 	{	
 		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
-		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST)";
+		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
 		std::cout << "\n       MOVE";
 		std::cout << "\n       LEFT";
 		std::cout << "\n       RIGHT";
