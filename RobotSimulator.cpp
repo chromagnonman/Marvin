@@ -76,7 +76,7 @@ namespace RobotWorldSimulator {
 	{
 		if (m_robots.empty())
 		{
-			std::cout << "\nThere are not robots in the grid.\n";
+			std::cout << "\nThere are no robots in the grid yet. Use Place command.\n";
 			return;
 		}
 	}
