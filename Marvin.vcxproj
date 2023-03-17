@@ -146,7 +146,6 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Utils.h" />
     <ClInclude Include="Marvin.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="RobotSimulator.h" />

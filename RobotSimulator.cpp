@@ -8,9 +8,15 @@
 
 #include "RobotSimulator.h"
 #include "Marvin.h"
-#include "Utils.h"
 
 namespace RobotWorldSimulator {
+
+	volatile std::sig_atomic_t signal_status;
+
+	void signal_handler(int signal)
+	{
+		signal_status = signal;
+	}
 
 	struct RobotSimulator::impl {
 
@@ -31,6 +37,10 @@ namespace RobotWorldSimulator {
 		RobotGrid& m_grid;
 		std::unordered_map<size_t, std::shared_ptr<RobotFactory::Robot>> m_robots;
 
+		std::string getDirection(const std::string& direction) const noexcept;
+		void checkGrid() const noexcept;
+		void showUsage() const noexcept;
+		void showReport(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept;
 		void execute(std::string& command) noexcept;
 	};
 
@@ -39,13 +49,64 @@ namespace RobotWorldSimulator {
 		m_robots.reserve(RobotWorldSimulator::DEFAULT_NUMBER_OF_ROBOTS);
 	}
 
+	std::string RobotSimulator::impl::getDirection(const std::string& direction) const noexcept
+	{
+		using namespace RobotFactory::ROBOT_DIRECTION;
+		if (_stricmp(direction.c_str(), NORTH) == 0)
+		{
+			return NORTH;
+		}
+		else if (_stricmp(direction.c_str(), SOUTH) == 0)
+		{
+			return SOUTH;
+		}
+		else if (_stricmp(direction.c_str(), EAST) == 0)
+		{
+			return EAST;
+		}
+		else if (_stricmp(direction.c_str(), WEST) == 0)
+		{
+			return WEST;
+		}
+
+		return NORTH;
+	}
+
+	void RobotSimulator::impl::checkGrid() const noexcept
+	{
+		if (m_robots.empty())
+		{
+			std::cout << "\nThere are not robots in the grid.\n";
+			return;
+		}
+	}
+
+	void RobotSimulator::impl::showUsage() const noexcept
+	{
+		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
+		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
+		std::cout << "\n       MOVE";
+		std::cout << "\n       LEFT";
+		std::cout << "\n       RIGHT";
+		std::cout << "\n       REPORT";
+		std::cout << "\n\n> ";
+	}
+
+	void RobotSimulator::impl::showReport(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept
+	{
+		std::cout << "\nRobot ID: " << robot->Id();
+		std::cout << "\nRobot name: " << robot->name();
+		std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
+			<< ")," << robot->location().direction << '\n';
+	}
+
 	void RobotSimulator::impl::start() noexcept
 	{
-		std::signal(SIGINT, Utils::signal_handler);
+		std::signal(SIGINT, signal_handler);
 
 		std::string command{};
 		
-		Utils::showUsage();
+		showUsage();
 
 		while (std::getline(std::cin, command)) {
 
@@ -81,7 +142,7 @@ namespace RobotWorldSimulator {
 
 		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
 		{
-			(name.empty()) ? place({ x, y, Utils::getDirection(direction) }) : place({ x, y, Utils::getDirection(direction) }, name);
+			(name.empty()) ? place({ x, y, getDirection(direction) }) : place({ x, y, getDirection(direction) }, name);
 		}
 		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
 		{
@@ -109,7 +170,7 @@ namespace RobotWorldSimulator {
 	{
 		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location);
 
-		Utils::showReport(robot);
+		showReport(robot);
 
 		m_robots.emplace(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
@@ -121,7 +182,7 @@ namespace RobotWorldSimulator {
 	{
 		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
 
-		Utils::showReport(robot);
+		showReport(robot);
 
 		m_robots.emplace(std::make_pair(robot->Id(), robot));
 		m_grid.addRobot(robot);
@@ -131,17 +192,17 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::report() const noexcept
 	{
-		Utils::checkGrid(m_robots);
+		checkGrid();
 
 		for (const auto& [_, robot] : m_robots)
 		{
-			Utils::showReport(robot);
+			showReport(robot);
 		}
 	}
 
 	void RobotSimulator::impl::move() noexcept
 	{
-		Utils::checkGrid(m_robots);
+		checkGrid();
 
 		for (auto& [_, robot] : m_robots)
 		{
@@ -164,7 +225,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateLeft() noexcept
 	{
-		Utils::checkGrid(m_robots);
+		checkGrid();
 
 		for (auto& [_, robot] : m_robots)
 		{
@@ -175,7 +236,7 @@ namespace RobotWorldSimulator {
 
 	void RobotSimulator::impl::rotateRight() noexcept
 	{
-		Utils::checkGrid(m_robots);
+		checkGrid();
 
 		for (auto& [_, robot] : m_robots)
 		{
