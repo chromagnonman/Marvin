@@ -20,7 +20,6 @@ namespace RobotWorldSimulator {
 		explicit RobotSimulator(RobotGrid& world) noexcept;
 		virtual ~RobotSimulator();
 
-		void place(const RobotFactory::RobotLocation& location) noexcept;
 		void place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept;
 		void report() const noexcept;
 		void move() noexcept;
@@ -37,10 +36,10 @@ namespace RobotWorldSimulator {
 		void end() noexcept;
 		void end(size_t robot_ID) noexcept;
 
-		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
-		std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
+		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
+		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
 		// TODO:
-		std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
+		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
 
 	private:
 		struct impl;

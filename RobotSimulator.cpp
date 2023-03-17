@@ -23,7 +23,6 @@ namespace RobotWorldSimulator {
 		impl(RobotGrid& world) noexcept;
 
 		void start() noexcept;
-		void place(const RobotFactory::RobotLocation& location) noexcept;
 		void place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept;
 		void report() const noexcept;
 		void move() noexcept;
@@ -122,7 +121,7 @@ namespace RobotWorldSimulator {
 			}, ' ');
 
 		std::string command{};
-		std::string name{};
+		std::string name{"Marvin"};
 		std::string direction{};
 		size_t x{ 0 };
 		size_t y{ 0 };
@@ -142,7 +141,7 @@ namespace RobotWorldSimulator {
 
 		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
 		{
-			(name.empty()) ? place({ x, y, getDirection(direction) }) : place({ x, y, getDirection(direction) }, name);
+			place({ x, y, getDirection(direction) }, name);
 		}
 		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
 		{
@@ -164,18 +163,6 @@ namespace RobotWorldSimulator {
 		{
 			std::cerr << "\nInvalid command!\n";
 		}
-	}
-
-	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location) noexcept
-	{
-		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location);
-
-		showReport(robot);
-
-		m_robots.emplace(std::make_pair(robot->Id(), robot));
-		m_grid.addRobot(robot);
-
-		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
 	}
 
 	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
@@ -258,8 +245,7 @@ namespace RobotWorldSimulator {
 
 	std::shared_ptr<RobotFactory::Robot> RobotSimulator::impl::getRobot(const size_t robot_id) noexcept
 	{
-		const auto found_robot = m_robots.find(robot_id);
-		if (found_robot != m_robots.end())
+		if (const auto found_robot = m_robots.find(robot_id); found_robot != m_robots.end())
 		{
 			return found_robot->second;
 		}
@@ -274,11 +260,7 @@ namespace RobotWorldSimulator {
 
 	RobotSimulator::~RobotSimulator() = default;
 
-	void RobotSimulator::place(const RobotFactory::RobotLocation& location) noexcept
-	{
-		m_pImpl->place(location);
-	}
-
+	
 	void RobotSimulator::place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept
 	{
 		m_pImpl->place(location, robot_name);
