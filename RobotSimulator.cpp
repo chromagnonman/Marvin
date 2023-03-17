@@ -208,14 +208,10 @@ namespace RobotWorldSimulator {
 
 	RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
 	{
+		m_pImpl->start();
 	}
 
 	RobotSimulator::~RobotSimulator() = default;
-
-	void RobotSimulator::start() noexcept
-	{
-		m_pImpl->start();
-	}
 
 	void RobotSimulator::place(const RobotFactory::RobotLocation& location) noexcept
 	{

@@ -20,7 +20,6 @@ namespace RobotWorldSimulator {
 		explicit RobotSimulator(RobotGrid& world) noexcept;
 		virtual ~RobotSimulator();
 
-		void start() noexcept;
 		void place(const RobotFactory::RobotLocation& location) noexcept;
 		void place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept;
 		void report() const noexcept;
