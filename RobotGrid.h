@@ -16,7 +16,7 @@ namespace RobotWorldSimulator{
 	static constexpr size_t DEFAULT_NUMBER_OF_ROBOTS = 10;
 
 	/**
-	* @brief Provides a 2D grid environment for Marvin - the paranoid android to explore.
+	* @brief Provides a 2D grid environment for Marvin (the paranoid android) to explore.
 	*/
 	class RobotGrid {
 	public:
