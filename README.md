@@ -5,13 +5,13 @@ A simple toy robot console application written in C++. A user can issue commands
 
 ## Features
 
-- Place a robot into the cartesian plane using X and Y coordinates with the direction the robot will be facing. (e.g., North, South, West, and East).
+- Place a robot onto the cartesian plane using X and Y coordinates with the direction the robot will be facing. (e.g., North, South, West, and East).
 - Move robot(s) one unit forward from its relative position in the direction the robot is currently facing.
 - Rotate the robot at a 90-degree angle in its specified direction - from left to right, and vice versa.
 - Report the robot's info such as id, name, direction, and position.
 
 ## Getting started
-Prequisites:
+Prerequisites:
 - This is a Windows console application. Your machine should be running on Windows 11 or newer.
 - Install the latest Visual Studio IDE available online with C++ 17 compiler or newer. The community edition should be sufficient.
 - Download the code or clone it:
@@ -22,7 +22,7 @@ Prequisites:
 -  Open the entire solution or project by double-clicking on the `.sln` or `.vcxproj` file. Pressing `CTRL + F5` should run the console application.
 
 ## Executing the unit tests
-- The solution also contains `RobotSimulatorTest` project utilizing the Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
+- The solution also contains a `RobotSimulatorTest` project utilizing the Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
 
 	![TestExplorer](TestExplorer.png)
 
