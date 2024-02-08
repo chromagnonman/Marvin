@@ -27,11 +27,11 @@ Prerequisites:
 	![TestExplorer](TestExplorer.png)
 
 ## Caveat
-- When executing the unit tests, you might encounter linker errors. You need to explicitly add the `.obj` files (Marvin, RobotGrid, and RobotSimulator) to the `Additional Dependencies`
+- When executing the unit tests, you may encounter linker errors. You need to explicitly add the `.obj` files (Marvin, RobotGrid, and RobotSimulator) to the `Additional Dependencies`
   of the `RobotSimulatorTest` project.
 
 	![Linker](Linker.png)
-- You might also need to update the `Additional Library Directories`.
+- You may also need to update the `Additional Library Directories`.
 
 	![IncludeDirectories](IncludeDirectories.png)
 - Lastly, you will probably need to set the `Runtime Library` to `Multi-threaded (/MT)`.
