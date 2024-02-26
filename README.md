@@ -31,7 +31,7 @@ Prerequisites:
   of the `RobotSimulatorTest` project.
 
 	![Linker](Linker.png)
-- You may also need to update the `Additional Library Directories`.
+- You might also need to update the `Additional Library Directories`.
 
 	![IncludeDirectories](IncludeDirectories.png)
 - Lastly, you will probably need to set the `Runtime Library` to `Multi-threaded (/MT)`.
