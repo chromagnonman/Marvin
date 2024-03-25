@@ -6,9 +6,9 @@ namespace RobotFactory
 {
 	
 	struct RobotLocation {
-		size_t x_coordinate{};
-		size_t y_coordinate{};
-		std::string direction{};
+		int x_coordinate;
+		int y_coordinate;
+		std::string direction;
 	};
 
 	enum class ROBOT_ROTATION : size_t {
@@ -28,22 +28,18 @@ namespace RobotFactory
 	*/
 	class Robot {
 	public:
-		Robot() noexcept
+        Robot() noexcept : m_location{}, m_robotID{++m_ID}
 		{
-			m_robotID = ++m_ID;
 		}
 
 		Robot(const RobotLocation& location) noexcept : 
-			m_location{location}
+			m_location{location}, m_robotID{++m_ID}
 		{ 
-			m_robotID = ++m_ID;
 		}
 
 		Robot(const RobotLocation& location, std::string&& name) noexcept : 
-			m_location{location},
-			m_name{ name }
+			m_location{location}, m_name{name}, m_robotID{++m_ID}
 		{
-			m_robotID = ++m_ID;
 		}
 
 		virtual ~Robot() = default;

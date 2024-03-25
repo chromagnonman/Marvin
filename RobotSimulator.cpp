@@ -123,8 +123,8 @@ namespace RobotWorldSimulator {
 		std::string command{};
 		std::string name{"Marvin"};
 		std::string direction{};
-		size_t x{ 0 };
-		size_t y{ 0 };
+		int x{ 0 };
+		int y{ 0 };
 
 		{ // Extract the command from the input stream including the parameters
 			std::stringstream input_stream{ input };
