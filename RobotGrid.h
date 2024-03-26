@@ -39,7 +39,7 @@ namespace RobotWorldSimulator{
 
         [[nodiscard]] const GridSize& getSize() const noexcept;
 
-        [[nodiscard]] size_t getRobot(const RobotFactory::RobotLocation& location) const noexcept;
+        [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
 
         [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
 

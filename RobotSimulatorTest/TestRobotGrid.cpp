@@ -68,7 +68,7 @@ TEST(RobotGridTest, PullRobotFromTheGrid)
 
 	grid.addRobot(R1->Id(), R1->location());
 
-	auto robot_id = grid.getRobot(location);
+	auto robot_id = grid.getRobotID(location);
 	EXPECT_GT(robot_id, 0);
 }
 

@@ -262,7 +262,7 @@ namespace RobotWorldSimulator {
 
     const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(const RobotFactory::RobotLocation& location) const noexcept 
     {
-      return getRobot(m_grid.getRobot(location));
+      return getRobot(m_grid.getRobotID(location));
     }
 
     const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(size_t robot_id) const noexcept 
