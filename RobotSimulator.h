@@ -7,42 +7,37 @@
 
 namespace RobotWorldSimulator {
 
-	namespace COMMAND {
-		static constexpr auto PLACE = "PLACE";
-		static constexpr auto MOVE = "MOVE";
-		static constexpr auto LEFT = "LEFT";
-		static constexpr auto RIGHT = "RIGHT";
-		static constexpr auto REPORT = "REPORT";
-	}
+    namespace COMMAND {
+        static constexpr auto PLACE = "PLACE";
+        static constexpr auto MOVE = "MOVE";
+        static constexpr auto LEFT = "LEFT";
+        static constexpr auto RIGHT = "RIGHT";
+        static constexpr auto REPORT = "REPORT";
+    }
 
-	class RobotSimulator {
-	public:
-		explicit RobotSimulator(RobotGrid& world) noexcept;
-		virtual ~RobotSimulator();
+    class RobotSimulator {
+    public:
+        explicit RobotSimulator(RobotGrid& world) noexcept;
+        virtual ~RobotSimulator();
 
-		void place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept;
-		void report() const noexcept;
-		void move() noexcept;
-		void rotateLeft() noexcept;
-		void rotateRight() noexcept;
-		
-		// TODO: Support issuing commands to a particular robot
-		void move(size_t robot_ID) noexcept;
-		void rotateLeft(size_t robot_ID) noexcept;
-		void rotateRight(size_t robot_ID) noexcept;
-		void report(size_t robot_ID) noexcept;
+        void place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept;
+        void report() const noexcept;
+        void move() noexcept;
+        void rotateLeft() noexcept;
+        void rotateRight() noexcept;
+        
+        void move(size_t robot_ID) noexcept;
+        void rotateLeft(size_t robot_ID) noexcept;
+        void rotateRight(size_t robot_ID) noexcept;
+        void report(size_t robot_ID) noexcept;
 
-		// TODO: Modify these to end the robot's meandering
-		void end() noexcept;
-		void end(size_t robot_ID) noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;
 
-		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
-		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
-		// TODO:
-		[[nodiscard]] std::shared_ptr<RobotFactory::Robot> getRobot(const std::string& robot_name) noexcept;
+        void end(size_t robot_ID) noexcept;
 
-	private:
-		struct impl;
-		std::unique_ptr<impl> m_pImpl;
-	};
+    private:
+        struct impl;
+        std::unique_ptr<impl> m_pImpl;
+    };
 }

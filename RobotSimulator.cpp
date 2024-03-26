@@ -11,293 +11,321 @@
 
 namespace RobotWorldSimulator {
 
-	volatile std::sig_atomic_t signal_status;
 
-	void signal_handler(int signal)
-	{
-		signal_status = signal;
-	}
+    using namespace RobotFactory::ROBOT_DIRECTION;
+    using namespace RobotWorldSimulator::COMMAND;
 
-	struct RobotSimulator::impl {
+    volatile std::sig_atomic_t signal_status;
 
-		impl(RobotGrid& world) noexcept;
+    void signal_handler(int signal)
+    {
+        signal_status = signal;
+    }
 
-		void start() noexcept;
-		void place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept;
-		void report() const noexcept;
-		void move() noexcept;
-		void rotateLeft() noexcept;
-		void rotateRight() noexcept;
-		void end() noexcept;
-		std::shared_ptr<RobotFactory::Robot> getRobot(const RobotFactory::RobotLocation& location) noexcept;
-		std::shared_ptr<RobotFactory::Robot> getRobot(const size_t robot_id) noexcept;
-		
-	private:
-		RobotGrid& m_grid;
-		std::unordered_map<size_t, std::shared_ptr<RobotFactory::Robot>> m_robots;
+    struct RobotSimulator::impl {
 
-		std::string getDirection(const std::string& direction) const noexcept;
-		void checkGrid() const noexcept;
-		void showUsage() const noexcept;
-		void showReport(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept;
-		void execute(std::string& command) noexcept;
-	};
+        impl(RobotGrid& world) noexcept;
 
-	RobotSimulator::impl::impl(RobotGrid& grid) noexcept : m_grid{ grid }
-	{
-		m_robots.reserve(RobotWorldSimulator::DEFAULT_NUMBER_OF_ROBOTS);
-	}
+        void start() noexcept;
+        void place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept;
+        void report() const noexcept;
+        void move() noexcept;
+        void rotateLeft() noexcept;
+        void rotateRight() noexcept;
+        void end(size_t robotId) noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;
 
-	std::string RobotSimulator::impl::getDirection(const std::string& direction) const noexcept
-	{
-		using namespace RobotFactory::ROBOT_DIRECTION;
-		if (_stricmp(direction.c_str(), NORTH) == 0)
-		{
-			return NORTH;
-		}
-		else if (_stricmp(direction.c_str(), SOUTH) == 0)
-		{
-			return SOUTH;
-		}
-		else if (_stricmp(direction.c_str(), EAST) == 0)
-		{
-			return EAST;
-		}
-		else if (_stricmp(direction.c_str(), WEST) == 0)
-		{
-			return WEST;
-		}
+    private:
+        RobotGrid& m_grid;
+        std::unordered_map<size_t, std::unique_ptr<RobotFactory::Robot>> m_robots;
 
-		return NORTH;
-	}
+        std::string getDirection(const std::string& direction) const noexcept;
+        bool isGridEmpty() const noexcept;
+        void showUsage() const noexcept;
+        void showDetails(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
+        void execute(std::string& command) noexcept;
 
-	void RobotSimulator::impl::checkGrid() const noexcept
-	{
-		if (m_robots.empty())
-		{
-			std::cout << "\nThere are no robots in the grid yet. Use Place command.\n";
-			return;
-		}
-	}
+    };
 
-	void RobotSimulator::impl::showUsage() const noexcept
-	{
-		std::cout << "\nConstraints: X and Y should not be greater than or equal to ten.";
-		std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
-		std::cout << "\n       MOVE";
-		std::cout << "\n       LEFT";
-		std::cout << "\n       RIGHT";
-		std::cout << "\n       REPORT";
-		std::cout << "\n\n> ";
-	}
+    RobotSimulator::impl::impl(RobotGrid& grid) noexcept : m_grid{grid}
+    {
+    }
 
-	void RobotSimulator::impl::showReport(const std::shared_ptr<RobotFactory::Robot>& robot) const noexcept
-	{
-		std::cout << "\nRobot ID: " << robot->Id();
-		std::cout << "\nRobot name: " << robot->name();
-		std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
-			<< ")," << robot->location().direction << '\n';
-	}
+    std::string RobotSimulator::impl::getDirection(const std::string& direction) const noexcept
+    {
+        if (direction == NORTH)
+        {
+            return NORTH;
+        }
+        else if (direction == SOUTH)
+        {
+            return SOUTH;
+        }
+        else if (direction == EAST)
+        {
+            return EAST;
+        }
+        else if (direction == WEST)
+        {
+            return WEST;
+        }
 
-	void RobotSimulator::impl::start() noexcept
-	{
-		std::signal(SIGINT, signal_handler);
+        return NORTH;
+    }
 
-		std::string command{};
-		
-		showUsage();
+    bool RobotSimulator::impl::isGridEmpty() const noexcept
+    {
+        if (m_robots.empty())
+        {
+            std::cout << "\nThere are no robots in the grid yet. Use Place command.\n";
+            return true;
+        }
 
-		while (std::getline(std::cin, command)) {
+        return false;
+    }
 
-			execute(command);
-		}
-	}
+    void RobotSimulator::impl::showUsage() const noexcept
+    {
+        std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
+        std::cout << "\n       MOVE";
+        std::cout << "\n       LEFT";
+        std::cout << "\n       RIGHT";
+        std::cout << "\n       REPORT";
+        std::cout << "\nCtrl+C to quit";
+        std::cout << "\n\n> ";
+    }
 
-	void RobotSimulator::impl::execute(std::string& input) noexcept
-	{
-		// Replace extraneous characters with spaces
-		std::replace_if(std::execution::par_unseq, input.begin(), input.end(), [](const unsigned char c) noexcept {
-			return !isalnum(c);
-			}, ' ');
+    void RobotSimulator::impl::showDetails(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept
+    {
+        std::cout << "\nRobot ID: " << robot->Id();
+        std::cout << "\nRobot name: " << robot->name();
+        std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
+            << ")," << robot->location().direction << '\n';
+    }
 
-		std::string command{};
-		std::string name{"Marvin"};
-		std::string direction{};
-		int x{ 0 };
-		int y{ 0 };
+    void RobotSimulator::impl::start() noexcept
+    {
+        std::signal(SIGINT, signal_handler);
 
-		{ // Extract the command from the input stream including the parameters
-			std::stringstream input_stream{ input };
-			input_stream >> command >> x >> y >> direction >> name;
-		}
+        std::string command{};
+        
+        showUsage();
 
-		// If XY is greater than or equal to the default size, reset the location to zero. 
-		if (x >= m_grid.getSize().width || y >= m_grid.getSize().height)
-		{
-			// TODO: Resize the grid
-			x = 0;
-			y = 0;
-		}
+        while (std::getline(std::cin, command)) {
 
-		if (_stricmp(command.c_str(), COMMAND::PLACE) == 0)
-		{
-			place({ x, y, getDirection(direction) }, name);
-		}
-		else if (_stricmp(command.c_str(), COMMAND::LEFT) == 0)
-		{
-			rotateLeft();
-		}
-		else if (_stricmp(command.c_str(), COMMAND::RIGHT) == 0)
-		{
-			rotateRight();
-		}
-		else if (_stricmp(command.c_str(), COMMAND::MOVE) == 0)
-		{
-			move();
-		}
-		else if (_stricmp(command.c_str(), COMMAND::REPORT) == 0)
-		{
-			report();
-		}
-		else
-		{
-			std::cerr << "\nInvalid command!\n";
-		}
-	}
+            execute(command);
+        }
+    }
 
-	void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
-	{
-		std::shared_ptr<RobotFactory::Robot> robot = std::make_shared<RobotFactory::Marvin>(location, name);
+    void RobotSimulator::impl::execute(std::string& input) noexcept
+    {
+        // Replace extraneous characters with spaces
+        std::replace_if(std::execution::par_unseq, input.begin(), input.end(), [](const unsigned char c) noexcept {
+            return !isalnum(c);
+            }, ' ');
 
-		showReport(robot);
+        std::string command{};
+        std::string name{"Marvin"};
+        std::string direction{};
+        int x{ 0 };
+        int y{ 0 };
 
-		m_robots.emplace(std::make_pair(robot->Id(), robot));
-		m_grid.addRobot(robot);
+        { // Extract the command from the input stream including the parameters
+            std::stringstream input_stream{ input };
+            input_stream >> command >> x >> y >> direction >> name;
+        }
 
-		std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
-	}
+        // If XY is greater than or equal to the default size, reset the location to zero. 
+        if (x >= m_grid.getSize().width || y >= m_grid.getSize().height)
+        {
+            // TODO: Resize the grid
+            x = 0;
+            y = 0;
+        }
 
-	void RobotSimulator::impl::report() const noexcept
-	{
-		checkGrid();
+        std::transform(std::execution::par, command.begin(), command.end(), command.begin(),
+            [] (char c) { 
+                return std::toupper(c);
+            });
 
-		for (const auto& [_, robot] : m_robots)
-		{
-			showReport(robot);
-		}
-	}
+        std::transform(std::execution::par, direction.begin(), direction.end(), direction.begin(),
+            [](char c) { 
+                return std::toupper(c); 
+            });
 
-	void RobotSimulator::impl::move() noexcept
-	{
-		checkGrid();
+        if (command == PLACE)
+        {
+            place({ x, y, getDirection(direction) }, name);
+        }
+        else if (command == LEFT)
+        {
+            rotateLeft();
+        }
+        else if (command == RIGHT)
+        {
+            rotateRight();
+        }
+        else if (command == MOVE)
+        {
+            move();
+        }
+        else if (command == REPORT)
+        {
+            report();
+        }
+        else
+        {
+            std::cerr << "\nInvalid command!\n";
+        }
+    }
 
-		for (auto& [_, robot] : m_robots)
-		{
-			const auto current_location = robot->location();
-			robot->move();
+    void RobotSimulator::impl::place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept
+    {
+        std::unique_ptr<RobotFactory::Robot> robot = std::make_unique<RobotFactory::Marvin>(location, name);
 
-			if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
-			{
-				std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << '\n';
-				m_grid.updateLocation(current_location, robot);
-			}
-			else
-			{
-				std::cout << '\n' << robot->name() << " is already at the edge of the grid, facing " << robot->location().direction << '\n';
-				// Revert to previous location
-				robot->setLocation(current_location);
-			}
-		}
-	}
+        showDetails(robot);
 
-	void RobotSimulator::impl::rotateLeft() noexcept
-	{
-		checkGrid();
+        if (!m_grid.isOffTheGrid(robot)) 
+        {
+            m_grid.addRobot(robot->Id(), robot->location());
+        }
+        else 
+        {
+            // Reset location
+            robot->setLocation({0, 0, robot->location().direction});
+        }
 
-		for (auto& [_, robot] : m_robots)
-		{
-			robot->rotate();
-			std::cout << '\n' << robot->name() << " turned left facing " << robot->location().direction << '\n';
-		}
-	}
+        m_robots.emplace(robot->Id(), std::move(robot));
 
-	void RobotSimulator::impl::rotateRight() noexcept
-	{
-		checkGrid();
+        std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
+    }
 
-		for (auto& [_, robot] : m_robots)
-		{
-			robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-			std::cout << '\n' << robot->name() << " shifted right facing " << robot->location().direction << '\n';
-		}
-	}
+    void RobotSimulator::impl::report() const noexcept
+    {
+        if (!isGridEmpty())
+        {
+            for (const auto& [_, robot] : m_robots)
+            {
+                showDetails(robot);
+            }
+        }
+    }
 
-	void RobotSimulator::impl::end() noexcept
-	{
-		std::cout << "\nRobot excursion ended!\n";
-		m_robots.clear();
-	}
+    void RobotSimulator::impl::move() noexcept
+    {
+        if (!isGridEmpty()) 
+        {
+            for (auto& [_, robot] : m_robots)
+            {
+                const auto current_location = robot->location();
+                robot->move();
 
-	std::shared_ptr<RobotFactory::Robot> RobotSimulator::impl::getRobot(const RobotFactory::RobotLocation& location) noexcept
-	{
-		return m_grid.getRobot(location);
-	}
+                if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
+                {
+                    std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << '\n';
+                    m_grid.updateLocation(current_location, robot->location(), robot->Id());
+                }
+                else
+                {
+                    std::cout << '\n' << robot->name() << " is already at the edge of the grid, facing " << robot->location().direction << '\n';
+                    // Revert to previous location
+                    robot->setLocation(current_location);
+                }
+            }
+        }
+    }
 
-	std::shared_ptr<RobotFactory::Robot> RobotSimulator::impl::getRobot(const size_t robot_id) noexcept
-	{
-		if (const auto found_robot = m_robots.find(robot_id); found_robot != m_robots.end())
-		{
-			return found_robot->second;
-		}
+    void RobotSimulator::impl::rotateLeft() noexcept
+    {
+        if (!isGridEmpty())
+        {
+            for (auto& [_, robot] : m_robots)
+            {
+                robot->rotate();
+                std::cout << '\n' << robot->name() << " turned left facing " << robot->location().direction << '\n';
+            }
+        }
+    }
 
-		return nullptr;
-	}
+    void RobotSimulator::impl::rotateRight() noexcept
+    {
+        if (!isGridEmpty())
+        {
+            for (auto& [_, robot] : m_robots)
+            {
+                robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
+                std::cout << '\n' << robot->name() << " shifted right facing " << robot->location().direction << '\n';
+            }
+        }
+    }
 
-	RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
-	{
-		m_pImpl->start();
-	}
+    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(const RobotFactory::RobotLocation& location) const noexcept 
+    {
+      return getRobot(m_grid.getRobot(location));
+    }
 
-	RobotSimulator::~RobotSimulator() = default;
+    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(size_t robot_id) const noexcept 
+    {
+      if (const auto found_robot = m_robots.find(robot_id); found_robot != m_robots.end()) 
+      {
+        return found_robot->second;
+      }
 
-	
-	void RobotSimulator::place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept
-	{
-		m_pImpl->place(location, robot_name);
-	}
+      return nullptr;
+    }
 
-	void RobotSimulator::report() const noexcept
-	{
-		m_pImpl->report();
-	}
+    void RobotSimulator::impl::end(size_t robotId) noexcept
+    {
+        std::cout << "\nRobot excursion ended!\n";
+        m_robots.erase(robotId);
+    }
 
-	void RobotSimulator::move() noexcept
-	{
-		m_pImpl->move();
-	}
+    RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
+    {
+        m_pImpl->start();
+    }
 
-	void RobotSimulator::rotateLeft() noexcept
-	{
-		m_pImpl->rotateLeft();
-	}
+    RobotSimulator::~RobotSimulator() = default;
 
-	void RobotSimulator::rotateRight() noexcept
-	{
-		m_pImpl->rotateRight();
-	}
+    
+    void RobotSimulator::place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept
+    {
+        m_pImpl->place(location, robot_name);
+    }
 
-	void RobotSimulator::end() noexcept
-	{
-		m_pImpl->end();
-	}
+    void RobotSimulator::report() const noexcept
+    {
+        m_pImpl->report();
+    }
 
-	std::shared_ptr<RobotFactory::Robot> RobotSimulator::getRobot(const RobotFactory::RobotLocation& location) noexcept
-	{
-		return m_pImpl->getRobot(location);
-	}
+    void RobotSimulator::move() noexcept
+    {
+        m_pImpl->move();
+    }
 
-	std::shared_ptr<RobotFactory::Robot> RobotSimulator::getRobot(const size_t robot_id) noexcept
-	{
-		return m_pImpl->getRobot(robot_id);
-	}
+    void RobotSimulator::rotateLeft() noexcept
+    {
+        m_pImpl->rotateLeft();
+    }
+
+    void RobotSimulator::rotateRight() noexcept
+    {
+        m_pImpl->rotateRight();
+    }
+
+    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::getRobot(const RobotFactory::RobotLocation& location) const noexcept
+    {
+        return m_pImpl->getRobot(location);
+    }
+
+    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::getRobot(size_t robot_id) const noexcept
+    {
+        return m_pImpl->getRobot(robot_id);
+    }
+
+    void RobotSimulator::end(size_t robotId) noexcept
+    {
+        m_pImpl->end(robotId);
+    }
 }
