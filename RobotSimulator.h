@@ -41,8 +41,6 @@ namespace RobotWorldSimulator {
         const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
         const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;
 
-        void end(size_t robot_ID) noexcept;
-
     private:
         struct impl;
         std::unique_ptr<impl> m_pImpl;
