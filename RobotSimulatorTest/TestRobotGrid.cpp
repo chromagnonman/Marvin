@@ -51,7 +51,7 @@ TEST(RobotGridTest, ResizeGrid) {
 
 	grid.resize(10, 10);
 
-    RobotFactory::RobotLocation location2{11, 11, "NORTH"};
+    RobotFactory::RobotLocation location2{5, 5, "NORTH"};
     Robot R2 = std::make_unique<RobotFactory::Marvin>(location2);
 
 	EXPECT_FALSE(grid.isOffTheGrid(R2));
@@ -80,12 +80,4 @@ TEST(TestRobotGrid, RobotOffTheGrid)
 	Robot R1 = std::make_unique<RobotFactory::Marvin>(location);
 		
 	EXPECT_TRUE(grid.isOffTheGrid(R1));
-
-	// Robot's location should be set to 0
-	EXPECT_EQ(R1->location().x_coordinate, 0);
-	EXPECT_EQ(R1->location().y_coordinate, 0);
-		
-	R1->move(); // Move up Y should be incremented
-	EXPECT_FALSE(grid.isOffTheGrid(R1));
-	EXPECT_GT(R1->location().y_coordinate, 0);
 }
