@@ -88,6 +88,11 @@ namespace RobotWorldSimulator {
     {
     }
 
+    RobotGrid::RobotGrid() noexcept : 
+        m_pImpl{ std::make_unique<impl>(GridSize{DEFAULT_WIDTH, DEFAULT_HEIGHT}) }
+    {
+    }
+
     RobotGrid::~RobotGrid() = default;
 
 

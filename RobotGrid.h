@@ -19,7 +19,8 @@ namespace RobotWorldSimulator{
     */
     class RobotGrid {
     public:
-        RobotGrid(size_t width = DEFAULT_WIDTH, size_t height = DEFAULT_HEIGHT) noexcept;
+        RobotGrid() noexcept;
+        RobotGrid(size_t width, size_t height) noexcept;
 
         RobotGrid(const RobotGrid&) = delete;
         RobotGrid& operator=(const RobotGrid&) = delete;
