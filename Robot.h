@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ROBOT_H
+#define ROBOT_H
 
 #include <string>
 
@@ -69,8 +70,10 @@ namespace RobotFactory
 
     protected:
         RobotLocation m_location;
-        std::string m_name{ "Marvin" };
+        std::string m_name;
         size_t m_robotID;
         static size_t m_ID;
     };
 }
+
+#endif

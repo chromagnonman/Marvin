@@ -8,6 +8,7 @@
 
 #include "RobotSimulator.h"
 #include "Marvin.h"
+#include "Menu.h"
 
 namespace RobotWorldSimulator {
 
@@ -42,8 +43,6 @@ namespace RobotWorldSimulator {
 
         std::string getDirection(const std::string& direction) const noexcept;
         bool isGridEmpty() const noexcept;
-        void showUsage() const noexcept;
-        void showDetails(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
         void execute(std::string& command) noexcept;
 
     };
@@ -85,32 +84,13 @@ namespace RobotWorldSimulator {
         return false;
     }
 
-    void RobotSimulator::impl::showUsage() const noexcept
-    {
-        std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
-        std::cout << "\n       MOVE";
-        std::cout << "\n       LEFT";
-        std::cout << "\n       RIGHT";
-        std::cout << "\n       REPORT";
-        std::cout << "\nCtrl+C to quit";
-        std::cout << "\n\n> ";
-    }
-
-    void RobotSimulator::impl::showDetails(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept
-    {
-        std::cout << "\nRobot ID: " << robot->Id();
-        std::cout << "\nRobot name: " << robot->name();
-        std::cout << "\nRobot location (" << robot->location().x_coordinate << "," << robot->location().y_coordinate
-            << ")," << robot->location().direction << '\n';
-    }
-
     void RobotSimulator::impl::start() noexcept
     {
         std::signal(SIGINT, signal_handler);
 
-        std::string command{};
+        std::string command;
         
-        showUsage();
+        Menu::showUsage();
 
         while (std::getline(std::cin, command)) {
 
@@ -125,9 +105,9 @@ namespace RobotWorldSimulator {
             return !isalnum(c);
             }, ' ');
 
-        std::string command{};
+        std::string command;
         std::string name{"Marvin"};
-        std::string direction{};
+        std::string direction;
         int32_t x{0};
         int32_t y{0};
 
@@ -177,6 +157,7 @@ namespace RobotWorldSimulator {
         else
         {
             std::cerr << "\nInvalid command!\n";
+            Menu::showUsage();
         }
     }
 
@@ -184,18 +165,15 @@ namespace RobotWorldSimulator {
     {
         std::unique_ptr<RobotFactory::Robot> robot = std::make_unique<RobotFactory::Marvin>(location, name);
 
-        showDetails(robot);
+        Menu::showDetails(robot);
 
-        if (!m_grid.isOffTheGrid(robot)) 
-        {
-            m_grid.addRobot(robot->Id(), robot->location());
-        }
-        else 
+        if (m_grid.isOffTheGrid(robot)) 
         {
             // Reset location
             robot->setLocation({0, 0, robot->location().direction});
         }
 
+        m_grid.addRobot(robot->Id(), robot->location());
         m_robots.emplace(robot->Id(), std::move(robot));
 
         std::cout << "\nNumber of robots in the grid: " << m_robots.size() << '\n';
@@ -207,7 +185,7 @@ namespace RobotWorldSimulator {
         {
             for (const auto& [_, robot] : m_robots)
             {
-                showDetails(robot);
+                Menu::showDetails(robot);
             }
         }
     }

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ROBOTGRID_H
+#define ROBOTGRID_H
+
 #include <memory>
 
 #include "RobotGrid.h"
@@ -49,3 +51,5 @@ namespace RobotWorldSimulator{
         std::unique_ptr<impl> m_pImpl;
     };
 }
+
+#endif

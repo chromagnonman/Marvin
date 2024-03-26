@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ROBOTSIMULATOR_H
+#define ROBOTSIMULATOR_H
 
 #include <memory>
 
@@ -41,3 +42,5 @@ namespace RobotWorldSimulator {
         std::unique_ptr<impl> m_pImpl;
     };
 }
+
+#endif
