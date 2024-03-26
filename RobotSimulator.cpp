@@ -195,13 +195,15 @@ namespace RobotWorldSimulator {
     {
         std::unique_ptr<RobotFactory::Robot> robot = std::make_unique<RobotFactory::Marvin>(location, name);
 
-        Menu::showDetails(robot);
-
-        if (m_grid.isOffTheGrid(robot)) 
+        if (m_grid.isOffTheGrid(robot) || m_grid.isOccupied(robot)) 
         {
+            // TODO: look for an empty slot in the grid
             // Reset location
+            std::cout << "\nLocation is occupied/off the grid.\n";
             robot->setLocation({0, 0, robot->location().direction});
         }
+
+        Menu::showDetails(robot);
 
         m_grid.addRobot(robot->Id(), robot->location());
         m_robots.emplace(robot->Id(), std::move(robot));
@@ -230,7 +232,7 @@ namespace RobotWorldSimulator {
                 const auto current_location = robot->location();
                 robot->move();
 
-                if (!m_grid.isOffTheGrid(robot)) // TODO: Also check if location is already occupied by another robot.
+                if (!m_grid.isOffTheGrid(robot))
                 {
                     std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << '\n';
                     m_grid.updateLocation(current_location, robot->location(), robot->Id());
@@ -273,6 +275,10 @@ namespace RobotWorldSimulator {
     { 
         if (!isGridEmpty()) 
         {
+            for (const auto& robot : m_robots) 
+            {
+               m_grid.remove(robot.second);
+            }
             m_robots.clear();
             std::cout << "\nAll robots were terminated!\n";
             Menu::showUsage();

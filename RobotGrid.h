@@ -47,6 +47,8 @@ namespace RobotWorldSimulator{
 
         [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
 
+        [[nodiscard]] bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
+
     private:
         struct impl;
         std::unique_ptr<impl> m_pImpl;

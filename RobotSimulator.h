@@ -18,7 +18,6 @@ namespace RobotWorldSimulator {
         static constexpr auto REPORT = "REPORT";
         static constexpr auto REMOVE = "REMOVE";
         static constexpr auto MENU = "MENU";
-
     }
 
     class RobotSimulator {

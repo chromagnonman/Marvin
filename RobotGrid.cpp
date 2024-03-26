@@ -28,7 +28,8 @@ namespace RobotWorldSimulator {
 
         size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
         bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
-        
+        bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
+
     private:
         std::vector<std::vector<ROBOT_ID>> m_grid;
         GridSize m_gridSz;
@@ -84,6 +85,11 @@ namespace RobotWorldSimulator {
                 robot->location().y_coordinate < 0;
     }
 
+    bool RobotGrid::impl::isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept
+    {
+        return m_grid[robot->location().x_coordinate][robot->location().y_coordinate];
+    }
+    
     void RobotGrid::impl::remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept 
     {
         m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = 0;
@@ -127,6 +133,11 @@ namespace RobotWorldSimulator {
         m_pImpl->resize(GridSize{ width, height });
     }
 
+    void RobotGrid::remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept 
+    {
+        m_pImpl->remove(robot);
+    }
+
     size_t RobotGrid::getRobotID(const RobotFactory::RobotLocation& location) const noexcept
     {
         return m_pImpl->getRobotID(location);
@@ -137,8 +148,10 @@ namespace RobotWorldSimulator {
         return m_pImpl->isOffTheGrid(robot);
     }
 
-    void RobotGrid::remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept 
-    { 
-        m_pImpl->remove(robot);
+    bool RobotGrid::isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept
+    {
+        return m_pImpl->isOccupied(robot);
     }
+
+
  }
