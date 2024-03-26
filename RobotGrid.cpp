@@ -26,7 +26,7 @@ namespace RobotWorldSimulator {
         void resize(const GridSize& gridSz) noexcept;
 
         size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
-        bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
+        bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
         
     private:
         std::vector<std::vector<ROBOT_ID>> m_grid;
@@ -75,7 +75,7 @@ namespace RobotWorldSimulator {
         return m_gridSz;
     }
 
-    bool RobotGrid::impl::isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
+    bool RobotGrid::impl::isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept
     {
         return robot->location().x_coordinate >= m_gridSz.width ||
                 robot->location().y_coordinate >= m_gridSz.height ||
