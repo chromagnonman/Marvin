@@ -19,6 +19,7 @@ class Menu {
         std::cout << "\n       LEFT";
         std::cout << "\n       RIGHT";
         std::cout << "\n       REPORT";
+        std::cout << "\n       REMOVE (Robot ID/All)";
         std::cout << "\nCtrl+C to quit";
         std::cout << "\n\n> ";
     }

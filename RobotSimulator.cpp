@@ -29,11 +29,20 @@ namespace RobotWorldSimulator {
 
         void start() noexcept;
         void place(const RobotFactory::RobotLocation& location, const std::string& name) noexcept;
+        
+        // Affects all robots in the grid
         void report() const noexcept;
         void move() noexcept;
         void rotateLeft() noexcept;
         void rotateRight() noexcept;
-        void end(size_t robotId) noexcept;
+        void removeAll() noexcept;
+
+        // Individual robot commands
+        void move(size_t robot_ID) noexcept;
+        void rotateLeft(size_t robot_ID) noexcept;
+        void rotateRight(size_t robot_ID) noexcept;
+        void remove(size_t robot_ID) noexcept;
+
         const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
         const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;
 
@@ -77,7 +86,8 @@ namespace RobotWorldSimulator {
     {
         if (m_robots.empty())
         {
-            std::cout << "\nThere are no robots in the grid yet. Use Place command.\n";
+            std::cout << "\nThere are no robots in the grid.\n";
+            Menu::showUsage();
             return true;
         }
 
@@ -112,7 +122,7 @@ namespace RobotWorldSimulator {
         int32_t y{0};
 
         { // Extract the command from the input stream including the parameters
-            std::stringstream input_stream{ input };
+            std::istringstream input_stream{ input };
             input_stream >> command >> x >> y >> direction >> name;
         }
 
@@ -153,6 +163,26 @@ namespace RobotWorldSimulator {
         else if (command == REPORT)
         {
             report();
+        } 
+        else if (command == REMOVE) 
+        {
+           size_t robot_ID{0};
+           {
+               std::stringstream input_stream{input};
+               input_stream >> command >> robot_ID;
+           }
+           if (robot_ID) 
+           {
+               remove(robot_ID);
+           } 
+           else 
+           {
+               removeAll();
+           }
+        } 
+        else if (command == MENU) 
+        {
+          Menu::showUsage();
         }
         else
         {
@@ -183,6 +213,7 @@ namespace RobotWorldSimulator {
     {
         if (!isGridEmpty())
         {
+            std::cout << "\nFound " << m_robots.size() << " robots in the grid\n";
             for (const auto& [_, robot] : m_robots)
             {
                 Menu::showDetails(robot);
@@ -238,6 +269,33 @@ namespace RobotWorldSimulator {
         }
     }
 
+    void RobotSimulator::impl::removeAll() noexcept 
+    { 
+        if (!isGridEmpty()) 
+        {
+            m_robots.clear();
+            std::cout << "\nAll robots were terminated!\n";
+            Menu::showUsage();
+        }
+    }
+
+    void RobotSimulator::impl::remove(size_t robot_ID) noexcept 
+    { 
+      if (const auto robot = m_robots.find(robot_ID); robot != m_robots.end()) 
+      {
+          m_grid.remove(robot->second);
+          std::cout << "\nThe following robot was removed.\n";
+          Menu::showDetails(robot->second);
+          Menu::showUsage();
+
+          m_robots.erase(robot_ID);
+      }
+      else 
+      {
+          std::cout << "Robot ID: " << robot_ID << " not found!\n";
+      }
+    }
+
     const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(const RobotFactory::RobotLocation& location) const noexcept 
     {
       return getRobot(m_grid.getRobotID(location));
@@ -251,12 +309,6 @@ namespace RobotWorldSimulator {
       }
 
       return nullptr;
-    }
-
-    void RobotSimulator::impl::end(size_t robotId) noexcept
-    {
-        std::cout << "\nRobot excursion ended!\n";
-        m_robots.erase(robotId);
     }
 
     RobotSimulator::RobotSimulator(RobotGrid& world) noexcept : m_pImpl{ std::make_unique<impl>(world) }
@@ -292,6 +344,11 @@ namespace RobotWorldSimulator {
         m_pImpl->rotateRight();
     }
 
+    void RobotSimulator::removeAll() noexcept 
+    { 
+        m_pImpl->removeAll();
+    }
+
     const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::getRobot(const RobotFactory::RobotLocation& location) const noexcept
     {
         return m_pImpl->getRobot(location);
@@ -302,8 +359,8 @@ namespace RobotWorldSimulator {
         return m_pImpl->getRobot(robot_id);
     }
 
-    void RobotSimulator::end(size_t robotId) noexcept
+    void RobotSimulator::remove(size_t robot_ID) noexcept
     {
-        m_pImpl->end(robotId);
+        m_pImpl->remove(robot_ID);
     }
 }

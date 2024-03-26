@@ -39,6 +39,7 @@ namespace RobotWorldSimulator{
                     size_t robotId) noexcept;
 
         void resize(size_t width, size_t height) noexcept;
+        void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         [[nodiscard]] const GridSize& getSize() const noexcept;
 
