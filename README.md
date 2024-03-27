@@ -22,7 +22,7 @@ Prerequisites:
 -  Open the entire solution or project by double-clicking on the `.sln` or `.vcxproj` file. Pressing `CTRL + F5` should run the console application.
 
 ## Executing the unit tests
-- The solution also contains a `RobotSimulatorTest` project utilizing the Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
+- The solution also contains a `RobotSimulatorTest` project utilizing Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
 
 	![TestExplorer](TestExplorer.png)
 
