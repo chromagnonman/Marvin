@@ -51,9 +51,12 @@
     <ClInclude Include="Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="SImulatorMenu.png">
+    <Image Include="SimulatorMenu.png">
       <Filter>Images</Filter>
     </Image>
     <Image Include="Linker.png">

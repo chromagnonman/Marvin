@@ -151,11 +151,12 @@
     <ClInclude Include="Robot.h" />
     <ClInclude Include="RobotSimulator.h" />
     <ClInclude Include="RobotGrid.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Linker.png" />
     <Image Include="RuntimeLibrary.png" />
-    <Image Include="SImulatorMenu.png" />
+    <Image Include="SimulatorMenu.png" />
     <Image Include="TestExplorer.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

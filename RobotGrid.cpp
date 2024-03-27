@@ -62,7 +62,6 @@ namespace RobotWorldSimulator {
             const RobotFactory::RobotLocation& location,
             size_t robotId) noexcept
     {
-        // TODO: Also check if location is already occupied by another robot.
         m_grid[prev_location.x_coordinate][prev_location.y_coordinate] = 0;
         m_grid[location.x_coordinate][location.y_coordinate] = robotId;
     }

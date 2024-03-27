@@ -18,12 +18,22 @@ namespace RobotWorldSimulator {
         static constexpr auto MENU   = "MENU";
     }
 
+    // Auxilliary robot container
+    struct RobotParameters {
+        RobotFactory::RobotLocation location;
+        std::string command;
+        size_t ID{0};
+        std::string name{"Marvin"};
+        std::string subcommand;
+        size_t block{0}; // movement unit
+    };
+
     class RobotSimulator {
     public:
         explicit RobotSimulator(RobotGrid& world) noexcept;
         virtual ~RobotSimulator();
 
-        void place(const RobotFactory::RobotLocation& location, const std::string& robot_name) noexcept;
+        void place(const RobotParameters& robot) noexcept;
         void report() const noexcept;
         void move() noexcept;
         void rotateLeft() noexcept;
@@ -31,10 +41,10 @@ namespace RobotWorldSimulator {
         void removeAll() noexcept;
         
         // Invidual robot commands
-        void move(size_t robot_ID) noexcept;
-        void rotateLeft(size_t robot_ID) noexcept;
-        void rotateRight(size_t robot_ID) noexcept;
-        void remove(size_t robot_ID) noexcept;
+        void move(const RobotParameters&) noexcept;
+        void rotateLeft(const RobotParameters&) noexcept;
+        void rotateRight(const RobotParameters&) noexcept;
+        void remove(const RobotParameters&) noexcept;
 
         const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
         const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;

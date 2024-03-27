@@ -1,21 +1,25 @@
 #include "pch.h"
 #include "RobotSimulator.h"
 
+using namespace RobotWorldSimulator;
+
 TEST(TestRobotSimulator, SimulateTheToyRobotApp)
 {
-	RobotWorldSimulator::RobotGrid matrix;
-	RobotWorldSimulator::RobotSimulator simulate{ matrix };
+	RobotGrid matrix;
+	RobotSimulator simulate{ matrix };
 
 	RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
+    RobotParameters robot {location, "Neo"};
 
-	simulate.place(location, "Neo");
+	simulate.place(robot);
     const std::unique_ptr<RobotFactory::Robot>& R2 = simulate.getRobot(location);
     ASSERT_NE(R2, nullptr);
 	EXPECT_EQ("Neo", R2->name());
 
 	RobotFactory::RobotLocation new_location{ 4, 2, "NORTH" };
+    RobotParameters robot2{location, "Buzz"};
 		
-	simulate.place(new_location, "Buzz");
+	simulate.place(robot2);
     const std::unique_ptr<RobotFactory::Robot>& D2 = simulate.getRobot(new_location);
     ASSERT_NE(D2, nullptr);
 	EXPECT_EQ("Buzz", D2->name());
