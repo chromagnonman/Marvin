@@ -8,16 +8,14 @@
 
 namespace RobotWorldSimulator {
 
-    using RobotPtr = std::unique_ptr<RobotFactory::Robot>&;
-
     namespace COMMAND {
-        static constexpr auto PLACE = "PLACE";
-        static constexpr auto MOVE = "MOVE";
-        static constexpr auto LEFT = "LEFT";
-        static constexpr auto RIGHT = "RIGHT";
+        static constexpr auto PLACE  = "PLACE";
+        static constexpr auto MOVE   = "MOVE";
+        static constexpr auto LEFT   = "LEFT";
+        static constexpr auto RIGHT  = "RIGHT";
         static constexpr auto REPORT = "REPORT";
         static constexpr auto REMOVE = "REMOVE";
-        static constexpr auto MENU = "MENU";
+        static constexpr auto MENU   = "MENU";
     }
 
     class RobotSimulator {

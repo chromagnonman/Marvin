@@ -379,7 +379,9 @@ namespace RobotWorldSimulator {
             {
                m_grid.remove(robot.second);
             }
+
             m_robots.clear();
+
             std::cout << "\nAll robots were terminated!\n";
             Menu::showUsage();
         }
