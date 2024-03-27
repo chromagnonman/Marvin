@@ -14,26 +14,26 @@ namespace RobotWorldSimulator {
 
     struct RobotParameters; // Forward declaration
 
-	class Utils {
-		public:
+    class Utils {
+        public:
 
-		static void toUpper(std::string& str) noexcept
-		{
-			std::transform(std::execution::par_unseq, str.begin(), str.end(), str.begin(),
-				[](char c) { 
-					return std::toupper(c); 
-				});
-		}
+        static void toUpper(std::string& str) noexcept
+        {
+            std::transform(std::execution::par_unseq, str.begin(), str.end(), str.begin(),
+                [](char c) { 
+                    return std::toupper(c); 
+                });
+        }
 
         // Replace extraneous characters with spaces
-		static void removeChars(std::string& str) noexcept 
-		{
-			std::replace_if( std::execution::par_unseq, str.begin(), str.end(),
-				[](const unsigned char c) noexcept 
-				{
-					return !isalnum(c);
-				}, ' ');
-		}
+        static void removeChars(std::string& str) noexcept 
+        {
+            std::replace_if( std::execution::par_unseq, str.begin(), str.end(),
+                [](const unsigned char c) noexcept 
+                {
+                    return !isalnum(c);
+                }, ' ');
+        }
 
         static void setDirection(std::string& direction) noexcept 
         {
@@ -61,8 +61,8 @@ namespace RobotWorldSimulator {
             direction = NORTH;  // Default
         }
 
-		static void processInputParams(RobotParameters& robot, std::string& command) noexcept 
-		{
+        static void processInputParams(RobotParameters& robot, std::string& command) noexcept 
+        {
             removeChars(command);
 
             // Extract the command from the input stream including the parameters
@@ -72,7 +72,7 @@ namespace RobotWorldSimulator {
 
             toUpper(robot.command);
             setDirection(robot.location.direction);
-		}
+        }
 
         static void processCommandParams(RobotParameters& robot, std::string& command) noexcept 
         {
@@ -83,10 +83,6 @@ namespace RobotWorldSimulator {
             input_stream >> robot.command >> robot.ID >> robot.subcommand >> robot.block;
         }
     };
-
-
-
-
 }
 
 #endif

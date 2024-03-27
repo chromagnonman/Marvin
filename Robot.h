@@ -7,8 +7,8 @@ namespace RobotFactory
 {
     
     struct RobotLocation {
-        int32_t x_coordinate;
-        int32_t y_coordinate;
+        size_t x_coordinate;
+        size_t y_coordinate;
         std::string direction;
     };
 
