@@ -4,11 +4,8 @@
 #include <algorithm>
 #include <execution>
 #include <string>
-#include <tuple>
-#include <string_view>
 #include <sstream>
 
-#include "Robot.h"
 
 namespace RobotWorldSimulator {
 

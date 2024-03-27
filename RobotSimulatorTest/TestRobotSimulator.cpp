@@ -9,7 +9,8 @@ TEST(TestRobotSimulator, SimulateTheToyRobotApp)
 	RobotSimulator simulate{ matrix };
 
 	RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
-    RobotParameters robot {location, "Neo"};
+    RobotParameters robot {location};
+    robot.name = "Neo";
 
 	simulate.place(robot);
     const std::unique_ptr<RobotFactory::Robot>& R2 = simulate.getRobot(location);
@@ -17,7 +18,8 @@ TEST(TestRobotSimulator, SimulateTheToyRobotApp)
 	EXPECT_EQ("Neo", R2->name());
 
 	RobotFactory::RobotLocation new_location{ 4, 2, "NORTH" };
-    RobotParameters robot2{location, "Buzz"};
+    RobotParameters robot2{new_location};
+    robot2.name = "Buzz";
 		
 	simulate.place(robot2);
     const std::unique_ptr<RobotFactory::Robot>& D2 = simulate.getRobot(new_location);

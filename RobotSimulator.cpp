@@ -10,7 +10,6 @@
 
 namespace RobotWorldSimulator {
 
-
     using namespace RobotFactory::ROBOT_DIRECTION;
     using namespace RobotWorldSimulator::COMMAND;
 

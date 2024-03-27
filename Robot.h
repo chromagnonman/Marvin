@@ -3,6 +3,7 @@
 
 #include <string>
 
+
 namespace RobotFactory
 {
     
@@ -20,8 +21,8 @@ namespace RobotFactory
     namespace ROBOT_DIRECTION {
         static constexpr auto NORTH = "NORTH";
         static constexpr auto SOUTH = "SOUTH";
-        static constexpr auto EAST = "EAST";
-        static constexpr auto WEST = "WEST";
+        static constexpr auto EAST  = "EAST";
+        static constexpr auto WEST  = "WEST";
     }
 
     /**
@@ -37,7 +38,7 @@ namespace RobotFactory
         Robot(const RobotLocation& location) noexcept : 
             m_location{location}, m_robotID{++m_ID}
         {
-          // TODO: Use random generated number as robot id
+            // TODO: Use random generated number as robot id
         }
 
         Robot(const RobotLocation& location, std::string&& name) noexcept : 
