@@ -13,7 +13,7 @@ A simple toy robot console application written in C++. A user can issue commands
 ## Getting started
 Prerequisites:
 - This is a Windows console application. Your machine should be running on Windows 11 or newer.
-- Install the latest Visual Studio IDE available online with C++ 17 compiler or newer. The community edition should be sufficient.
+- Install the latest Visual Studio IDE available online with at least C++17 compiler. The community edition should be sufficient.
 - Download the code or clone it:
 	```
 	git@github.com:chromagnonman/Marvin.git
@@ -25,6 +25,12 @@ Prerequisites:
 - The solution also contains a `RobotSimulatorTest` project utilizing the Google Test framework. To execute the tests, open the `Test Explorer` and click the play button.
 
 	![TestExplorer](TestExplorer.png)
+
+## Future Improvements
+- Issuing a command to a particular robot using its name e.g. `Move C3PU`.
+- Piping commands i.e. `Move <robot id/name> left`
+- Move robot(s) to more than just one block e.g. `Move Marvin 2 blocks`
+- Support for non bipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
 
 ## Caveat
 - When executing the unit tests, you may encounter linker errors. You need to explicitly add the `.obj` files (Marvin, RobotGrid, and RobotSimulator) to the `Additional Dependencies`
