@@ -31,13 +31,13 @@ namespace RobotFactory
     public:
         Robot() noexcept : m_location{}, m_robotID{++m_ID}
         {
-            // TODO: Use random generate number as robot id
+            // TODO: Use random generated number as robot id
         }
 
         Robot(const RobotLocation& location) noexcept : 
             m_location{location}, m_robotID{++m_ID}
         {
-          // TODO: Use random generate number as robot id
+          // TODO: Use random generated number as robot id
         }
 
         Robot(const RobotLocation& location, std::string&& name) noexcept : 
