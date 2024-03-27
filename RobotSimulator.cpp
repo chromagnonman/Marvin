@@ -110,6 +110,7 @@ namespace RobotWorldSimulator {
 
     void RobotSimulator::impl::execute(std::string& input) noexcept
     {
+        // TODO: Move all these input processing to a utility class
         // Replace extraneous characters with spaces
         std::replace_if(std::execution::par_unseq, input.begin(), input.end(), [](const unsigned char c) noexcept {
             return !isalnum(c);
