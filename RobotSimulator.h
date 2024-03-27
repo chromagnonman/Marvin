@@ -32,7 +32,7 @@ namespace RobotWorldSimulator {
         void rotateRight() noexcept;
         void removeAll() noexcept;
         
-        // TODO: Add support for invidual robot commands
+        // Invidual robot commands
         void move(size_t robot_ID) noexcept;
         void rotateLeft(size_t robot_ID) noexcept;
         void rotateRight(size_t robot_ID) noexcept;

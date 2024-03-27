@@ -13,14 +13,16 @@ class Menu {
 
     static void showUsage() 
     {
-        std::cout << "\nUsage: PLACE X,Y, Direction (NORTH, SOUTH, EAST, "
-                    "WEST) Name (optional) i.e. PLACE 2,2, NORTH, R2D2";
-        std::cout << "\n       MOVE";
-        std::cout << "\n       LEFT";
-        std::cout << "\n       RIGHT";
-        std::cout << "\n       REPORT";
-        std::cout << "\n       REMOVE (Robot ID/All)";
-        std::cout << "\nCtrl+C to quit";
+        std::cout << "\nExample: PLACE 2,2, NORTH, R2D2";
+        std::cout << "\n\n    COMMANDS:";
+        std::cout << "\n\n    PLACE";
+        std::cout << "\n    MOVE   (ROBOT ID/All)";
+        std::cout << "\n    LEFT   (ID/All)";
+        std::cout << "\n    RIGHT  (ID/All)";
+        std::cout << "\n    REPORT (ID/All)";
+        std::cout << "\n    REMOVE (ID/All)";
+        std::cout << "\n\n    MENU";
+        std::cout << "\n\n    Ctrl+C to quit";
         std::cout << "\n\n> ";
     }
 
