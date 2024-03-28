@@ -175,7 +175,7 @@ namespace RobotWorldSimulator {
 
         if (m_grid.isOffTheGrid(new_robot) || m_grid.isOccupied(new_robot)) 
         {
-            // TODO: look for an empty slot in the grid
+            // TODO: look for an empty slot in the grid if (0,0) is also occupied
             // Reset location
             std::cout << "\nLocation is occupied/off the grid.\n";
             new_robot->setLocation({0, 0, new_robot->location().direction});
@@ -212,8 +212,10 @@ namespace RobotWorldSimulator {
 
                 if (!m_grid.isOffTheGrid(robot))
                 {
-                    std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << "("
-                              << robot->location().x_coordinate << "," << robot->location().y_coordinate << ")\n";
+                    std::cout << '\n' << robot->name() << " (ID: " << robot->Id() << ") moved one unit forward heading " 
+                              << robot->location().direction << "(" << robot->location().x_coordinate << "," 
+                              << robot->location().y_coordinate << ")\n";
+
                     m_grid.updateLocation(current_location, robot->location(), robot->Id());
                 }
                 else
@@ -239,9 +241,10 @@ namespace RobotWorldSimulator {
                 // Checks if location is outside the grid or is occupied by another robot
                 if (!m_grid.isOffTheGrid(search->second) && !m_grid.isOccupied(search->second))
                 {
-                    std::cout << '\n' << search->second->name() << " moved " << robot.pace << " pace(s) forward heading " 
-                              << search->second->location().direction << "(" << search->second->location().x_coordinate << ","
-                              << search->second->location().y_coordinate << ")\n";
+                  std::cout << '\n'
+                            << search->second->name() << " (ID: " << search->second->Id() << ") moved " << robot.pace
+                            << " pace(s) forward heading " << search->second->location().direction 
+                            << "(" << search->second->location().x_coordinate << "," << search->second->location().y_coordinate << ")\n";
                     
                     m_grid.updateLocation(current_location, search->second->location(), search->second->Id());
                 } 
@@ -268,7 +271,8 @@ namespace RobotWorldSimulator {
             for (auto& [_, robot] : m_robots)
             {
                 robot->rotate();
-                std::cout << '\n' << robot->name() << " turned left facing " << robot->location().direction << '\n';
+                std::cout << '\n' << robot->name() << " (ID: " << robot->Id() << ") turned left facing " 
+                          << robot->location().direction << '\n';
             }
         }
     }
@@ -281,7 +285,7 @@ namespace RobotWorldSimulator {
             {
                 search->second->rotate();
 
-                std::cout << '\n' << search->second->name() << " turned left facing " 
+                std::cout << '\n' << search->second->name() << "(ID: " << search->second->Id() <<  ") turned left facing " 
                           << search->second->location().direction << '\n';
             }
         }
@@ -298,7 +302,8 @@ namespace RobotWorldSimulator {
             for (auto& [_, robot] : m_robots)
             {
                 robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-                std::cout << '\n' << robot->name() << " shifted right facing " << robot->location().direction << '\n';
+                std::cout << '\n' << robot->name() << " (ID: " << robot->Id() << ") shifted right facing " 
+                          << robot->location().direction << '\n';
             }
         }
     }
@@ -310,7 +315,8 @@ namespace RobotWorldSimulator {
             if (auto search = m_robots.find(robot.ID); search != m_robots.end()) 
             {
                 search->second->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-                std::cout << '\n' << search->second->name() << " turned right facing " << search->second->location().direction << '\n';
+                std::cout << '\n' << search->second->name() << " (ID: " << search->second->Id() <<  ") turned right facing " 
+                          << search->second->location().direction << '\n';
             }
             else 
             {
