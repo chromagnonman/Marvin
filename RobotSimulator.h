@@ -24,8 +24,8 @@ namespace RobotWorldSimulator {
         std::string command;
         size_t ID{0};
         std::string name{"Marvin"};
+        size_t pace{1}; // movement unit
         std::string subcommand;
-        size_t block{0}; // movement unit
     };
 
     class RobotSimulator {

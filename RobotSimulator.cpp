@@ -96,7 +96,6 @@ namespace RobotWorldSimulator {
             if (robot.location.x_coordinate >= m_grid.getSize().width || 
                 robot.location.y_coordinate >= m_grid.getSize().height) 
             {
-                // TODO: Resize the grid
                 robot.location.x_coordinate = 0;
                 robot.location.y_coordinate = 0;
             }
@@ -213,7 +212,8 @@ namespace RobotWorldSimulator {
 
                 if (!m_grid.isOffTheGrid(robot))
                 {
-                    std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << '\n';
+                    std::cout << '\n' << robot->name() << " moved one unit forward heading " << robot->location().direction << "("
+                              << robot->location().x_coordinate << "," << robot->location().y_coordinate << ")\n";
                     m_grid.updateLocation(current_location, robot->location(), robot->Id());
                 }
                 else
@@ -230,17 +230,18 @@ namespace RobotWorldSimulator {
     {
         if (!isGridEmpty()) 
         {
-        if (auto search = m_robots.find(robot.ID); search != m_robots.end())
+            if (auto search = m_robots.find(robot.ID); search != m_robots.end())
             {
                 const auto current_location = search->second->location();
-                // Attempt to move robot
-                search->second->move();
+
+                search->second->move(robot.pace);
 
                 // Checks if location is outside the grid or is occupied by another robot
                 if (!m_grid.isOffTheGrid(search->second) && !m_grid.isOccupied(search->second))
                 {
-                    std::cout << '\n' << search->second->name() << " moved one unit forward heading " 
-                              << search->second->location().direction << '\n';
+                    std::cout << '\n' << search->second->name() << " moved " << robot.pace << " pace(s) forward heading " 
+                              << search->second->location().direction << "(" << search->second->location().x_coordinate << ","
+                              << search->second->location().y_coordinate << ")\n";
                     
                     m_grid.updateLocation(current_location, search->second->location(), search->second->Id());
                 } 
@@ -252,9 +253,11 @@ namespace RobotWorldSimulator {
                     search->second->setLocation(current_location);
                  }
             }
-            else {
+            else 
+            {
+                std::cout << "Robot ID: " << robot.ID << " not found!\n";
             }
-      }
+        }
      
     }
 

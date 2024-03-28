@@ -76,8 +76,8 @@ namespace RobotWorldSimulator {
             // Extract the command from the input stream including the parameters
             std::istringstream input_stream{command};
 
-            // For commands such as Move 42 Left 2 - Robot will move two blocks to the left.
-            input_stream >> robot.command >> robot.ID >> robot.subcommand >> robot.block;
+            // For commands such as Move 42 Left 2 - Robot will move two paces to the left.
+            input_stream >> robot.command >> robot.ID >> robot.pace >> robot.subcommand;
         }
     };
 }
