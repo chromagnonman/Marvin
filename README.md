@@ -1,5 +1,5 @@
 # Marvin (The Paranoid Android)
-A simple toy robot console application written in C++. User can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
+A simple robot simulator written in C++. User can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
 
 ![Menu](SimulatorMenu.png)
 
