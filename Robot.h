@@ -41,8 +41,9 @@ namespace RobotFactory
             // TODO: Use random generated number as robot id
         }
 
-        Robot(const RobotLocation& location, std::string&& name) noexcept : 
-            m_location{location}, m_name{name}, m_robotID{++m_ID}
+        Robot(const RobotLocation& location, std::string name) noexcept
+            : 
+            m_location{location}, m_name{std::move(name)}, m_robotID{++m_ID}
         {
         }
 
@@ -53,7 +54,7 @@ namespace RobotFactory
             return m_robotID;
         }
 
-        const std::string& name() const noexcept
+        std::string name() const noexcept
         {
             return m_name;
         }

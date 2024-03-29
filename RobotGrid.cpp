@@ -6,8 +6,6 @@
 
 namespace RobotWorldSimulator {
 
-    using ROBOT_ID = size_t;
-
     struct RobotGrid::impl {
 
         impl(GridSize&& gridSz) noexcept;
@@ -31,6 +29,7 @@ namespace RobotWorldSimulator {
         bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
 
     private:
+        using ROBOT_ID = size_t;
         std::vector<std::vector<ROBOT_ID>> m_grid;
         GridSize m_gridSz;
     };

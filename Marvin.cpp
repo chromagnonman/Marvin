@@ -12,7 +12,7 @@ namespace RobotFactory {
     }
 
     Marvin::Marvin(const RobotLocation& location, std::string robot_name) noexcept :
-        Robot{ location, std::move(robot_name) }
+        Robot{ location, std::move(robot_name)}
     {
     }
 

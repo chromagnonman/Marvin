@@ -22,8 +22,7 @@ namespace RobotWorldSimulator {
     struct RobotParameters {
         RobotFactory::RobotLocation location;
         std::string command;
-        size_t ID{0};
-        std::string name{"Marvin"};
+        std::string name;
         size_t pace{1}; // movement unit
         std::string subcommand;
     };
@@ -46,8 +45,10 @@ namespace RobotWorldSimulator {
         void rotateRight(const RobotParameters&) noexcept;
         void remove(const RobotParameters&) noexcept;
 
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(size_t robot_id) const noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(
+            const RobotFactory::RobotLocation& location) const noexcept;
+        const std::unique_ptr<RobotFactory::Robot>& getRobot(
+            const std::string robot_name) const noexcept;
 
     private:
         struct impl;

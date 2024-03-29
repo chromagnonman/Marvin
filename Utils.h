@@ -54,8 +54,10 @@ namespace RobotWorldSimulator {
             {
                 direction = WEST;
             }
-
-            direction = NORTH;  // Default
+            else 
+            {
+                direction = NORTH;  // Default
+            }
         }
 
         static void processInputParams(RobotParameters& robot, std::string& command) noexcept 
@@ -64,8 +66,8 @@ namespace RobotWorldSimulator {
 
             // Extract the command from the input stream including the parameters
             std::istringstream input_stream{command};
-            input_stream >> robot.command >> robot.location.x_coordinate >> robot.location.y_coordinate 
-                         >> robot.location.direction >> robot.name;
+            input_stream >> robot.command >> robot.name >> robot.location.x_coordinate >> robot.location.y_coordinate 
+                         >> robot.location.direction;
 
             toUpper(robot.command);
             setDirection(robot.location.direction);
@@ -76,8 +78,8 @@ namespace RobotWorldSimulator {
             // Extract the command from the input stream including the parameters
             std::istringstream input_stream{command};
 
-            // For commands such as Move 42 Left 2 - Robot will move two paces to the left.
-            input_stream >> robot.command >> robot.ID >> robot.pace >> robot.subcommand;
+            // For commands such as Move R2D2 2 left - Robot will move two paces to the left.
+            input_stream >> robot.command >> robot.name >> robot.pace >> robot.subcommand;
         }
     };
 }
