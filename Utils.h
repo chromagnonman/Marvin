@@ -7,7 +7,7 @@
 #include <sstream>
 
 
-namespace RobotWorldSimulator {
+namespace Simulator {
 
     struct RobotParameters; // Forward declaration
 

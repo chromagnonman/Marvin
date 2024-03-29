@@ -4,7 +4,7 @@
 #include <memory>
 #include <iostream>
 
-namespace RobotWorldSimulator {
+namespace Simulator {
 
 class Menu {
 	public:

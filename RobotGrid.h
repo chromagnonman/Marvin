@@ -6,7 +6,7 @@
 #include "RobotGrid.h"
 #include "Robot.h"
 
-namespace RobotWorldSimulator{
+namespace Simulator{
     
     struct GridSize {
         size_t width;

@@ -30,20 +30,20 @@ namespace RobotFactory
     */
     class Robot {
     public:
-        Robot() noexcept : m_location{}, m_robotID{++m_ID}
+        Robot() noexcept : m_location{}, m_robotID{++m_serial_number}
         {
             // TODO: Use random generated number as robot id
         }
 
         Robot(const RobotLocation& location) noexcept : 
-            m_location{location}, m_robotID{++m_ID}
+            m_location{location}, m_robotID{++m_serial_number}
         {
             // TODO: Use random generated number as robot id
         }
 
         Robot(const RobotLocation& location, std::string name) noexcept
             : 
-            m_location{location}, m_name{std::move(name)}, m_robotID{++m_ID}
+            m_location{location}, m_name{std::move(name)}, m_robotID{++m_serial_number}
         {
         }
 
@@ -76,7 +76,7 @@ namespace RobotFactory
         RobotLocation m_location;
         std::string m_name;
         size_t m_robotID;
-        static size_t m_ID;
+        static size_t m_serial_number;
     };
 }
 

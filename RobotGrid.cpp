@@ -4,7 +4,7 @@
 #include "RobotGrid.h"
 
 
-namespace RobotWorldSimulator {
+namespace Simulator {
 
     struct RobotGrid::impl {
 
@@ -28,7 +28,7 @@ namespace RobotWorldSimulator {
         bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
         bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
 
-    private:
+        // Private data
         using ROBOT_ID = size_t;
         std::vector<std::vector<ROBOT_ID>> m_grid;
         GridSize m_gridSz;

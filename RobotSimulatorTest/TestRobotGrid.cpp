@@ -4,12 +4,12 @@
 
 using Robot = std::unique_ptr<RobotFactory::Robot>;
 
-TEST(RobotGridTest, DefaultGridSize) {
+TEST(RobotGrid, DefaultGridSize) {
 
-	RobotWorldSimulator::RobotGrid grid;
+	Simulator::RobotGrid grid;
 
-	EXPECT_EQ(grid.getSize().height, RobotWorldSimulator::DEFAULT_HEIGHT);
-	EXPECT_EQ(grid.getSize().width, RobotWorldSimulator::DEFAULT_WIDTH);
+	EXPECT_EQ(grid.getSize().height, Simulator::DEFAULT_HEIGHT);
+	EXPECT_EQ(grid.getSize().width, Simulator::DEFAULT_WIDTH);
 
 	RobotFactory::RobotLocation location { 11, 11, "NORTH" };
 
@@ -18,9 +18,9 @@ TEST(RobotGridTest, DefaultGridSize) {
 	EXPECT_TRUE(grid.isOffTheGrid(R2));
 }
 
-TEST(RobotGridTest, CustomGridSize) {
+TEST(RobotGrid, CustomGridSize) {
 
-	RobotWorldSimulator::RobotGrid grid{ 5,5 };
+	Simulator::RobotGrid grid{ 5,5 };
 
 	EXPECT_EQ(grid.getSize().height, 5);
 	EXPECT_EQ(grid.getSize().width, 5);
@@ -36,10 +36,10 @@ TEST(RobotGridTest, CustomGridSize) {
 	EXPECT_FALSE(grid.isOffTheGrid(R2));
 }
 
-TEST(RobotGridTest, ResizeGrid) {
+TEST(RobotGrid, ResizeGrid) {
 
 	// Initialize to 5 X 5
-	RobotWorldSimulator::RobotGrid grid{ 5,5 };
+    Simulator::RobotGrid grid{ 5,5 };
 
 	EXPECT_EQ(grid.getSize().height, 5);
 	EXPECT_EQ(grid.getSize().width, 5);
@@ -57,9 +57,9 @@ TEST(RobotGridTest, ResizeGrid) {
 	EXPECT_FALSE(grid.isOffTheGrid(R2));
 }
 
-TEST(RobotGridTest, PullRobotFromTheGrid)
+TEST(RobotGrid, PullRobotFromTheGrid)
 {
-	RobotWorldSimulator::RobotGrid grid;
+	Simulator::RobotGrid grid;
 
 	RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
 	const std::string name{ "NEO" };
@@ -72,9 +72,9 @@ TEST(RobotGridTest, PullRobotFromTheGrid)
 	EXPECT_GT(robot_id, 0);
 }
 
-TEST(TestRobotGrid, RobotOffTheGrid)
+TEST(RobotGrid, RobotOffTheGrid)
 {
-	RobotWorldSimulator::RobotGrid grid; // Default size is 10x10
+	Simulator::RobotGrid grid; // Default size is 10x10
 	RobotFactory::RobotLocation location{ 20, 20, "NORTH" };
 
 	Robot R1 = std::make_unique<RobotFactory::Marvin>(location);

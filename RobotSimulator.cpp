@@ -8,10 +8,10 @@
 #include "Menu.h"
 #include "Utils.h"
 
-namespace RobotWorldSimulator {
+namespace Simulator {
 
     using namespace RobotFactory::ROBOT_DIRECTION;
-    using namespace RobotWorldSimulator::COMMAND;
+    using namespace Simulator::COMMAND;
 
     volatile std::sig_atomic_t signal_status;
 
@@ -25,25 +25,23 @@ namespace RobotWorldSimulator {
         impl(RobotGrid& world) noexcept;
 
         void start() noexcept;
-        void place(const RobotParameters&) noexcept;
+        bool place(const RobotParameters&) noexcept;
         
         // Affects all robots in the grid
-        void report() const noexcept;
         void move() noexcept;
         void rotateLeft() noexcept;
         void rotateRight() noexcept;
         void removeAll() noexcept;
+        void report() const noexcept;
+
 
         // Individual robot commands
-        void move(const RobotParameters&) noexcept;
-        void rotateLeft(const RobotParameters&) noexcept;
-        void rotateRight(const RobotParameters&) noexcept;
-        void remove(const RobotParameters&) noexcept;
+        bool move(const RobotParameters&) noexcept;
+        bool rotateLeft(const RobotParameters&) noexcept;
+        bool rotateRight(const RobotParameters&) noexcept;
+        bool remove(const RobotParameters&) noexcept;
 
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(const RobotFactory::RobotLocation& location) const noexcept;
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(const std::string& robot_name) const noexcept;
-
-    private:
+        // Private
         RobotGrid& m_grid;
         std::unordered_map<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
 
@@ -173,7 +171,7 @@ namespace RobotWorldSimulator {
         }
     }
 
-    void RobotSimulator::impl::place(const RobotParameters& robot) noexcept
+    bool RobotSimulator::impl::place(const RobotParameters& robot) noexcept
     {
         std::unique_ptr<RobotFactory::Robot> new_robot = std::make_unique<RobotFactory::Marvin>(robot.location, robot.name);
 
@@ -188,9 +186,11 @@ namespace RobotWorldSimulator {
         Menu::showDetails(new_robot);
 
         m_grid.addRobot(new_robot->Id(), new_robot->location());
-        m_robots.emplace(std::move(new_robot->name()), std::move(new_robot));
+        const auto result = m_robots.emplace(std::move(new_robot->name()), std::move(new_robot));
 
         std::cout << "\nNumber of robots on the grid: " << m_robots.size() << '\n';
+
+        return result.second;
     }
 
     void RobotSimulator::impl::report() const noexcept
@@ -217,16 +217,18 @@ namespace RobotWorldSimulator {
                 if (!m_grid.isOffTheGrid(robot))
                 {
                     std::cout << '\n' << name << " moved one unit forward heading " 
-                              << robot->location().direction << "("
-                              << robot->location().x_coordinate << ","
-                              << robot->location().y_coordinate << ")\n";
+                                << robot->location().direction << "("
+                                << robot->location().x_coordinate << ","
+                                << robot->location().y_coordinate << ")\n";
 
                     m_grid.updateLocation(current_location, robot->location(), robot->Id());
                 }
                 else
                 {
                     std::cout << '\n' << robot->name() << " is already at the edge of the grid, facing " 
-                              << robot->location().direction << '\n';
+                              << robot->location().direction << "("
+                              << current_location.x_coordinate << ","
+                              << current_location.y_coordinate << ")\n";
 
                     // Revert to previous location
                     robot->setLocation(current_location);
@@ -235,8 +237,10 @@ namespace RobotWorldSimulator {
         }
     }
 
-    void RobotSimulator::impl::move(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::move(const RobotParameters& robot) noexcept 
     {
+        bool result{false};
+
         if (!isGridEmpty()) 
         {
             if (auto search = m_robots.find(robot.name); search != m_robots.end())
@@ -254,6 +258,7 @@ namespace RobotWorldSimulator {
                             << search->second->location().y_coordinate << ")\n";
                     
                     m_grid.updateLocation(current_location, search->second->location(), search->second->Id());
+                    result = true;
                 } 
                 else 
                 {
@@ -268,6 +273,8 @@ namespace RobotWorldSimulator {
                 std::cout << robot.name << " isn't on the grid!\n";
             }
         }
+
+        return result;
      
     }
 
@@ -287,8 +294,10 @@ namespace RobotWorldSimulator {
         }
     }
 
-    void RobotSimulator::impl::rotateLeft(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::rotateLeft(const RobotParameters& robot) noexcept 
     {
+        bool result {false};
+
         if (!isGridEmpty()) 
         {
             if (auto search = m_robots.find(robot.name); search != m_robots.end())
@@ -299,12 +308,16 @@ namespace RobotWorldSimulator {
                           << search->second->location().direction << "("
                           << search->second->location().x_coordinate << ","
                           << search->second->location().y_coordinate << ")\n";
+
+                result = true;
             } 
             else 
             {
                 std::cout << robot.name << " isn't on the grid!\n";
             }
         }
+        
+        return result;
     }
 
     void RobotSimulator::impl::rotateRight() noexcept
@@ -324,8 +337,10 @@ namespace RobotWorldSimulator {
         }
     }
 
-    void RobotSimulator::impl::rotateRight(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::rotateRight(const RobotParameters& robot) noexcept 
     {
+        bool result {false};
+
         if (!isGridEmpty()) 
         {
             if (auto search = m_robots.find(robot.name); search != m_robots.end()) 
@@ -336,12 +351,16 @@ namespace RobotWorldSimulator {
                           << search->second->location().direction << "("
                           << search->second->location().x_coordinate << ","
                           << search->second->location().y_coordinate << ")\n";
+
+                result = true;
             }
             else 
             {
                 std::cout << robot.name << " isn't on the grid!\n";
             }
         }
+
+        return result;
     }
 
     void RobotSimulator::impl::removeAll() noexcept 
@@ -358,8 +377,10 @@ namespace RobotWorldSimulator {
         }
     }
 
-    void RobotSimulator::impl::remove(const RobotParameters& robot) noexcept 
-    { 
+    bool RobotSimulator::impl::remove(const RobotParameters& robot) noexcept 
+    {
+        bool result {false};
+
         if (auto search = m_robots.find(robot.name); search != m_robots.end()) 
         {
             m_grid.remove(search->second);
@@ -368,50 +389,34 @@ namespace RobotWorldSimulator {
             Menu::showDetails(search->second);
             
             m_robots.erase(robot.name);
+
+            result = true;
         }
         else 
         {
             std::cout << robot.name << " isn't on the grid!\n";
         }
+
+        return result;
     }
 
-    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(
-        const RobotFactory::RobotLocation& location) const noexcept
+    
+
+    RobotSimulator::RobotSimulator(RobotGrid& grid) noexcept
+        : m_pImpl{std::make_unique<impl>(grid)}
     {
-        const auto robot_id = m_grid.getRobotID(location);
-
-        for (const auto& robot : m_robots) 
-        {
-            if (robot_id == robot.second->Id()) 
-            {
-                return robot.second;
-            }
-        }
-    }
-
-    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::impl::getRobot(
-        const std::string& robot_name) const noexcept 
-    {
-        if (const auto search = m_robots.find(robot_name); search != m_robots.end()) 
-        {
-            return search->second;
-        }
-
-        return nullptr;
-    }
-
-    RobotSimulator::RobotSimulator(RobotGrid& world) noexcept
-        : m_pImpl{std::make_unique<impl>(world)}
-    {
-        m_pImpl->start();
     }
 
     RobotSimulator::~RobotSimulator() = default;
 
-    
-    void RobotSimulator::place(const RobotParameters& robot) noexcept
+    void RobotSimulator::start() noexcept 
+    { 
+        m_pImpl->start();
+    }
+
+    bool RobotSimulator::place(const RobotParameters& robot) noexcept
     {
-        m_pImpl->place(robot);
+        return m_pImpl->place(robot);
     }
 
     void RobotSimulator::report() const noexcept
@@ -424,9 +429,9 @@ namespace RobotWorldSimulator {
         m_pImpl->move();
     }
 
-    void RobotSimulator::move(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::move(const RobotParameters& robot) noexcept 
     { 
-        m_pImpl->move(robot); 
+        return m_pImpl->move(robot); 
     }
 
     void RobotSimulator::rotateLeft() noexcept
@@ -434,9 +439,9 @@ namespace RobotWorldSimulator {
         m_pImpl->rotateLeft();
     }
 
-    void RobotSimulator::rotateLeft(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::rotateLeft(const RobotParameters& robot) noexcept 
     {
-        m_pImpl->rotateLeft(robot); 
+        return m_pImpl->rotateLeft(robot); 
     }
 
     void RobotSimulator::rotateRight() noexcept
@@ -444,9 +449,9 @@ namespace RobotWorldSimulator {
         m_pImpl->rotateRight();
     }
 
-    void RobotSimulator::rotateRight(const RobotParameters& robot) noexcept
+    bool RobotSimulator::rotateRight(const RobotParameters& robot) noexcept
     { 
-        m_pImpl->rotateRight(robot);
+        return m_pImpl->rotateRight(robot);
     }
 
     void RobotSimulator::removeAll() noexcept 
@@ -454,20 +459,8 @@ namespace RobotWorldSimulator {
         m_pImpl->removeAll();
     }
 
-    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::getRobot(
-        const RobotFactory::RobotLocation& location) const noexcept
+    bool RobotSimulator::remove(const RobotParameters& robot) noexcept
     {
-        return m_pImpl->getRobot(location);
-    }
-
-    const std::unique_ptr<RobotFactory::Robot>& RobotSimulator::getRobot(
-        const std::string robot_name) const noexcept
-    {
-        return m_pImpl->getRobot(robot_name);
-    }
-
-    void RobotSimulator::remove(const RobotParameters& robot) noexcept
-    {
-        m_pImpl->remove(robot);
+        return m_pImpl->remove(robot);
     }
 }

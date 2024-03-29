@@ -4,7 +4,7 @@ namespace RobotFactory {
 
     using namespace RobotFactory::ROBOT_DIRECTION;
 
-    size_t Robot::m_ID{42};
+    size_t Robot::m_serial_number{42};
 
     Marvin::Marvin(const RobotLocation& location) noexcept :
         Robot{ location }

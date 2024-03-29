@@ -6,7 +6,7 @@
 #include "Robot.h"
 #include "RobotGrid.h"
 
-namespace RobotWorldSimulator {
+namespace Simulator {
 
     namespace COMMAND {
         static constexpr auto PLACE  = "PLACE";
@@ -29,26 +29,23 @@ namespace RobotWorldSimulator {
 
     class RobotSimulator {
     public:
-        explicit RobotSimulator(RobotGrid& world) noexcept;
+        explicit RobotSimulator(RobotGrid& grid) noexcept;
         virtual ~RobotSimulator();
 
-        void place(const RobotParameters& robot) noexcept;
-        void report() const noexcept;
+        void start() noexcept;
+
+        bool place(const RobotParameters& robot) noexcept;
         void move() noexcept;
         void rotateLeft() noexcept;
         void rotateRight() noexcept;
         void removeAll() noexcept;
-        
-        // Invidual robot commands
-        void move(const RobotParameters&) noexcept;
-        void rotateLeft(const RobotParameters&) noexcept;
-        void rotateRight(const RobotParameters&) noexcept;
-        void remove(const RobotParameters&) noexcept;
+        void report() const noexcept;
 
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(
-            const RobotFactory::RobotLocation& location) const noexcept;
-        const std::unique_ptr<RobotFactory::Robot>& getRobot(
-            const std::string robot_name) const noexcept;
+        // Invidual robot commands
+        bool move(const RobotParameters&) noexcept;
+        bool rotateLeft(const RobotParameters&) noexcept;
+        bool rotateRight(const RobotParameters&) noexcept;
+        bool remove(const RobotParameters&) noexcept;
 
     private:
         struct impl;
