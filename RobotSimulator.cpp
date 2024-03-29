@@ -176,11 +176,17 @@ namespace Simulator {
       std::unique_ptr<RobotFactory::Robot> new_robot =
           std::make_unique<RobotFactory::Marvin>(robot.location, robot.name);
 
+        RobotParameters new_bot {robot};
+        const auto new_bot_ID = new_robot->Id();
+
         if (m_grid.isOffTheGrid(new_robot) || m_grid.isOccupied(new_robot)) 
         {
+            std::cout << "\nLocation is occupied or off the grid!\n";
+
             // Reset location to (0,0)
-            std::cout << "\nLocation is occupied/outside the grid!\n";
-            new_robot->setLocation({0, 0, new_robot->location().direction});
+            new_bot.location.x_coordinate = 0;
+            new_bot.location.y_coordinate = 0;
+            new_robot->setLocation(new_bot.location);
             
             // Don't insert if location (0,0) is also occupied
             if (m_grid.isOccupied(new_robot)) 
@@ -189,21 +195,22 @@ namespace Simulator {
             }
         }
 
-        m_grid.addRobot(new_robot->Id(), new_robot->location());
-        const auto& [neo, result] = m_robots.emplace(
-            std::move(new_robot->name()), std::move(new_robot));
+        const auto& [neo, created] = m_robots.emplace(
+            std::move(new_bot.name), std::move(new_robot));
 
-        if (!result) 
+        if (!created) 
         {
-           std::cout << '\n' << neo->first << " already exists! Use report to show all robots.\n";
+            std::cout << '\n' << neo->first << " already exists! Use report to show all robots.\n";
         }
         else 
         {
-           std::cout << "\nRobot was created. Info:";
-           Menu::showDetails(neo->second);
+            m_grid.addRobot(new_bot_ID, new_bot.location);
+
+            std::cout << "\nRobot was created. Info:";
+            Menu::showDetails(neo->second);
         }
 
-        return result;
+        return created;
     }
 
     void RobotSimulator::impl::report() const noexcept
@@ -265,7 +272,7 @@ namespace Simulator {
                 // Checks if location is outside the grid or is occupied by another robot
                 if (!m_grid.isOffTheGrid(search->second) && !m_grid.isOccupied(search->second))
                 {
-                  std::cout << '\n' << search->second->name() << " moved " << robot.pace << " pace(s) forward heading " 
+                    std::cout << '\n' << search->second->name() << " moved " << robot.pace << " pace(s) forward heading " 
                             << search->second->location().direction << "("
                             << search->second->location().x_coordinate << ","
                             << search->second->location().y_coordinate << ")\n";
