@@ -14,6 +14,14 @@ TEST(SimulateRobot, CreationAndMovement)
     // Place robot onto the grid
 	ASSERT_TRUE(simulate.place(Neo));
 
+    // Don't allow robot on the same location
+    ASSERT_FALSE(simulate.place(Neo));
+
+    // Don't allow robot with the same name
+    RobotFactory::RobotLocation zion{1, 1, "SOUTH"};
+    RobotParameters TheOne {zion, {}, {"Neo"}};
+    ASSERT_FALSE(simulate.place(TheOne));
+
 	EXPECT_TRUE(simulate.move(Neo));
     EXPECT_TRUE(simulate.rotateRight(Neo));
     EXPECT_TRUE(simulate.rotateLeft(Neo));

@@ -173,24 +173,37 @@ namespace Simulator {
 
     bool RobotSimulator::impl::place(const RobotParameters& robot) noexcept
     {
-        std::unique_ptr<RobotFactory::Robot> new_robot = std::make_unique<RobotFactory::Marvin>(robot.location, robot.name);
+      std::unique_ptr<RobotFactory::Robot> new_robot =
+          std::make_unique<RobotFactory::Marvin>(robot.location, robot.name);
 
         if (m_grid.isOffTheGrid(new_robot) || m_grid.isOccupied(new_robot)) 
         {
-            // TODO: look for an empty slot in the grid if (0,0) is also occupied
-            // Reset location
+            // Reset location to (0,0)
             std::cout << "\nLocation is occupied/outside the grid!\n";
             new_robot->setLocation({0, 0, new_robot->location().direction});
+            
+            // Don't insert if location (0,0) is also occupied
+            if (m_grid.isOccupied(new_robot)) 
+            {
+                return false;
+            }
         }
 
-        Menu::showDetails(new_robot);
-
         m_grid.addRobot(new_robot->Id(), new_robot->location());
-        const auto result = m_robots.emplace(std::move(new_robot->name()), std::move(new_robot));
+        const auto& [neo, result] = m_robots.emplace(
+            std::move(new_robot->name()), std::move(new_robot));
 
-        std::cout << "\nNumber of robots on the grid: " << m_robots.size() << '\n';
+        if (!result) 
+        {
+           std::cout << '\n' << neo->first << " already exists! Use report to show all robots.\n";
+        }
+        else 
+        {
+           std::cout << "\nRobot was created. Info:";
+           Menu::showDetails(neo->second);
+        }
 
-        return result.second;
+        return result;
     }
 
     void RobotSimulator::impl::report() const noexcept
@@ -275,7 +288,6 @@ namespace Simulator {
         }
 
         return result;
-     
     }
 
     void RobotSimulator::impl::rotateLeft() noexcept
@@ -385,7 +397,7 @@ namespace Simulator {
         {
             m_grid.remove(search->second);
 
-            std::cout << "\nThe following robot was removed.\n";
+            std::cout << "\nRobot was removed. Info:";
             Menu::showDetails(search->second);
             
             m_robots.erase(robot.name);

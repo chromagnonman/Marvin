@@ -28,7 +28,7 @@ class Menu {
     static void showDetails(const std::unique_ptr<RobotFactory::Robot>& robot) 
     {
         std::cout << "\nName: " << robot->name();
-
+        std::cout << "\nID: " << robot->Id();
         std::cout << "\nlocation (" << robot->location().x_coordinate << ","
                   << robot->location().y_coordinate << "),"
                   << " facing " << robot->location().direction << '\n';
