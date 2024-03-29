@@ -1,20 +1,22 @@
 # Marvin (The Paranoid Android)
-A simple toy robot console application written in C++. A user can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
+A simple toy robot console application written in C++. User can issue commands to create a robot onto a two-dimensional grid environment and control its movement.
 
 ![Menu](SimulatorMenu.png)
 
 ## Features
 
-- Place a robot onto the cartesian plane using X and Y coordinates with the direction the robot will be facing. (e.g., North, South, West, and East).
-- Move robot(s) one unit forward from its relative position in the direction the robot is currently facing.
-- Rotate the robot at a 90-degree angle in its specified direction - from left to right, and vice versa.
-- Report the robot's info such as id, name, direction, and position.
+- Place a robot onto the cartesian plane using X and Y coordinates with direction that the robot will be facing. (e.g., North, South, West, and East).
+- Move robot(s) one unit forward from its relative position to the direction the robot is currently facing.
+- Rotate robot(s) in a 90-degree angle from left to right and vice versa.
+- Report the robot's info: ID, name, direction, and position.
+- Move particular robot to more than one block e.g. `Move Marvin 2 blocks`
+
 
 ## Getting started
 Prerequisites:
-- This is a Windows console application. Your machine should be running on Windows 11 or newer.
-- Install the latest Visual Studio IDE available online with at least C++17 compiler. The community edition should be sufficient.
-- Download the code or clone it:
+- This is a Windows console application, your machine should be running on Windows 11 or newer.
+- Install the latest Visual Studio IDE available online with at least C++17 compiler. The community edition will suffice.
+- Download or clone the repo:
 	```
 	git@github.com:chromagnonman/Marvin.git
 	```
@@ -27,12 +29,10 @@ Prerequisites:
 	![TestExplorer](TestExplorer.png)
 
 ## Future Improvements
-- Issuing a command to a particular robot using its name e.g. `Move C3PU`.
 - Piping commands i.e. `Move <robot id/name> left`
-- Move robot(s) to more than just one block e.g. `Move Marvin 2 blocks`
 - Support for non bipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
 
-## Caveat
+## Caveats
 - When executing the unit tests, you may encounter linker errors. You need to explicitly add the `.obj` files (Marvin, RobotGrid, and RobotSimulator) to the `Additional Dependencies`
   of the `RobotSimulatorTest` project.
 
