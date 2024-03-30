@@ -5,11 +5,11 @@
 #include <execution>
 #include <string>
 #include <sstream>
+#include <optional>
+#include <tuple>
 
 
 namespace Simulator {
-
-    struct RobotParameters; // Forward declaration
 
     class Utils {
         public:
@@ -32,54 +32,36 @@ namespace Simulator {
                 }, ' ');
         }
 
-        static void setDirection(std::string& direction) noexcept 
+        static void setCommand(std::string& input, RobotFactory::Robot& robot, std::string& command) noexcept 
         {
-            using namespace RobotFactory::ROBOT_DIRECTION;
+            removeChars(input);
+            RobotFactory::RobotLocation location;
+            std::string model;
 
-            toUpper(direction);
+            std::istringstream input_stream {input};
 
-            if (direction == NORTH) 
-            {
-                direction = NORTH;
-            } 
-            else if (direction == SOUTH) 
-            {
-                direction = SOUTH;
-            } 
-            else if (direction == EAST) 
-            {
-                direction = EAST;
-            } 
-            else if (direction == WEST) 
-            {
-                direction = WEST;
-            }
-            else 
-            {
-                direction = NORTH;  // Default
-            }
+            input_stream >> command >> model >> location.x_coordinate >>
+                location.y_coordinate >> location.direction;
+
+            toUpper(command);
+            toUpper(location.direction);
+
+            robot.setLocation(location);
+            robot.setModel(model);
         }
 
-        static void processInputParams(RobotParameters& robot, std::string& command) noexcept 
-        {
-            removeChars(command);
-
-            // Extract the command from the input stream including the parameters
-            std::istringstream input_stream{command};
-            input_stream >> robot.command >> robot.name >> robot.location.x_coordinate >> robot.location.y_coordinate 
-                         >> robot.location.direction;
-
-            toUpper(robot.command);
-            setDirection(robot.location.direction);
-        }
-
-        static void processCommandParams(RobotParameters& robot, std::string& command) noexcept 
+        static std::optional<std::tuple<std::string, size_t>> getCommandParams(const std::string& input) noexcept 
         {
             // Extract the command from the input stream including the parameters
-            std::istringstream input_stream{command};
+            std::istringstream input_stream{input};
+            std::string com;
+            std::string robot_model;
+            size_t pace {1};
 
             // For commands such as Move R2D2 2 left - Robot will move two paces to the left.
-            input_stream >> robot.command >> robot.name >> robot.pace >> robot.subcommand;
+            input_stream >> com >> robot_model >> pace;
+
+            return {std::tuple{robot_model, pace}};
         }
     };
 }

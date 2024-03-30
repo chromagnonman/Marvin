@@ -10,7 +10,7 @@
 
 namespace Simulator {
 
-    using namespace RobotFactory::ROBOT_DIRECTION;
+    using namespace RobotFactory;
     using namespace Simulator::COMMAND;
 
     volatile std::sig_atomic_t signal_status;
@@ -25,7 +25,7 @@ namespace Simulator {
         impl(RobotGrid& world) noexcept;
 
         void start() noexcept;
-        bool place(const RobotParameters&) noexcept;
+        bool place(const RobotFactory::Marvin&) noexcept;
         
         // Affects all robots in the grid
         void move() noexcept;
@@ -36,14 +36,14 @@ namespace Simulator {
 
 
         // Individual robot commands
-        bool move(const RobotParameters&) noexcept;
-        bool rotateLeft(const RobotParameters&) noexcept;
-        bool rotateRight(const RobotParameters&) noexcept;
-        bool remove(const RobotParameters&) noexcept;
+        bool move(const RobotFactory::Marvin&, size_t) noexcept;
+        bool rotateLeft(const RobotFactory::Marvin&) noexcept;
+        bool rotateRight(const RobotFactory::Marvin&) noexcept;
+        bool remove(const RobotFactory::Marvin&) noexcept;
 
         // Private
         RobotGrid& m_grid;
-        std::unordered_map<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
+        std::unordered_multimap<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
 
         bool isGridEmpty() const noexcept;
         void execute(std::string&& command) noexcept;
@@ -69,46 +69,49 @@ namespace Simulator {
     {
         std::signal(SIGINT, signal_handler);
 
-        std::string command;
+        std::string input;
         
         Menu::showUsage();
 
-        while (std::getline(std::cin, command)) {
+        while (std::getline(std::cin, input)) {
 
-            execute(std::move(command));
+            execute(std::move(input));
         }
     }
 
-    void RobotSimulator::impl::execute(std::string&& command) noexcept
+    void RobotSimulator::impl::execute(std::string&& input) noexcept
     {
-        RobotParameters robot;
+        RobotFactory::Marvin robot;
+        std::string command;
 
-        Utils::processInputParams(robot, command);
+        Utils::setCommand(input, robot, command);
 
-        if (robot.command == PLACE)
+        if (command == PLACE)
         {
             //  If XY is greater than or equal to the default size, reset the
             //  location to zero.
-            if (robot.location.x_coordinate >= m_grid.getSize().width || 
-                robot.location.y_coordinate >= m_grid.getSize().height) 
+            if (robot.location().x_coordinate >= m_grid.getSize().width || 
+                robot.location().y_coordinate >= m_grid.getSize().height) 
             {
-                robot.location.x_coordinate = 0;
-                robot.location.y_coordinate = 0;
+                RobotLocation new_location{robot.location()};
+                
+                new_location.x_coordinate = 0;
+                new_location.y_coordinate = 0;
+
+                robot.setLocation(new_location);
             }
 
-            // Handle user error on not specifying a name
-            if (robot.name.empty()) 
+            // Handle user error on not specifying a model
+            if (robot.model().empty()) 
             {
-                robot.name = "R2D2";
+                robot.setModel("R2D2");
             }
 
             place(robot);
         }
-        else if (robot.command == LEFT)
+        else if (command == LEFT)
         {
-            Utils::processCommandParams(robot, command);
-
-            if (!robot.name.empty()) 
+            if (!robot.model().empty()) 
             {
                 rotateLeft(robot);
             }
@@ -117,11 +120,9 @@ namespace Simulator {
                 rotateLeft();
             }
         }
-        else if (robot.command == RIGHT)
+        else if (command == RIGHT)
         {
-            Utils::processCommandParams(robot, command);
-            
-            if (!robot.name.empty()) 
+            if (!robot.model().empty()) 
             {
                 rotateRight(robot);
             } 
@@ -130,24 +131,24 @@ namespace Simulator {
                 rotateRight();
             }
         }
-        else if (robot.command == MOVE)
+        else if (command == MOVE)
         {
-            Utils::processCommandParams(robot, command);
+            const auto params = Utils::getCommandParams(input);
 
-            if (!robot.name.empty()) 
+            const auto [robot_model, blocks] = params.value();
+            
+            if (!robot_model.empty()) 
             {
-              move(robot);
+                move(robot, blocks);
             } 
             else 
             {
               move();
             }
         }
-        else if (robot.command == REMOVE) 
+        else if (command == REMOVE) 
         {
-            Utils::processCommandParams(robot, command);
-
-            if (!robot.name.empty()) 
+            if (!robot.model().empty()) 
             {
                 remove(robot);
             } 
@@ -156,11 +157,11 @@ namespace Simulator {
                 removeAll();
             }
         } 
-        else if (robot.command == REPORT) 
+        else if (command == REPORT) 
         {
             report();
         }
-        else if (robot.command == MENU) 
+        else if (command == MENU) 
         {
             Menu::showUsage();
         }
@@ -171,46 +172,33 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::place(const RobotParameters& robot) noexcept
+    bool RobotSimulator::impl::place(const RobotFactory::Marvin& robot) noexcept
     {
-      std::unique_ptr<RobotFactory::Robot> new_robot =
-          std::make_unique<RobotFactory::Marvin>(robot.location, robot.name);
+        std::unique_ptr<Robot> new_robot = std::make_unique<Marvin>(robot);
 
-        RobotParameters new_bot {robot};
-        const auto new_bot_ID = new_robot->Id();
-
-        if (m_grid.isOffTheGrid(new_robot) || m_grid.isOccupied(new_robot)) 
+        if (!m_grid.addRobot(new_robot))
         {
             std::cout << "\nLocation is occupied or off the grid!\n";
 
             // Reset location to (0,0)
-            new_bot.location.x_coordinate = 0;
-            new_bot.location.y_coordinate = 0;
-            new_robot->setLocation(new_bot.location);
+            RobotLocation new_location {new_robot->location()};
+            new_location.x_coordinate = 0;
+            new_location.y_coordinate = 0;
+
+            new_robot->setLocation(new_location);
             
             // Don't insert if location (0,0) is also occupied
-            if (m_grid.isOccupied(new_robot)) 
+            if (!m_grid.addRobot(new_robot)) 
             {
                 return false;
             }
         }
 
-        const auto& [neo, created] = m_robots.emplace(
-            std::move(new_bot.name), std::move(new_robot));
+        std::cout << "\nRobot created. Info:";
+        Menu::showDetails(new_robot);
+        m_robots.emplace(robot.model(), std::move(new_robot));
 
-        if (!created) 
-        {
-            std::cout << '\n' << neo->first << " already exists! Use report to show all robots.\n";
-        }
-        else 
-        {
-            m_grid.addRobot(new_bot_ID, new_bot.location);
-
-            std::cout << "\nRobot was created. Info:";
-            Menu::showDetails(neo->second);
-        }
-
-        return created;
+        return true;
     }
 
     void RobotSimulator::impl::report() const noexcept
@@ -229,14 +217,15 @@ namespace Simulator {
     {
         if (!isGridEmpty()) 
         {
-            for (auto& [name, robot] : m_robots)
+            for (auto& [model, robot] : m_robots)
             {
                 const auto current_location = robot->location();
+                
                 robot->move();
 
                 if (!m_grid.isOffTheGrid(robot))
                 {
-                    std::cout << '\n' << name << " moved one unit forward heading " 
+                    std::cout << '\n' << model << " moved one unit forward heading " 
                                 << robot->location().direction << "("
                                 << robot->location().x_coordinate << ","
                                 << robot->location().y_coordinate << ")\n";
@@ -245,7 +234,7 @@ namespace Simulator {
                 }
                 else
                 {
-                    std::cout << '\n' << robot->name() << " is already at the edge of the grid, facing " 
+                    std::cout << '\n' << robot->model() << " is already at the edge of the grid, facing " 
                               << robot->location().direction << "("
                               << current_location.x_coordinate << ","
                               << current_location.y_coordinate << ")\n";
@@ -257,40 +246,45 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::move(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::move(const RobotFactory::Marvin& target_robot,
+                                    size_t blocks) noexcept 
     {
         bool result{false};
 
         if (!isGridEmpty()) 
         {
-            if (auto search = m_robots.find(robot.name); search != m_robots.end())
+            if (auto [robot, last] = m_robots.equal_range(target_robot.model());
+                  robot != m_robots.end())
             {
-                const auto current_location = search->second->location();
-
-                search->second->move(robot.pace);
-
-                // Checks if location is outside the grid or is occupied by another robot
-                if (!m_grid.isOffTheGrid(search->second) && !m_grid.isOccupied(search->second))
+                for (; robot != last; ++robot) 
                 {
-                    std::cout << '\n' << search->second->name() << " moved " << robot.pace << " pace(s) forward heading " 
-                            << search->second->location().direction << "("
-                            << search->second->location().x_coordinate << ","
-                            << search->second->location().y_coordinate << ")\n";
+                    const auto current_location = robot->second->location();
+
+                    robot->second->move(blocks);
+
+                    // Checks if location is outside the grid or is occupied by another robot
+                    if (!m_grid.isOffTheGrid(robot->second) && !m_grid.isOccupied(robot->second))
+                    {
+                        std::cout << '\n' << robot->second->model() << " moved " << blocks << " block(s) forward heading " 
+                                << robot->second->location().direction << "("
+                                << robot->second->location().x_coordinate << ","
+                                << robot->second->location().y_coordinate << ")\n";
                     
-                    m_grid.updateLocation(current_location, search->second->location(), search->second->Id());
-                    result = true;
-                } 
-                else 
-                {
-                    std::cout << '\n' << search->second->name() << " is unable to move. Area is occupied or outside the grid.\n";
+                        m_grid.updateLocation(current_location, robot->second->location(), robot->second->Id());
+                        result = true;
+                    } 
+                    else 
+                    {
+                        std::cout << '\n' << robot->second->model() << " is unable to move. Area is occupied or outside the grid.\n";
                     
-                    // Revert to previous location
-                    search->second->setLocation(current_location);
-                 }
+                        // Revert to previous location
+                        robot->second->setLocation(current_location);
+                     }
+                }
             }
             else 
             {
-                std::cout << robot.name << " isn't on the grid!\n";
+                std::cout << target_robot.model() << " isn't on the grid!\n";
             }
         }
 
@@ -301,11 +295,11 @@ namespace Simulator {
     {
         if (!isGridEmpty())
         {
-            for (auto& [name, robot] : m_robots)
+            for (auto& [model, robot] : m_robots)
             {
                 robot->rotate();
                 std::cout << '\n'
-                          << name << " turned left facing "
+                          << model << " turned left facing "
                           << robot->location().direction << "("
                           << robot->location().x_coordinate << ","
                           << robot->location().y_coordinate << ")\n";
@@ -313,26 +307,29 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::rotateLeft(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::rotateLeft(const RobotFactory::Marvin& target_robot) noexcept 
     {
         bool result {false};
 
         if (!isGridEmpty()) 
         {
-            if (auto search = m_robots.find(robot.name); search != m_robots.end())
+          if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
             {
-                search->second->rotate();
+                for (; robot != last; ++robot) 
+                {
+                    robot->second->rotate();
 
-                std::cout << '\n' << search->second->name() << " turned left facing " 
-                          << search->second->location().direction << "("
-                          << search->second->location().x_coordinate << ","
-                          << search->second->location().y_coordinate << ")\n";
+                    std::cout << '\n' << robot->second->model() << " turned left facing " 
+                              << robot->second->location().direction << "("
+                              << robot->second->location().x_coordinate << ","
+                              << robot->second->location().y_coordinate << ")\n";
 
-                result = true;
+                    result = true;
+                }
             } 
             else 
             {
-                std::cout << robot.name << " isn't on the grid!\n";
+                std::cout << target_robot.model() << " isn't on the grid!\n";
             }
         }
         
@@ -343,12 +340,12 @@ namespace Simulator {
     {
         if (!isGridEmpty())
         {
-            for (auto& [name, robot] : m_robots)
+            for (auto& [model, robot] : m_robots)
             {
                 robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 
                 std::cout << '\n'
-                          << name << " shifted right facing "
+                          << model << " shifted right facing "
                           << robot->location().direction << "("
                           << robot->location().x_coordinate << ","
                           << robot->location().y_coordinate << ")\n";
@@ -356,26 +353,29 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::rotateRight(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::rotateRight(const RobotFactory::Marvin& target_robot) noexcept 
     {
         bool result {false};
 
         if (!isGridEmpty()) 
         {
-            if (auto search = m_robots.find(robot.name); search != m_robots.end()) 
+            if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
             {
-                search->second->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
+                for (; robot != last; ++robot) 
+                {
+                    robot->second->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
 
-                std::cout << '\n' << search->second->name() << " turned right facing "
-                          << search->second->location().direction << "("
-                          << search->second->location().x_coordinate << ","
-                          << search->second->location().y_coordinate << ")\n";
+                    std::cout << '\n' << robot->second->model() << " turned right facing "
+                              << robot->second->location().direction << "("
+                              << robot->second->location().x_coordinate << ","
+                              << robot->second->location().y_coordinate << ")\n";
 
-                result = true;
+                    result = true;
+                }
             }
             else 
             {
-                std::cout << robot.name << " isn't on the grid!\n";
+                std::cout << target_robot.model() << " isn't on the grid!\n";
             }
         }
 
@@ -396,24 +396,27 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::remove(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::impl::remove(const RobotFactory::Marvin& target_robot) noexcept 
     {
         bool result {false};
 
-        if (auto search = m_robots.find(robot.name); search != m_robots.end()) 
+        if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
         {
-            m_grid.remove(search->second);
+            for (auto first = robot; first != last; ++first) 
+            {
+                m_grid.remove(first->second);
 
-            std::cout << "\nRobot was removed. Info:";
-            Menu::showDetails(search->second);
-            
-            m_robots.erase(robot.name);
+                std::cout << "\nRobot was removed. Info:";
+                Menu::showDetails(first->second);
+            }
 
-            result = true;
+          m_robots.erase(robot, last);
+
+          result = true;
         }
         else 
         {
-            std::cout << robot.name << " isn't on the grid!\n";
+            std::cout << target_robot.model() << " isn't on the grid!\n";
         }
 
         return result;
@@ -433,7 +436,7 @@ namespace Simulator {
         m_pImpl->start();
     }
 
-    bool RobotSimulator::place(const RobotParameters& robot) noexcept
+    bool RobotSimulator::place(const RobotFactory::Marvin& robot) noexcept
     {
         return m_pImpl->place(robot);
     }
@@ -448,9 +451,9 @@ namespace Simulator {
         m_pImpl->move();
     }
 
-    bool RobotSimulator::move(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::move(const RobotFactory::Marvin& robot, size_t paces) noexcept 
     { 
-        return m_pImpl->move(robot); 
+        return m_pImpl->move(robot, paces); 
     }
 
     void RobotSimulator::rotateLeft() noexcept
@@ -458,7 +461,7 @@ namespace Simulator {
         m_pImpl->rotateLeft();
     }
 
-    bool RobotSimulator::rotateLeft(const RobotParameters& robot) noexcept 
+    bool RobotSimulator::rotateLeft(const RobotFactory::Marvin& robot) noexcept 
     {
         return m_pImpl->rotateLeft(robot); 
     }
@@ -468,7 +471,7 @@ namespace Simulator {
         m_pImpl->rotateRight();
     }
 
-    bool RobotSimulator::rotateRight(const RobotParameters& robot) noexcept
+    bool RobotSimulator::rotateRight(const RobotFactory::Marvin& robot) noexcept
     { 
         return m_pImpl->rotateRight(robot);
     }
@@ -478,7 +481,7 @@ namespace Simulator {
         m_pImpl->removeAll();
     }
 
-    bool RobotSimulator::remove(const RobotParameters& robot) noexcept
+    bool RobotSimulator::remove(const RobotFactory::Marvin& robot) noexcept
     {
         return m_pImpl->remove(robot);
     }

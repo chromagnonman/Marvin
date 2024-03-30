@@ -11,6 +11,7 @@ namespace RobotFactory {
 	*/
 	class Marvin : public Robot {
 	public:
+        Marvin();
 		Marvin(const RobotLocation& location) noexcept;
 		Marvin(const RobotLocation&, std::string robot_name) noexcept;
 		Marvin(const Marvin&) noexcept;

@@ -1,8 +1,7 @@
 #include <vector>
-#include <iostream>
 
 #include "RobotGrid.h"
-
+#include "Marvin.h"
 
 namespace Simulator {
 
@@ -10,9 +9,7 @@ namespace Simulator {
 
         impl(GridSize&& gridSz) noexcept;
 
-        void addRobot(
-                    size_t robotId,
-                    const RobotFactory::RobotLocation& location) noexcept;
+        bool addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         void updateLocation(
                     const RobotFactory::RobotLocation& prev_location,
@@ -51,9 +48,17 @@ namespace Simulator {
         resize(gridSz);
     }
 
-    void RobotGrid::impl::addRobot(size_t robotId, const RobotFactory::RobotLocation& location) noexcept
+    bool RobotGrid::impl::addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
     {
-        m_grid[location.x_coordinate][location.y_coordinate] = robotId;
+        if (!isOffTheGrid(robot) && !isOccupied(robot))
+        {
+            m_grid[robot->location().x_coordinate][robot->location().y_coordinate] =
+                robot->Id();
+
+            return true;
+        }
+
+        return false;
     }
 
     void RobotGrid::impl::updateLocation(
@@ -106,13 +111,11 @@ namespace Simulator {
     RobotGrid::~RobotGrid() = default;
 
 
-    void RobotGrid::addRobot(
-            size_t robotId,
-            const RobotFactory::RobotLocation& location) noexcept
+    bool RobotGrid::addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
     {
-        m_pImpl->addRobot(robotId, location);
+        return m_pImpl->addRobot(robot);
     }
-
+    
     void RobotGrid::updateLocation(
             const RobotFactory::RobotLocation& prev_location,
             const RobotFactory::RobotLocation& location,

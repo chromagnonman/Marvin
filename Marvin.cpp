@@ -6,6 +6,8 @@ namespace RobotFactory {
 
     size_t Robot::m_serial_number{42};
 
+    Marvin::Marvin() = default;
+
     Marvin::Marvin(const RobotLocation& location) noexcept :
         Robot{ location }
     {
@@ -22,7 +24,7 @@ namespace RobotFactory {
         {
             m_location = marvin.m_location;
             m_robotID = marvin.m_robotID;
-            m_name = marvin.m_name;
+            m_model = marvin.m_model;
         }
     }
 
@@ -32,7 +34,7 @@ namespace RobotFactory {
         {
             m_location = marvin.m_location;
             m_robotID = marvin.m_robotID;
-            m_name = marvin.m_name;
+            m_model = marvin.m_model;
         }
 
         return *this;

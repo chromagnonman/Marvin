@@ -8,9 +8,9 @@ namespace RobotFactory
 {
     
     struct RobotLocation {
-        size_t x_coordinate;
-        size_t y_coordinate;
-        std::string direction;
+        size_t x_coordinate{0};
+        size_t y_coordinate{0};
+        std::string direction {"NORTH"};
     };
 
     enum class ROBOT_ROTATION : size_t {
@@ -43,7 +43,7 @@ namespace RobotFactory
 
         Robot(const RobotLocation& location, std::string name) noexcept
             : 
-            m_location{location}, m_name{std::move(name)}, m_robotID{++m_serial_number}
+            m_location{location}, m_model{std::move(name)}, m_robotID{++m_serial_number}
         {
         }
 
@@ -54,9 +54,9 @@ namespace RobotFactory
             return m_robotID;
         }
 
-        std::string name() const noexcept
+        std::string model() const noexcept
         {
-            return m_name;
+            return m_model;
         }
 
         RobotLocation location() const noexcept
@@ -69,12 +69,17 @@ namespace RobotFactory
             m_location = location;
         }
 
+        void setModel(const std::string& model) noexcept 
+        {
+            m_model = model;
+        }
+
         virtual void rotate(const ROBOT_ROTATION& rotate_direction = ROBOT_ROTATION::LEFT) = 0;
         virtual void move(size_t pace = 1) = 0;
 
     protected:
         RobotLocation m_location;
-        std::string m_name;
+        std::string m_model;
         size_t m_robotID;
         static size_t m_serial_number;
     };

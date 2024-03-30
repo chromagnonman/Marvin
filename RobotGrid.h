@@ -29,9 +29,7 @@ namespace Simulator{
         
         virtual ~RobotGrid() noexcept;
 
-        void addRobot(
-                    size_t robotId,
-                    const RobotFactory::RobotLocation& location) noexcept;
+        bool addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         void updateLocation(
                     const RobotFactory::RobotLocation& prev_location,

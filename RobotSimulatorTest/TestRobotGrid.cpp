@@ -66,7 +66,7 @@ TEST(RobotGrid, PullRobotFromTheGrid)
 
 	Robot R1 = std::make_unique<RobotFactory::Marvin>(location, name);
 
-	grid.addRobot(R1->Id(), R1->location());
+	grid.addRobot(R1);
 
 	auto robot_id = grid.getRobotID(location);
 	EXPECT_GT(robot_id, 0);

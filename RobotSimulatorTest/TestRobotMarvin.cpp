@@ -18,7 +18,7 @@ TEST(Marvin, RobotCreationAndMovement)
 	EXPECT_GT(marvin->location().x_coordinate, 0);
 
 	std::shared_ptr<RobotFactory::Robot> robot{ marvin };
-	EXPECT_EQ(robot->name(), marvin->name());
+	EXPECT_EQ(robot->model(), marvin->model());
 
 	robot->rotate(); // Rotate left facing north
 	robot->move();   // Move up one unit

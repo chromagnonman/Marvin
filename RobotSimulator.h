@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "Robot.h"
+#include "Marvin.h"
 #include "RobotGrid.h"
 
 namespace Simulator {
@@ -18,15 +18,6 @@ namespace Simulator {
         static constexpr auto MENU   = "MENU";
     }
 
-    // Auxilliary robot container
-    struct RobotParameters {
-        RobotFactory::RobotLocation location;
-        std::string command;
-        std::string name;
-        size_t pace{1}; // movement unit
-        std::string subcommand;
-    };
-
     class RobotSimulator {
     public:
         explicit RobotSimulator(RobotGrid& grid) noexcept;
@@ -34,18 +25,18 @@ namespace Simulator {
 
         void start() noexcept;
 
-        bool place(const RobotParameters& robot) noexcept;
+        bool place(const RobotFactory::Marvin&) noexcept;
         void move() noexcept;
         void rotateLeft() noexcept;
         void rotateRight() noexcept;
         void removeAll() noexcept;
         void report() const noexcept;
 
-        // Invidual robot commands
-        bool move(const RobotParameters&) noexcept;
-        bool rotateLeft(const RobotParameters&) noexcept;
-        bool rotateRight(const RobotParameters&) noexcept;
-        bool remove(const RobotParameters&) noexcept;
+        // Individual robot commands
+        bool move(const RobotFactory::Marvin&, size_t blocks=1) noexcept;
+        bool rotateLeft(const RobotFactory::Marvin&) noexcept;
+        bool rotateRight(const RobotFactory::Marvin&) noexcept;
+        bool remove(const RobotFactory::Marvin&) noexcept;
 
     private:
         struct impl;
