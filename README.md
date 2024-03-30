@@ -9,7 +9,7 @@ A simple robot simulator written in C++. User can issue commands to create a rob
 - Move robot(s) one unit forward from its relative position to the direction the robot is currently facing.
 - Rotate robot(s) in a 90-degree angle from left to right and vice versa.
 - Report the robot's info: ID, name, direction, and position.
-- Move particular robot to more than one block e.g. `Move Marvin 2 blocks`
+- Move particular robot to more than one block e.g. `Move Marvin 2 (blocks)`
 
 
 ## Getting started
@@ -29,8 +29,9 @@ Prerequisites:
 	![TestExplorer](TestExplorer.png)
 
 ## Future Improvements
-- Piping commands i.e. `Move <robot id/name> left`
+- Piping commands e.g. `Move R2D2 left` will move `R2D2` one block to the left. Another example: `Move R2D2 2 (blocks) left`.
 - Support for non bipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
+- Display the actual grid with all the robots mapped out.
 
 ## Caveats
 - When executing the unit tests, you may encounter linker errors. You need to explicitly add the `.obj` files (Marvin, RobotGrid, and RobotSimulator) to the `Additional Dependencies`
