@@ -5,8 +5,7 @@ using namespace Simulator;
 
 TEST(SimulateRobot, CreationAndMovement)
 {
-	RobotGrid matrix;
-	RobotSimulator simulate{ matrix };
+	RobotSimulator simulate;
 
 	RobotFactory::RobotLocation location{ 0, 0, "NORTH" };
     RobotFactory::Marvin R2D2 {location, {"Neo"}};
@@ -27,9 +26,10 @@ TEST(SimulateRobot, CreationAndMovement)
     EXPECT_FALSE(simulate.move(R2D2));
 
     EXPECT_TRUE(simulate.remove(R2D2));
-
+    
     // Grid is now empty; expect failures
     EXPECT_FALSE(simulate.move(R2D2));
     EXPECT_FALSE(simulate.rotateLeft(R2D2));
     EXPECT_FALSE(simulate.rotateRight(R2D2));
+    EXPECT_FALSE(simulate.remove(R2D2));
 }

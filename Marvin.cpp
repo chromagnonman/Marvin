@@ -42,23 +42,23 @@ namespace RobotFactory {
 
     Marvin::~Marvin() = default;
 
-    void Marvin::move(size_t pace) noexcept
+    void Marvin::move(size_t unit) noexcept
     {
         if (m_location.direction == NORTH)
         {
-            m_location.y_coordinate+=pace;
+            m_location.y_coordinate+=unit;
         }
         else if (m_location.direction == SOUTH)
         {
-            m_location.y_coordinate-=pace;
+            m_location.y_coordinate-=unit;
         }
         else if (m_location.direction == EAST)
         {
-            m_location.x_coordinate+=pace;
+            m_location.x_coordinate+=unit;
         }
         else if (m_location.direction == WEST)
         {
-            m_location.x_coordinate-=pace;
+            m_location.x_coordinate-=unit;
         }
     }
 

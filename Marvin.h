@@ -19,7 +19,7 @@ namespace RobotFactory {
 		virtual ~Marvin();
 
 		void rotate(const ROBOT_ROTATION& rotate_direction = ROBOT_ROTATION::LEFT) noexcept override;
-		void move(size_t pace=1) noexcept override;
+		void move(size_t unit=1) noexcept override;
 	};
 }
 

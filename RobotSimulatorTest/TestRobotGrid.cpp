@@ -20,7 +20,7 @@ TEST(RobotGrid, DefaultGridSize) {
 
 TEST(RobotGrid, CustomGridSize) {
 
-	Simulator::RobotGrid grid{ 5,5 };
+	Simulator::RobotGrid grid{ {5,5} };
 
 	EXPECT_EQ(grid.getSize().height, 5);
 	EXPECT_EQ(grid.getSize().width, 5);
@@ -39,7 +39,7 @@ TEST(RobotGrid, CustomGridSize) {
 TEST(RobotGrid, ResizeGrid) {
 
 	// Initialize to 5 X 5
-    Simulator::RobotGrid grid{ 5,5 };
+    Simulator::RobotGrid grid{ {5,5} };
 
 	EXPECT_EQ(grid.getSize().height, 5);
 	EXPECT_EQ(grid.getSize().width, 5);

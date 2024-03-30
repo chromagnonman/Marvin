@@ -2,10 +2,7 @@
 
 int main()
 {
-    using namespace Simulator;
-    
-    RobotGrid robot_excursion;
-    RobotSimulator simulate(robot_excursion);
+    Simulator::RobotSimulator simulate;
 
     simulate.start();
 

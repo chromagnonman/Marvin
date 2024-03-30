@@ -20,7 +20,8 @@ namespace Simulator {
 
     class RobotSimulator {
     public:
-        explicit RobotSimulator(RobotGrid& grid) noexcept;
+        RobotSimulator() noexcept;
+        RobotSimulator(GridSize&& grid) noexcept;
         virtual ~RobotSimulator();
 
         void start() noexcept;

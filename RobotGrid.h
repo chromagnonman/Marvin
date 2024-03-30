@@ -22,7 +22,7 @@ namespace Simulator{
     class RobotGrid {
     public:
         RobotGrid() noexcept;
-        RobotGrid(size_t width, size_t height) noexcept;
+        RobotGrid(GridSize grid) noexcept;
 
         RobotGrid(const RobotGrid&) = delete;
         RobotGrid& operator=(const RobotGrid&) = delete;
@@ -40,11 +40,8 @@ namespace Simulator{
         void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         [[nodiscard]] const GridSize& getSize() const noexcept;
-
         [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
-
         [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
-
         [[nodiscard]] bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
 
     private:

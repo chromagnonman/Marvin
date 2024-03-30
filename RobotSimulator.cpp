@@ -22,7 +22,7 @@ namespace Simulator {
 
     struct RobotSimulator::impl {
 
-        impl(RobotGrid& world) noexcept;
+        impl(GridSize&& grid) noexcept;
 
         void start() noexcept;
         bool place(const RobotFactory::Marvin&) noexcept;
@@ -42,7 +42,7 @@ namespace Simulator {
         bool remove(const RobotFactory::Marvin&) noexcept;
 
         // Private
-        RobotGrid& m_grid;
+        std::unique_ptr<RobotGrid> m_grid;
         std::unordered_multimap<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
 
         bool isGridEmpty() const noexcept;
@@ -50,8 +50,10 @@ namespace Simulator {
 
     };
 
-    RobotSimulator::impl::impl(RobotGrid& grid) noexcept : m_grid{grid}
+    RobotSimulator::impl::impl(GridSize&& grid) noexcept
+        : m_grid{std::make_unique<RobotGrid>(grid)}
     {
+        m_robots.reserve(100);
     }
 
     bool RobotSimulator::impl::isGridEmpty() const noexcept
@@ -70,7 +72,6 @@ namespace Simulator {
         std::signal(SIGINT, signal_handler);
 
         std::string input;
-        
         Menu::showUsage();
 
         while (std::getline(std::cin, input)) {
@@ -90,8 +91,8 @@ namespace Simulator {
         {
             //  If XY is greater than or equal to the default size, reset the
             //  location to zero.
-            if (robot.location().x_coordinate >= m_grid.getSize().width || 
-                robot.location().y_coordinate >= m_grid.getSize().height) 
+            if (robot.location().x_coordinate >= m_grid->getSize().width || 
+                robot.location().y_coordinate >= m_grid->getSize().height) 
             {
                 RobotLocation new_location{robot.location()};
                 
@@ -176,7 +177,7 @@ namespace Simulator {
     {
         std::unique_ptr<Robot> new_robot = std::make_unique<Marvin>(robot);
 
-        if (!m_grid.addRobot(new_robot))
+        if (!m_grid->addRobot(new_robot))
         {
             std::cout << "\nLocation is occupied or off the grid!\n";
 
@@ -188,7 +189,7 @@ namespace Simulator {
             new_robot->setLocation(new_location);
             
             // Don't insert if location (0,0) is also occupied
-            if (!m_grid.addRobot(new_robot)) 
+            if (!m_grid->addRobot(new_robot)) 
             {
                 return false;
             }
@@ -196,7 +197,7 @@ namespace Simulator {
 
         std::cout << "\nRobot created. Info:";
         Menu::showDetails(new_robot);
-        m_robots.emplace(robot.model(), std::move(new_robot));
+        m_robots.emplace(std::move(robot.model()), std::move(new_robot));
 
         return true;
     }
@@ -223,14 +224,14 @@ namespace Simulator {
                 
                 robot->move();
 
-                if (!m_grid.isOffTheGrid(robot))
+                if (!m_grid->isOffTheGrid(robot))
                 {
                     std::cout << '\n' << model << " moved one unit forward heading " 
                                 << robot->location().direction << "("
                                 << robot->location().x_coordinate << ","
                                 << robot->location().y_coordinate << ")\n";
 
-                    m_grid.updateLocation(current_location, robot->location(), robot->Id());
+                    m_grid->updateLocation(current_location, robot->location(), robot->Id());
                 }
                 else
                 {
@@ -263,14 +264,14 @@ namespace Simulator {
                     robot->second->move(blocks);
 
                     // Checks if location is outside the grid or is occupied by another robot
-                    if (!m_grid.isOffTheGrid(robot->second) && !m_grid.isOccupied(robot->second))
+                    if (!m_grid->isOffTheGrid(robot->second) && !m_grid->isOccupied(robot->second))
                     {
                         std::cout << '\n' << robot->second->model() << " moved " << blocks << " block(s) forward heading " 
                                 << robot->second->location().direction << "("
                                 << robot->second->location().x_coordinate << ","
                                 << robot->second->location().y_coordinate << ")\n";
                     
-                        m_grid.updateLocation(current_location, robot->second->location(), robot->second->Id());
+                        m_grid->updateLocation(current_location, robot->second->location(), robot->second->Id());
                         result = true;
                     } 
                     else 
@@ -313,7 +314,7 @@ namespace Simulator {
 
         if (!isGridEmpty()) 
         {
-          if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
+            if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
             {
                 for (; robot != last; ++robot) 
                 {
@@ -388,7 +389,7 @@ namespace Simulator {
         {
             for (const auto& robot : m_robots) 
             {
-               m_grid.remove(robot.second);
+               m_grid->remove(robot.second);
             }
 
             m_robots.clear();
@@ -404,7 +405,7 @@ namespace Simulator {
         {
             for (auto first = robot; first != last; ++first) 
             {
-                m_grid.remove(first->second);
+                m_grid->remove(first->second);
 
                 std::cout << "\nRobot was removed. Info:";
                 Menu::showDetails(first->second);
@@ -424,8 +425,13 @@ namespace Simulator {
 
     
 
-    RobotSimulator::RobotSimulator(RobotGrid& grid) noexcept
-        : m_pImpl{std::make_unique<impl>(grid)}
+    RobotSimulator::RobotSimulator() noexcept
+        : m_pImpl{std::make_unique<impl>(GridSize{DEFAULT_HEIGHT, DEFAULT_WIDTH})}
+    {
+    }
+
+    RobotSimulator::RobotSimulator(GridSize&& grid) noexcept
+        : m_pImpl{std::make_unique<impl>(std::move(grid))} 
     {
     }
 

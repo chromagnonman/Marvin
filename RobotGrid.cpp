@@ -19,6 +19,7 @@ namespace Simulator {
         const GridSize& getSize() const noexcept;
 
         void resize(const GridSize& gridSz) noexcept;
+
         void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
@@ -29,23 +30,33 @@ namespace Simulator {
         using ROBOT_ID = size_t;
         std::vector<std::vector<ROBOT_ID>> m_grid;
         GridSize m_gridSz;
+
+        void initialize() noexcept;
     };
 
     void RobotGrid::impl::resize(const GridSize& gridSz) noexcept
     {
         m_grid.resize(gridSz.height);
+        
         for (size_t i = 0; i < gridSz.height; i++)
         {
             m_grid[i].resize(gridSz.width);
         }
-
         m_gridSz = gridSz;
     }
 
-    RobotGrid::impl::impl(GridSize&& gridSz) noexcept : m_gridSz{ gridSz }
+    void RobotGrid::impl::initialize() noexcept 
     {
-        // Initialize grid for random access
-        resize(gridSz);
+        m_grid.resize(m_gridSz.height);
+
+        for (size_t i = 0; i < m_gridSz.height; i++) {
+            m_grid[i].resize(m_gridSz.width);
+        }
+    }
+
+    RobotGrid::impl::impl(GridSize&& gridSz) noexcept : m_gridSz{gridSz}
+    {
+        initialize();
     }
 
     bool RobotGrid::impl::addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
@@ -98,8 +109,8 @@ namespace Simulator {
         m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = 0;
     }
 
-    RobotGrid::RobotGrid(size_t width, size_t height)  noexcept :
-        m_pImpl{ std::make_unique<impl>(GridSize{width, height}) }
+    RobotGrid::RobotGrid(GridSize grid)  noexcept :
+        m_pImpl{ std::make_unique<impl>(std::move(grid)) }
     {
     }
 
