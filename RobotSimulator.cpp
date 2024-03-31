@@ -53,7 +53,7 @@ namespace Simulator {
     RobotSimulator::impl::impl(GridSize&& grid) noexcept
         : m_grid{std::make_unique<RobotGrid>(grid)}
     {
-        m_robots.reserve(100);
+        m_robots.reserve(grid.height * grid.width);
     }
 
     bool RobotSimulator::impl::isGridEmpty() const noexcept

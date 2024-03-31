@@ -32,9 +32,30 @@ namespace Simulator {
                 }, ' ');
         }
 
+        // Handle mistyped direction
+        static void setDirection(std::string& direction) noexcept 
+        {
+            using namespace RobotFactory::ROBOT_DIRECTION;
+
+            toUpper(direction);
+
+            if (direction == NORTH) {
+              direction = NORTH;
+            } else if (direction == SOUTH) {
+              direction = SOUTH;
+            } else if (direction == EAST) {
+              direction = EAST;
+            } else if (direction == WEST) {
+              direction = WEST;
+            } else {
+              direction = NORTH;  // Default
+            }
+        }
+
         static void setCommand(std::string& input, RobotFactory::Robot& robot, std::string& command) noexcept 
         {
             removeChars(input);
+
             RobotFactory::RobotLocation location;
             std::string model;
 
@@ -44,7 +65,7 @@ namespace Simulator {
                 location.y_coordinate >> location.direction;
 
             toUpper(command);
-            toUpper(location.direction);
+            setDirection(location.direction);
 
             robot.setLocation(location);
             robot.setModel(model);
@@ -56,12 +77,12 @@ namespace Simulator {
             std::istringstream input_stream{input};
             std::string com;
             std::string robot_model;
-            size_t pace {1};
+            size_t units {1};
 
             // For commands such as Move R2D2 2 left - Robot will move two paces to the left.
-            input_stream >> com >> robot_model >> pace;
+            input_stream >> com >> robot_model >> units;
 
-            return {std::tuple{robot_model, pace}};
+            return {std::tuple{robot_model, units}};
         }
     };
 }
