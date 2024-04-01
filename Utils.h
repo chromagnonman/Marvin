@@ -7,6 +7,7 @@
 #include <sstream>
 #include <optional>
 #include <tuple>
+#include <variant>
 
 
 namespace Simulator {
@@ -14,12 +15,17 @@ namespace Simulator {
     class Utils {
         public:
 
-        static void toUpper(std::string& str) noexcept
+        static void toUpper(std::vector<std::reference_wrapper<std::string>> strings) noexcept
         {
-            std::transform(std::execution::par_unseq, str.begin(), str.end(), str.begin(),
-                [](char c) { 
-                    return std::toupper(c); 
-                });
+           for (auto str : strings) 
+           {
+            
+                std::transform(std::execution::par_unseq, str.get().begin(), str.get().end(), str.get().begin(),
+                    [](char c) { 
+                        return std::toupper(c); 
+                    });
+            
+           }
         }
 
         // Replace extraneous characters with spaces
@@ -37,17 +43,24 @@ namespace Simulator {
         {
             using namespace RobotFactory::ROBOT_DIRECTION;
 
-            toUpper(direction);
-
-            if (direction == NORTH) {
+            if (direction == NORTH) 
+            {
               direction = NORTH;
-            } else if (direction == SOUTH) {
+            } 
+            else if (direction == SOUTH) 
+            {
               direction = SOUTH;
-            } else if (direction == EAST) {
+            } 
+            else if (direction == EAST) 
+            {
               direction = EAST;
-            } else if (direction == WEST) {
+            } 
+            else if (direction == WEST) 
+            {
               direction = WEST;
-            } else {
+            } 
+            else 
+            {
               direction = NORTH;  // Default
             }
         }
@@ -64,25 +77,27 @@ namespace Simulator {
             input_stream >> command >> model >> location.x_coordinate >>
                 location.y_coordinate >> location.direction;
 
-            toUpper(command);
+            toUpper({command, location.direction});
             setDirection(location.direction);
 
             robot.setLocation(location);
             robot.setModel(model);
         }
 
-        static std::optional<std::tuple<std::string, size_t>> getCommandParams(const std::string& input) noexcept 
+        static std::optional<std::tuple<std::string, std::string>> getCommandParams(const std::string& input) noexcept 
         {
             // Extract the command from the input stream including the parameters
             std::istringstream input_stream{input};
             std::string com;
             std::string robot_model;
-            size_t units {1};
+            std::string variant{"1"}; // set as one unit
 
-            // For commands such as Move R2D2 2 left - Robot will move two paces to the left.
-            input_stream >> com >> robot_model >> units;
+            // For commands such as Move R2D2 2 (units) or Rotate R2D2 Left
+            input_stream >> com >> robot_model >> variant;
 
-            return {std::tuple{robot_model, units}};
+            toUpper({robot_model, variant});
+
+            return {std::tuple{robot_model, variant}};
         }
     };
 }

@@ -11,7 +11,6 @@
 namespace Simulator {
 
     using namespace RobotFactory;
-    using namespace Simulator::COMMAND;
 
     volatile std::sig_atomic_t signal_status;
 
@@ -27,18 +26,13 @@ namespace Simulator {
         void start() noexcept;
         bool place(const RobotFactory::Marvin&) noexcept;
         
-        // Affects all robots in the grid
-        void move() noexcept;
-        void rotateLeft() noexcept;
-        void rotateRight() noexcept;
+        void moveAll() noexcept;
+        void rotateAll(const std::string& direction) noexcept;
         void removeAll() noexcept;
         void report() const noexcept;
 
-
-        // Individual robot commands
         bool move(const RobotFactory::Marvin&, size_t) noexcept;
-        bool rotateLeft(const RobotFactory::Marvin&) noexcept;
-        bool rotateRight(const RobotFactory::Marvin&) noexcept;
+        bool rotate(const RobotFactory::Marvin&, const std::string& direction) noexcept;
         bool remove(const RobotFactory::Marvin&) noexcept;
 
         // Private
@@ -87,13 +81,12 @@ namespace Simulator {
 
         Utils::setCommand(input, robot, command);
 
-        if (command == PLACE)
+        if (command == "PLACE")
         {
-            //  If XY is greater than or equal to the default size, reset the
-            //  location to zero.
             if (robot.location().x_coordinate >= m_grid->getSize().width || 
                 robot.location().y_coordinate >= m_grid->getSize().height) 
             {
+                std::cout << "\nLocation is or off the grid! Current location is set to (0,0)\n";
                 RobotLocation new_location{robot.location()};
                 
                 new_location.x_coordinate = 0;
@@ -109,45 +102,49 @@ namespace Simulator {
             }
 
             place(robot);
-        }
-        else if (command == LEFT)
-        {
-            if (!robot.model().empty()) 
-            {
-                rotateLeft(robot);
-            }
-            else 
-            {
-                rotateLeft();
-            }
-        }
-        else if (command == RIGHT)
-        {
-            if (!robot.model().empty()) 
-            {
-                rotateRight(robot);
-            } 
-            else 
-            {
-                rotateRight();
-            }
-        }
-        else if (command == MOVE)
+        } 
+        else if (command == "ROTATE")
         {
             const auto params = Utils::getCommandParams(input);
 
-            const auto [robot_model, blocks] = params.value();
+            const auto [variant, direction] = params.value();
+
+            if (variant.empty()) {
+                std::cout << "Usage: ROTATE <direction> or ROTATE <robot> <direction>\n";
+                return;
+            }
+
+            // if no robot is specified
+            if (variant == "LEFT" || variant == "RIGHT") 
+            {
+                rotateAll(direction);
+            }
+            else // Rotate specified robot
+            {
+                rotate(robot, direction);
+            }
+        } 
+        else if (command == "MOVE")
+        {
+            const auto params = Utils::getCommandParams(input);
+
+            auto [robot_model, blocks] = params.value();
+
+            // FixME: Support chain of commands i.e. MOVE R2D2 LEFT.
+            if ((blocks == "LEFT" || blocks == "RIGHT")) {
+                blocks = "1";
+            }
             
             if (!robot_model.empty()) 
             {
-                move(robot, blocks);
+                move(robot, std::stoi(blocks));
             } 
             else 
             {
-              move();
+                moveAll();
             }
-        }
-        else if (command == REMOVE) 
+        } 
+        else if (command == "REMOVE") 
         {
             if (!robot.model().empty()) 
             {
@@ -158,11 +155,11 @@ namespace Simulator {
                 removeAll();
             }
         } 
-        else if (command == REPORT) 
+        else if (command == "REPORT") 
         {
             report();
-        }
-        else if (command == MENU) 
+        } 
+        else if (command == "MENU") 
         {
             Menu::showUsage();
         }
@@ -214,7 +211,7 @@ namespace Simulator {
         }
     }
 
-    void RobotSimulator::impl::move() noexcept
+    void RobotSimulator::impl::moveAll() noexcept
     {
         if (!isGridEmpty()) 
         {
@@ -292,15 +289,16 @@ namespace Simulator {
         return result;
     }
 
-    void RobotSimulator::impl::rotateLeft() noexcept
+    void RobotSimulator::impl::rotateAll(const std::string& direction) noexcept
     {
         if (!isGridEmpty())
         {
+            const auto dir = (direction == "LEFT") ? ROBOT_ROTATION::LEFT : ROBOT_ROTATION::RIGHT;
             for (auto& [model, robot] : m_robots)
             {
-                robot->rotate();
+                robot->rotate(dir);
                 std::cout << '\n'
-                          << model << " turned left facing "
+                          << model << " turned " << direction << " facing "
                           << robot->location().direction << "("
                           << robot->location().x_coordinate << ","
                           << robot->location().y_coordinate << ")\n";
@@ -308,19 +306,23 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::rotateLeft(const RobotFactory::Marvin& target_robot) noexcept 
+    bool RobotSimulator::impl::rotate(const RobotFactory::Marvin& target_robot, const std::string& direction) noexcept 
     {
         bool result {false};
 
         if (!isGridEmpty()) 
         {
+             const auto dir = (direction == "LEFT") ? ROBOT_ROTATION::LEFT : ROBOT_ROTATION::RIGHT;
+
             if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
             {
                 for (; robot != last; ++robot) 
                 {
-                    robot->second->rotate();
+                    robot->second->rotate(dir);
 
-                    std::cout << '\n' << robot->second->model() << " turned left facing " 
+                    std::cout << '\n'
+                              << robot->second->model() << " turned "
+                              << direction << " facing " 
                               << robot->second->location().direction << "("
                               << robot->second->location().x_coordinate << ","
                               << robot->second->location().y_coordinate << ")\n";
@@ -337,52 +339,6 @@ namespace Simulator {
         return result;
     }
 
-    void RobotSimulator::impl::rotateRight() noexcept
-    {
-        if (!isGridEmpty())
-        {
-            for (auto& [model, robot] : m_robots)
-            {
-                robot->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-
-                std::cout << '\n'
-                          << model << " shifted right facing "
-                          << robot->location().direction << "("
-                          << robot->location().x_coordinate << ","
-                          << robot->location().y_coordinate << ")\n";
-            }
-        }
-    }
-
-    bool RobotSimulator::impl::rotateRight(const RobotFactory::Marvin& target_robot) noexcept 
-    {
-        bool result {false};
-
-        if (!isGridEmpty()) 
-        {
-            if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
-            {
-                for (; robot != last; ++robot) 
-                {
-                    robot->second->rotate(RobotFactory::ROBOT_ROTATION::RIGHT);
-
-                    std::cout << '\n' << robot->second->model() << " turned right facing "
-                              << robot->second->location().direction << "("
-                              << robot->second->location().x_coordinate << ","
-                              << robot->second->location().y_coordinate << ")\n";
-
-                    result = true;
-                }
-            }
-            else 
-            {
-                std::cout << target_robot.model() << " isn't on the grid!\n";
-            }
-        }
-
-        return result;
-    }
-
     void RobotSimulator::impl::removeAll() noexcept 
     { 
         if (!isGridEmpty()) 
@@ -393,7 +349,7 @@ namespace Simulator {
             }
 
             m_robots.clear();
-            std::cout << "\nAll robots were terminated!\n";
+            std::cout << "\nAll robots were removed!\n";
         }
     }
 
@@ -407,7 +363,7 @@ namespace Simulator {
             {
                 m_grid->remove(first->second);
 
-                std::cout << "\nRobot was removed. Info:";
+                std::cout << "\nThe following robot(s) were removed. Info:";
                 Menu::showDetails(first->second);
             }
 
@@ -454,7 +410,7 @@ namespace Simulator {
 
     void RobotSimulator::move() noexcept
     {
-        m_pImpl->move();
+        m_pImpl->moveAll();
     }
 
     bool RobotSimulator::move(const RobotFactory::Marvin& robot, size_t paces) noexcept 
@@ -462,27 +418,17 @@ namespace Simulator {
         return m_pImpl->move(robot, paces); 
     }
 
-    void RobotSimulator::rotateLeft() noexcept
-    {
-        m_pImpl->rotateLeft();
-    }
-
-    bool RobotSimulator::rotateLeft(const RobotFactory::Marvin& robot) noexcept 
-    {
-        return m_pImpl->rotateLeft(robot); 
-    }
-
-    void RobotSimulator::rotateRight() noexcept
-    {
-        m_pImpl->rotateRight();
-    }
-
-    bool RobotSimulator::rotateRight(const RobotFactory::Marvin& robot) noexcept
+    bool RobotSimulator::rotate(const RobotFactory::Marvin& robot, const std::string& direction) noexcept
     { 
-        return m_pImpl->rotateRight(robot);
+        return m_pImpl->rotate(robot, direction);
     }
 
-    void RobotSimulator::removeAll() noexcept 
+    void RobotSimulator::rotate(const std::string& direction) noexcept 
+    {
+        return m_pImpl->rotateAll(direction);
+    }
+
+    void RobotSimulator::remove() noexcept 
     { 
         m_pImpl->removeAll();
     }

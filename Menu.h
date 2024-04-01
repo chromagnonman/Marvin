@@ -11,16 +11,13 @@ class Menu {
 
     static void showUsage() 
     {
-        std::cout << "\nUsage: PLACE <Robot> (X,Y) <Direction>";
-        std::cout << "\n\nExample: PLACE R2D2 2,2 NORTH";
-        std::cout << "\n\n  COMMANDS:";
-        std::cout << "\n\n    PLACE  (Robot into the Grid(10x10)";
-        std::cout << "\n\n    MOVE   (Particular robot or all robots if name is unspecified) e.g. MOVE R2D2 <number of block>";
-        std::cout << "\n    LEFT   (Rotates robot to the left; all robots will shift if name is unspecified)";
-        std::cout << "\n    RIGHT  (Rotates robot to the right; all robots will shift if name is unspecified)";
-        std::cout << "\n    REMOVE (Particular robot or all robots if name is unspecified)";
-        std::cout << "\n\n    REPORT (Shows all robots)";
-        std::cout << "\n    MENU   ";
+        std::cout << "\n\n  COMMANDS (case insensitive):";
+        std::cout << "\n\n    Place  (Place <robot> <x,y> <north,south,west,east>) e.g. Place R2D2 1,1 north";
+        std::cout << "\n\n    Move   (Move <robot> <number of units> or just MOVE, which moves all the robots)";
+        std::cout << "\n    Rotate (Rotate <robot> <left/right> or just ROTATE)";
+        std::cout << "\n    Remove (Remove <robot> or just REMOVE)";
+        std::cout << "\n\n    Report (Shows all robots)";
+        std::cout << "\n    Menu   ";
         std::cout << "\n\n    Ctrl + C to quit";
         std::cout << "\n\n> ";
     }

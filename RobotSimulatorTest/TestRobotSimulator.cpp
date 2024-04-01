@@ -17,10 +17,10 @@ TEST(SimulateRobot, CreationAndMovement)
     ASSERT_FALSE(simulate.place(R2D2));
 
 	EXPECT_TRUE(simulate.move(R2D2));
-    EXPECT_TRUE(simulate.rotateRight(R2D2));
-    EXPECT_TRUE(simulate.rotateLeft(R2D2));
+    EXPECT_TRUE(simulate.rotate(R2D2, "RIGHT"));
+    EXPECT_TRUE(simulate.rotate(R2D2, "LEFT"));
 
-    simulate.rotateLeft(R2D2); // Facing East (0,1)
+    simulate.rotate(R2D2, "LEFT");  // Facing East (0,1)
 
     // Neo is at the edge and should NOT be able to move
     EXPECT_FALSE(simulate.move(R2D2));
@@ -29,7 +29,7 @@ TEST(SimulateRobot, CreationAndMovement)
     
     // Grid is now empty; expect failures
     EXPECT_FALSE(simulate.move(R2D2));
-    EXPECT_FALSE(simulate.rotateLeft(R2D2));
-    EXPECT_FALSE(simulate.rotateRight(R2D2));
+    EXPECT_FALSE(simulate.rotate(R2D2, "LEFT"));
+    EXPECT_FALSE(simulate.rotate(R2D2, "RIGHT"));
     EXPECT_FALSE(simulate.remove(R2D2));
 }
