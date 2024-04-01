@@ -21,6 +21,7 @@ namespace Simulator {
         void rotate(const std::string& direction) noexcept;
         void remove() noexcept;
         void report() const noexcept;
+        void resize(GridSize&&) noexcept;
 
         // Individual robot commands
         bool move(const RobotFactory::Marvin&, size_t blocks=1) noexcept;

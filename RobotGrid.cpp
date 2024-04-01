@@ -18,7 +18,7 @@ namespace Simulator {
 
         const GridSize& getSize() const noexcept;
 
-        void resize(const GridSize& gridSz) noexcept;
+        void resize(GridSize&& gridSz) noexcept;
 
         void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
@@ -34,7 +34,7 @@ namespace Simulator {
         void initialize() noexcept;
     };
 
-    void RobotGrid::impl::resize(const GridSize& gridSz) noexcept
+    void RobotGrid::impl::resize(GridSize&& gridSz) noexcept
     {
         m_grid.resize(gridSz.height);
         
@@ -140,9 +140,9 @@ namespace Simulator {
         return m_pImpl->getSize();
     }
 
-    void RobotGrid::resize(size_t width, size_t height) noexcept
+    void RobotGrid::resize(GridSize&& grid) noexcept
     {
-        m_pImpl->resize(GridSize{ width, height });
+        m_pImpl->resize(std::move(grid));
     }
 
     void RobotGrid::remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept 

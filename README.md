@@ -8,8 +8,9 @@ A simple robot simulator written in C++. User can issue commands to create a rob
 - Place a robot onto the cartesian plane using X and Y coordinates with direction that the robot will be facing. (e.g., North, South, West, and East).
 - Move robot(s) one unit forward from its relative position to the direction the robot is currently facing.
 - Rotate robot(s) in a 90-degree angle from left to right and vice versa.
-- Report the robot's info: ID, name, direction, and position.
-- Move particular robot to more than one block e.g. `Move Marvin 2 (blocks)`
+- Report the current grid size and all the robots' info: ID, name, direction, and position.
+- Move particular robot more than one block e.g. `Move Marvin 2 (blocks)`
+- Dynamically expand the size of the grid (default is 10x10).
 
 
 ## Getting started
@@ -30,7 +31,7 @@ Prerequisites:
 
 ## Potential Enhancements
 - Piping commands e.g. `Move R2D2 left` will move `R2D2` one block to the left.
-- Support for non bipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
+- Support for nonbipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
 - Display the actual grid with all the robots mapped out.
 
 ## Caveats

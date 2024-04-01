@@ -36,7 +36,7 @@ namespace Simulator{
                     const RobotFactory::RobotLocation& location,
                     size_t robotId) noexcept;
 
-        void resize(size_t width, size_t height) noexcept;
+        void resize(GridSize&&) noexcept;
         void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         [[nodiscard]] const GridSize& getSize() const noexcept;

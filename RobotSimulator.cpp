@@ -30,6 +30,7 @@ namespace Simulator {
         void rotateAll(const std::string& direction) noexcept;
         void removeAll() noexcept;
         void report() const noexcept;
+        void resize(GridSize&& grid) noexcept;
 
         bool move(const RobotFactory::Marvin&, size_t) noexcept;
         bool rotate(const RobotFactory::Marvin&, const std::string& direction) noexcept;
@@ -103,6 +104,23 @@ namespace Simulator {
 
             place(robot);
         } 
+        else if (command == "MOVE") 
+        {
+          const auto params = Utils::getCommandParams(input);
+
+          auto [robot_model, blocks] = params.value();
+
+          // FixME: Support chain of commands i.e. MOVE R2D2 LEFT.
+          if ((blocks == "LEFT" || blocks == "RIGHT")) {
+            blocks = "1";
+          }
+
+          if (!robot_model.empty()) {
+            move(robot, std::stoi(blocks));
+          } else {
+            moveAll();
+          }
+        } 
         else if (command == "ROTATE")
         {
             const auto params = Utils::getCommandParams(input);
@@ -124,26 +142,7 @@ namespace Simulator {
                 rotate(robot, direction);
             }
         } 
-        else if (command == "MOVE")
-        {
-            const auto params = Utils::getCommandParams(input);
-
-            auto [robot_model, blocks] = params.value();
-
-            // FixME: Support chain of commands i.e. MOVE R2D2 LEFT.
-            if ((blocks == "LEFT" || blocks == "RIGHT")) {
-                blocks = "1";
-            }
-            
-            if (!robot_model.empty()) 
-            {
-                move(robot, std::stoi(blocks));
-            } 
-            else 
-            {
-                moveAll();
-            }
-        } 
+       
         else if (command == "REMOVE") 
         {
             if (!robot.model().empty()) 
@@ -159,6 +158,27 @@ namespace Simulator {
         {
             report();
         } 
+        else if (command == "RESIZE") 
+        {
+           size_t width {0};
+           size_t height {0};
+
+           std::istringstream input_stream {input};
+           input_stream >> command >> width >> height;
+
+           if (m_grid->getSize().width < width || m_grid->getSize().height < height) 
+           {
+               std::cout << "Grid resized from: (" << m_grid->getSize().width
+                         << "x" << m_grid->getSize().height << ") to: (" << width
+                         << "x" << height << ")\n";
+               
+               resize(GridSize{width, height});
+           }
+           else 
+           {
+              std::cerr << "\nError resizing; value must be larger than the current grid size.\n";
+           }
+        }
         else if (command == "MENU") 
         {
             Menu::showUsage();
@@ -201,6 +221,9 @@ namespace Simulator {
 
     void RobotSimulator::impl::report() const noexcept
     {
+        std::cout << "Current grid size: (" << m_grid->getSize().width << "x"
+                << m_grid->getSize().height << ")\n";
+
         if (!isGridEmpty())
         {
             std::cout << "\nFound " << m_robots.size() << " robots on the grid\n";
@@ -209,6 +232,11 @@ namespace Simulator {
                 Menu::showDetails(robot);
             }
         }
+    }
+
+    void RobotSimulator::impl::resize(GridSize&& grid) noexcept 
+    {
+        m_grid->resize(std::move(grid));
     }
 
     void RobotSimulator::impl::moveAll() noexcept
@@ -405,7 +433,11 @@ namespace Simulator {
 
     void RobotSimulator::report() const noexcept
     {
-        m_pImpl->report();
+        m_pImpl->report(); }
+
+    void RobotSimulator::resize(GridSize&& grid) noexcept 
+    { 
+        m_pImpl->resize(std::move(grid));
     }
 
     void RobotSimulator::move() noexcept

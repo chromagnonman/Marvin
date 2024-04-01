@@ -49,7 +49,7 @@ TEST(RobotGrid, ResizeGrid) {
 
 	EXPECT_TRUE(grid.isOffTheGrid(R1));
 
-	grid.resize(10, 10);
+	grid.resize(Simulator::GridSize{10, 10});
 
     RobotFactory::RobotLocation location2{5, 5, "NORTH"};
     Robot R2 = std::make_unique<RobotFactory::Marvin>(location2);
