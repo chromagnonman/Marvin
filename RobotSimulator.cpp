@@ -221,12 +221,12 @@ namespace Simulator {
 
     void RobotSimulator::impl::report() const noexcept
     {
-        std::cout << "Current grid size: (" << m_grid->getSize().width << "x"
+        std::cout << "\nCurrent grid size: (" << m_grid->getSize().width << "x"
                 << m_grid->getSize().height << ")\n";
 
         if (!isGridEmpty())
         {
-            std::cout << "\nFound " << m_robots.size() << " robots on the grid\n";
+            std::cout << "\nFound " << m_robots.size() << " robot(s) in the grid\n";
             for (const auto& [_, robot] : m_robots)
             {
                 Menu::showDetails(robot);
