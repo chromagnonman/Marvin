@@ -387,15 +387,16 @@ namespace Simulator {
 
         if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
         {
-            for (auto first = robot; first != last; ++first) 
+            std::cout << "\nThe following robot(s) were removed. Info:";
+
+            do
             {
-                m_grid->remove(first->second);
+                Menu::showDetails(robot->second);
 
-                std::cout << "\nThe following robot(s) were removed. Info:";
-                Menu::showDetails(first->second);
-            }
+                m_grid->remove(robot->second);
+                robot = m_robots.erase(robot);
 
-          m_robots.erase(robot, last);
+            } while (robot != last);
 
           result = true;
         }
