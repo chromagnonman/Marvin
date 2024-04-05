@@ -20,6 +20,13 @@ namespace RobotFactory {
 
 		void rotate(const ROBOT_ROTATION& rotate_direction = ROBOT_ROTATION::LEFT) noexcept override;
 		void move(size_t unit=1) noexcept override;
+
+		friend bool operator!=(const Marvin& rhs,
+                                const RobotLocation& location) {
+            return rhs.location().direction != location.direction ||
+                    rhs.location().x_coordinate != location.x_coordinate ||
+                    rhs.location().y_coordinate != location.y_coordinate;
+        }
 	};
 }
 

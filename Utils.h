@@ -7,7 +7,6 @@
 #include <sstream>
 #include <optional>
 #include <tuple>
-#include <variant>
 
 
 namespace Simulator {
@@ -65,7 +64,7 @@ namespace Simulator {
             }
         }
 
-        static void setCommand(std::string& input, RobotFactory::Robot& robot, std::string& command) noexcept 
+        static void setCommand(std::string& input, RobotFactory::Marvin& robot, std::string& command) noexcept 
         {
             removeChars(input);
 
@@ -79,9 +78,16 @@ namespace Simulator {
 
             toUpper({command, location.direction});
             setDirection(location.direction);
+            
+            if (robot != location) 
+            {
+                robot.setLocation(location);
+            }
 
-            robot.setLocation(location);
-            robot.setModel(model);
+            if (!model.empty() && model != robot.model()) 
+            {
+                robot.setModel(model);
+            }
         }
 
         static std::optional<std::tuple<std::string, std::string>> getCommandParams(const std::string& input) noexcept 

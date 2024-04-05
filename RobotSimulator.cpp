@@ -108,17 +108,21 @@ namespace Simulator {
         {
           const auto params = Utils::getCommandParams(input);
 
-          auto [robot_model, blocks] = params.value();
+          auto [robot_model, variant] = params.value();
 
-          // FixME: Support chain of commands i.e. MOVE R2D2 LEFT.
-          if ((blocks == "LEFT" || blocks == "RIGHT")) {
-            blocks = "1";
+          if ((variant == "LEFT" || variant == "RIGHT")) 
+          {
+              rotate(robot, variant);
+              variant = "1";
           }
 
-          if (!robot_model.empty()) {
-            move(robot, std::stoi(blocks));
-          } else {
-            moveAll();
+          if (!robot_model.empty()) 
+          {
+              move(robot, std::stoi(variant));
+          } 
+          else 
+          {
+              moveAll();
           }
         } 
         else if (command == "ROTATE")

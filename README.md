@@ -30,7 +30,6 @@ Prerequisites:
 	![TestExplorer](TestExplorer.png)
 
 ## Potential Enhancements
-- Piping commands, e.g. `Move R2D2 left` will move `R2D2` one block to the left.
 - Support for nonbipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
 - Display the actual grid with all the robots mapped out.
 
