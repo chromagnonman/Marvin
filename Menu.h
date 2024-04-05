@@ -19,7 +19,7 @@ class Menu {
         std::cout << "\n\n    Report (Shows the current grid size and all the occypying robots)";
         std::cout << "\n    Resize (Expands the current grid. i.e. Resize 20 20)";
         std::cout << "\n\n    Menu   ";
-        std::cout << "\n\n    Ctrl + C to quit";
+        std::cout << "\n\n    Ctrl + C to terminate application.";
         std::cout << "\n\n> ";
     }
 
