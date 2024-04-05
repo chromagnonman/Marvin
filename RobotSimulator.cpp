@@ -344,6 +344,8 @@ namespace Simulator {
 
             if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
             {
+                result = true;
+
                 for (; robot != last; ++robot) 
                 {
                     robot->second->rotate(dir);
@@ -354,8 +356,6 @@ namespace Simulator {
                               << robot->second->location().direction << "("
                               << robot->second->location().x_coordinate << ","
                               << robot->second->location().y_coordinate << ")\n";
-
-                    result = true;
                 }
             } 
             else 
@@ -387,6 +387,8 @@ namespace Simulator {
 
         if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
         {
+            result = true;
+
             std::cout << "\nThe following robot(s) were removed. Info:";
 
             do
@@ -397,8 +399,6 @@ namespace Simulator {
                 robot = m_robots.erase(robot);
 
             } while (robot != last);
-
-          result = true;
         }
         else 
         {
