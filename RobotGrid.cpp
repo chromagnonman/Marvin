@@ -35,13 +35,9 @@ namespace Simulator {
 
     void RobotGrid::impl::resize(GridSize&& gridSz) noexcept
     {
-        m_grid.resize(gridSz.height);
-        
-        for (size_t i = 0; i < gridSz.height; i++)
-        {
-            m_grid[i].resize(gridSz.width);
-        }
         m_gridSz = gridSz;
+
+        initialize();
     }
 
     void RobotGrid::impl::initialize() noexcept 
