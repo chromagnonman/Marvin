@@ -128,7 +128,7 @@ namespace Simulator {
             const auto [variant, direction] = params.value();
 
             if (variant.empty()) {
-                std::cout << "Usage: ROTATE <direction> or ROTATE <robot> <direction>\n";
+                std::cout << "Usage: ROTATE <direction> or ROTATE <robot> <direction> or simply LEFT/RIGHT\n";
                 return;
             }
 
@@ -142,7 +142,17 @@ namespace Simulator {
                 rotate(robot, direction);
             }
         } 
-       
+        else if (command == "LEFT" || command == "RIGHT") 
+        {
+          if (!robot.model().empty()) 
+          {
+              rotate(robot, command);
+          } 
+          else 
+          {
+              rotateAll(command);
+          }
+        }
         else if (command == "REMOVE") 
         {
             if (!robot.model().empty()) 
