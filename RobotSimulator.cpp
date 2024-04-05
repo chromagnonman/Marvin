@@ -256,7 +256,7 @@ namespace Simulator {
                                 << robot->location().x_coordinate << ","
                                 << robot->location().y_coordinate << ")\n";
 
-                    m_grid->updateLocation(current_location, robot->location(), robot->Id());
+                    m_grid->updateLocation(current_location, robot);
                 }
                 else
                 {
@@ -296,7 +296,7 @@ namespace Simulator {
                                 << robot->second->location().x_coordinate << ","
                                 << robot->second->location().y_coordinate << ")\n";
                     
-                        m_grid->updateLocation(current_location, robot->second->location(), robot->second->Id());
+                        m_grid->updateLocation(current_location, robot->second);
                         result = true;
                     } 
                     else 

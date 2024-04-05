@@ -12,9 +12,8 @@ namespace Simulator {
         bool addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         void updateLocation(
-                    const RobotFactory::RobotLocation& prev_location,
-                    const RobotFactory::RobotLocation& location,
-                    size_t robotId) noexcept;
+            const RobotFactory::RobotLocation& location,
+            const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         const GridSize& getSize() const noexcept;
 
@@ -73,12 +72,11 @@ namespace Simulator {
     }
 
     void RobotGrid::impl::updateLocation(
-            const RobotFactory::RobotLocation& prev_location,
-            const RobotFactory::RobotLocation& location,
-            size_t robotId) noexcept
+        const RobotFactory::RobotLocation& location,
+        const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
     {
-        m_grid[prev_location.x_coordinate][prev_location.y_coordinate] = 0;
-        m_grid[location.x_coordinate][location.y_coordinate] = robotId;
+        m_grid[location.x_coordinate][location.y_coordinate] = 0;
+        m_grid[robot->location().x_coordinate][robot->location().y_coordinate] = robot->Id();
     }
 
     size_t RobotGrid::impl::getRobotID(const RobotFactory::RobotLocation& location) const noexcept
@@ -128,11 +126,10 @@ namespace Simulator {
     }
     
     void RobotGrid::updateLocation(
-            const RobotFactory::RobotLocation& prev_location,
-            const RobotFactory::RobotLocation& location,
-            size_t robotId) noexcept
+        const RobotFactory::RobotLocation& location, 
+        const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
     {
-        m_pImpl->updateLocation(prev_location, location, robotId);
+        m_pImpl->updateLocation(location, robot);
     } 
 
     const GridSize& RobotGrid::getSize() const noexcept

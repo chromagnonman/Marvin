@@ -29,20 +29,19 @@ namespace Simulator{
         
         virtual ~RobotGrid() noexcept;
 
-        bool addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
+        bool addRobot(const std::unique_ptr<RobotFactory::Robot>&) noexcept;
 
         void updateLocation(
-                    const RobotFactory::RobotLocation& prev_location,
-                    const RobotFactory::RobotLocation& location,
-                    size_t robotId) noexcept;
+            const RobotFactory::RobotLocation&,
+            const std::unique_ptr<RobotFactory::Robot>&) noexcept;
 
         void resize(GridSize&&) noexcept;
         void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
 
         [[nodiscard]] const GridSize& getSize() const noexcept;
-        [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation& location) const noexcept;
-        [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
-        [[nodiscard]] bool isOccupied(const std::unique_ptr<RobotFactory::Robot>& robot) const noexcept;
+        [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation&) const noexcept;
+        [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>&) const noexcept;
+        [[nodiscard]] bool isOccupied(const std::unique_ptr<RobotFactory::Robot>&) const noexcept;
 
     private:
         struct impl;
