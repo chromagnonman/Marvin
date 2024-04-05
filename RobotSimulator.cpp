@@ -371,12 +371,12 @@ namespace Simulator {
     { 
         if (!isGridEmpty()) 
         {
-            for (const auto& robot : m_robots) 
+            for (auto robot = m_robots.begin(); robot != m_robots.end();)
             {
-               m_grid->remove(robot.second);
-            }
+               m_grid->remove(robot->second);
+               robot = m_robots.erase(robot);
 
-            m_robots.clear();
+            }
             std::cout << "\nAll robots were removed!\n";
         }
     }
