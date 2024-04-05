@@ -106,11 +106,13 @@ namespace Simulator {
     RobotGrid::RobotGrid(GridSize grid)  noexcept :
         m_pImpl{ std::make_unique<impl>(std::move(grid)) }
     {
+        m_pImpl->initialize();
     }
 
     RobotGrid::RobotGrid() noexcept : 
         m_pImpl{ std::make_unique<impl>(GridSize{DEFAULT_WIDTH, DEFAULT_HEIGHT}) }
     {
+        m_pImpl->initialize();
     }
 
     RobotGrid::~RobotGrid() = default;
