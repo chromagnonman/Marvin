@@ -176,9 +176,11 @@ namespace Simulator {
         {
            size_t width {0};
            size_t height {0};
-
-           std::istringstream input_stream {input};
-           input_stream >> command >> width >> height;
+           
+           {   // Extact the command parameters from the input stream
+               std::istringstream input_stream {input};
+               input_stream >> command >> width >> height;
+           }
 
            if (m_grid->getSize().width < width || m_grid->getSize().height < height) 
            {
