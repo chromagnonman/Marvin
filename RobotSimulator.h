@@ -24,9 +24,9 @@ namespace Simulator {
         void resize(GridSize&&) noexcept;
 
         // Individual robot commands
-        bool move(const RobotFactory::Marvin&, size_t blocks=1) noexcept;
-        bool rotate(const RobotFactory::Marvin&, const std::string& direction) noexcept;
-        bool remove(const RobotFactory::Marvin&) noexcept;
+        bool move(const std::string& robot, size_t blocks=1) noexcept;
+        bool rotate(const std::string& robot, const std::string& direction) noexcept;
+        bool remove(const std::string& robot) noexcept;
 
     private:
         struct impl;

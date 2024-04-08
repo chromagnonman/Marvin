@@ -32,9 +32,10 @@ namespace Simulator {
         void report() const noexcept;
         void resize(GridSize&& grid) noexcept;
 
-        bool move(const RobotFactory::Marvin&, size_t) noexcept;
-        bool rotate(const RobotFactory::Marvin&, const std::string& direction) noexcept;
-        bool remove(const RobotFactory::Marvin&) noexcept;
+        bool move(const std::string& robot, size_t) noexcept;
+        bool rotate(const std::string& robot,
+                    const std::string& direction) noexcept;
+        bool remove(const std::string& robot) noexcept;
 
         // Private
         std::unique_ptr<RobotGrid> m_grid;
@@ -112,13 +113,13 @@ namespace Simulator {
 
           if ((variant == "LEFT" || variant == "RIGHT")) 
           {
-              rotate(robot, variant);
+              rotate(robot.model(), variant);
               variant = "1";
           }
 
           if (!robot_model.empty()) 
           {
-              move(robot, std::stoi(variant));
+              move(robot.model(), std::stoi(variant));
           } 
           else 
           {
@@ -143,14 +144,14 @@ namespace Simulator {
             }
             else // Rotate specified robot
             {
-                rotate(robot, direction);
+                rotate(robot.model(), direction);
             }
         } 
         else if (command == "LEFT" || command == "RIGHT") 
         {
           if (!robot.model().empty()) 
           {
-              rotate(robot, command);
+              rotate(robot.model(), command);
           } 
           else 
           {
@@ -161,7 +162,7 @@ namespace Simulator {
         {
             if (!robot.model().empty()) 
             {
-                remove(robot);
+                remove(robot.model());
             } 
             else 
             {
@@ -288,14 +289,14 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::move(const RobotFactory::Marvin& target_robot,
+    bool RobotSimulator::impl::move(const std::string& target_robot,
                                     size_t blocks) noexcept 
     {
         bool result{false};
 
         if (!isGridEmpty()) 
         {
-            if (auto [robot, last] = m_robots.equal_range(target_robot.model());
+            if (auto [robot, last] = m_robots.equal_range(target_robot);
                   robot != m_robots.end())
             {
                 for (; robot != last; ++robot) 
@@ -326,7 +327,7 @@ namespace Simulator {
             }
             else 
             {
-                std::cout << target_robot.model() << " isn't on the grid!\n";
+                std::cout << target_robot << " isn't on the grid!\n";
             }
         }
 
@@ -350,7 +351,8 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::rotate(const RobotFactory::Marvin& target_robot, const std::string& direction) noexcept 
+    bool RobotSimulator::impl::rotate(const std::string& target_robot,
+                                      const std::string& direction) noexcept 
     {
         bool result {false};
 
@@ -358,7 +360,7 @@ namespace Simulator {
         {
              const auto dir = (direction == "LEFT") ? ROBOT_ROTATION::LEFT : ROBOT_ROTATION::RIGHT;
 
-            if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end())
+            if (auto [robot, last] = m_robots.equal_range(target_robot); robot != m_robots.end())
             {
                 result = true;
 
@@ -376,7 +378,7 @@ namespace Simulator {
             } 
             else 
             {
-                std::cout << target_robot.model() << " isn't on the grid!\n";
+                std::cout << target_robot << " isn't on the grid!\n";
             }
         }
         
@@ -397,11 +399,11 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::remove(const RobotFactory::Marvin& target_robot) noexcept 
+    bool RobotSimulator::impl::remove(const std::string& target_robot) noexcept 
     {
         bool result {false};
 
-        if (auto [robot, last] = m_robots.equal_range(target_robot.model()); robot != m_robots.end()) 
+        if (auto [robot, last] = m_robots.equal_range(target_robot); robot != m_robots.end()) 
         {
             result = true;
 
@@ -418,7 +420,7 @@ namespace Simulator {
         }
         else 
         {
-            std::cout << target_robot.model() << " isn't on the grid!\n";
+            std::cout << target_robot << " isn't on the grid!\n";
         }
 
         return result;
@@ -462,12 +464,12 @@ namespace Simulator {
         m_pImpl->moveAll();
     }
 
-    bool RobotSimulator::move(const RobotFactory::Marvin& robot, size_t paces) noexcept 
+    bool RobotSimulator::move(const std::string& robot, size_t paces) noexcept 
     { 
         return m_pImpl->move(robot, paces); 
     }
 
-    bool RobotSimulator::rotate(const RobotFactory::Marvin& robot, const std::string& direction) noexcept
+    bool RobotSimulator::rotate(const std::string& robot, const std::string& direction) noexcept
     { 
         return m_pImpl->rotate(robot, direction);
     }
@@ -482,7 +484,7 @@ namespace Simulator {
         m_pImpl->removeAll();
     }
 
-    bool RobotSimulator::remove(const RobotFactory::Marvin& robot) noexcept
+    bool RobotSimulator::remove(const std::string& robot) noexcept
     {
         return m_pImpl->remove(robot);
     }
