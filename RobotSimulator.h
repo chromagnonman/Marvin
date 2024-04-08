@@ -16,7 +16,7 @@ namespace Simulator {
 
         void start() noexcept;
 
-        bool place(const RobotFactory::Marvin&) noexcept;
+        bool place(std::unique_ptr<RobotFactory::Robot>) noexcept;
         void move() noexcept;
         void rotate(const std::string& direction) noexcept;
         void remove() noexcept;

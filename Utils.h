@@ -11,6 +11,8 @@
 
 namespace Simulator {
 
+    using command_params = std::optional<std::tuple<std::string, std::string>>;
+
     class Utils {
         public:
 
@@ -64,7 +66,9 @@ namespace Simulator {
             }
         }
 
-        static void setCommand(std::string& input, RobotFactory::Marvin& robot, std::string& command) noexcept 
+        static void setCommand(std::string& input,
+                               std::unique_ptr<RobotFactory::Robot>& robot,
+                               std::string& command) noexcept 
         {
             removeChars(input);
 
@@ -80,18 +84,20 @@ namespace Simulator {
             toUpper({command, location.direction});
             setDirection(location.direction);
             
-            if (robot != location) 
+            if (robot->location().direction != location.direction ||
+                    robot->location().x_coordinate != location.x_coordinate ||
+                    robot->location().y_coordinate != location.y_coordinate)
             {
-                robot.setLocation(location);
+                robot->setLocation(location);
             }
 
-            if (!model.empty() && model != robot.model()) 
+            if (!model.empty() && model != robot->model()) 
             {
-                robot.setModel(model);
+                robot->setModel(model);
             }
         }
 
-        static std::optional<std::tuple<std::string, std::string>> getCommandParams(const std::string& input) noexcept 
+        static  command_params getCommandParams(const std::string& input) noexcept 
         {
             std::string com;
             std::string robot_model;

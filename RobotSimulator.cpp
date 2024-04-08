@@ -24,7 +24,7 @@ namespace Simulator {
         impl(GridSize&& grid) noexcept;
 
         void start() noexcept;
-        bool place(const RobotFactory::Marvin&) noexcept;
+        bool place(std::unique_ptr<RobotFactory::Robot>) noexcept;
         
         void moveAll() noexcept;
         void rotateAll(const std::string& direction) noexcept;
@@ -78,32 +78,34 @@ namespace Simulator {
 
     void RobotSimulator::impl::execute(std::string&& input) noexcept
     {
-        RobotFactory::Marvin robot;
+        std::unique_ptr<RobotFactory::Robot> robot =
+            std::make_unique<RobotFactory::Marvin>();
+
         std::string command;
 
         Utils::setCommand(input, robot, command);
 
         if (command == "PLACE")
         {
-            if (robot.location().x_coordinate >= m_grid->getSize().width || 
-                robot.location().y_coordinate >= m_grid->getSize().height) 
+            if (robot->location().x_coordinate >= m_grid->getSize().width || 
+                robot->location().y_coordinate >= m_grid->getSize().height) 
             {
                 std::cout << "\nLocation is or off the grid! Current location is set to (0,0)\n";
-                RobotLocation new_location{robot.location()};
+                RobotLocation new_location{robot->location()};
                 
                 new_location.x_coordinate = 0;
                 new_location.y_coordinate = 0;
 
-                robot.setLocation(new_location);
+                robot->setLocation(new_location);
             }
 
             // Handle user error on not specifying a model
-            if (robot.model().empty()) 
+            if (robot->model().empty()) 
             {
-                robot.setModel("R2D2");
+                robot->setModel("R2D2");
             }
 
-            place(robot);
+            place(std::move(robot));
         } 
         else if (command == "MOVE") 
         {
@@ -113,13 +115,13 @@ namespace Simulator {
 
           if ((variant == "LEFT" || variant == "RIGHT")) 
           {
-              rotate(robot.model(), variant);
+              rotate(robot->model(), variant);
               variant = "1";
           }
 
           if (!robot_model.empty()) 
           {
-              move(robot.model(), std::stoi(variant));
+              move(robot->model(), std::stoi(variant));
           } 
           else 
           {
@@ -144,14 +146,14 @@ namespace Simulator {
             }
             else // Rotate specified robot
             {
-                rotate(robot.model(), direction);
+                rotate(robot->model(), direction);
             }
         } 
         else if (command == "LEFT" || command == "RIGHT") 
         {
-          if (!robot.model().empty()) 
+          if (!robot->model().empty()) 
           {
-              rotate(robot.model(), command);
+              rotate(robot->model(), command);
           } 
           else 
           {
@@ -160,9 +162,9 @@ namespace Simulator {
         }
         else if (command == "REMOVE") 
         {
-            if (!robot.model().empty()) 
+            if (!robot->model().empty()) 
             {
-                remove(robot.model());
+                remove(robot->model());
             } 
             else 
             {
@@ -207,10 +209,8 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::place(const RobotFactory::Marvin& robot) noexcept
+    bool RobotSimulator::impl::place(std::unique_ptr<RobotFactory::Robot> new_robot) noexcept
     {
-        std::unique_ptr<Robot> new_robot = std::make_unique<Marvin>(robot);
-
         if (!m_grid->addRobot(new_robot))
         {
             std::cout << "\nLocation is occupied or off the grid!\n";
@@ -231,7 +231,7 @@ namespace Simulator {
 
         std::cout << "\nRobot created. Info:";
         Menu::showDetails(new_robot);
-        m_robots.emplace(std::move(robot.model()), std::move(new_robot));
+        m_robots.emplace(new_robot->model(), std::move(new_robot));
 
         return true;
     }
@@ -445,14 +445,15 @@ namespace Simulator {
         m_pImpl->start();
     }
 
-    bool RobotSimulator::place(const RobotFactory::Marvin& robot) noexcept
+    bool RobotSimulator::place(std::unique_ptr<RobotFactory::Robot> robot) noexcept
     {
-        return m_pImpl->place(robot);
+        return m_pImpl->place(std::move(robot));
     }
 
     void RobotSimulator::report() const noexcept
     {
-        m_pImpl->report(); }
+        m_pImpl->report(); 
+    }
 
     void RobotSimulator::resize(GridSize&& grid) noexcept 
     { 
