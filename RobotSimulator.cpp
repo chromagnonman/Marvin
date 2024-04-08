@@ -134,8 +134,8 @@ namespace Simulator {
 
             const auto [variant, direction] = params.value();
 
-            if (variant.empty()) {
-                std::cout << "Usage: ROTATE <direction> or ROTATE <robot> <direction> or simply LEFT/RIGHT\n";
+            if (variant.empty() || variant == "LEFT" || variant == "RIGHT") {
+                std::cout << "Usage: ROTATE <robot> <direction> or simply LEFT/RIGHT\n";
                 return;
             }
 
