@@ -10,7 +10,7 @@ A simple robot simulator written in C++. The user can issue commands to create a
 - Rotate the robot(s) at a 90-degree angle from left to right and vice versa.
 - Report the current grid size and all the robots' information: ID, name, direction, and position.
 - Move particular robot more than one block, e.g. `Move Marvin 2 (blocks)`
-- Dynamically expand the size of the grid (the default is 10x10).
+- Dynamically expand the grid (the default is 10x10).
 
 
 ## Getting started
