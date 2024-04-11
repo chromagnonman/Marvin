@@ -13,19 +13,16 @@ namespace Simulator {
 
     using command_params = std::optional<std::tuple<std::string, std::string>>;
 
-    class Utils {
-        public:
+    struct Utils {
 
         static void toUpper(std::vector<std::reference_wrapper<std::string>> strings) noexcept
         {
            for (auto str : strings) 
            {
-            
-                std::transform(std::execution::par_unseq, str.get().begin(), str.get().end(), str.get().begin(),
-                    [](char c) { 
-                        return std::toupper(c); 
+                std::for_each(std::execution::par_unseq, str.get().begin(), str.get().end(),
+                    [](auto& c) { 
+                        c = std::toupper(c); 
                     });
-            
            }
         }
 
