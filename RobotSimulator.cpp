@@ -109,9 +109,7 @@ namespace Simulator {
         } 
         else if (command == "MOVE") 
         {
-          const auto params = Utils::getCommandParams(input);
-
-          auto [robot_model, variant] = params.value();
+          auto [robot_model, variant] = Utils::getCommandParams(input);
 
           if ((variant == "LEFT" || variant == "RIGHT")) 
           {
@@ -130,9 +128,7 @@ namespace Simulator {
         } 
         else if (command == "ROTATE")
         {
-            const auto params = Utils::getCommandParams(input);
-
-            const auto [variant, direction] = params.value();
+            const auto [variant, direction] = Utils::getCommandParams(input);
 
             if (variant.empty() || variant == "LEFT" || variant == "RIGHT") {
                 std::cout << "Usage: ROTATE <robot> <direction> or simply LEFT/RIGHT\n";

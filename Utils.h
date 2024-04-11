@@ -11,7 +11,7 @@
 
 namespace Simulator {
 
-    using command_params = std::optional<std::tuple<std::string, std::string>>;
+    using command_params = std::tuple<std::string, std::string>;
 
     struct Utils {
 
