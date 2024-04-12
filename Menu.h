@@ -6,8 +6,7 @@
 
 namespace Simulator {
 
-class Menu {
-	public:
+struct Menu {
 
     static void showUsage() 
     {
