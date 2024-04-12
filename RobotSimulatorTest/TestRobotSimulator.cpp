@@ -6,16 +6,16 @@ using namespace RobotFactory;
 
 TEST(SimulateRobot, CreationAndMovement)
 {
-	RobotSimulator simulate;
+    RobotSimulator simulate;
 
-	RobotLocation location{ 0, 0, "NORTH" };
+    RobotLocation location{ 0, 0, "NORTH" };
     constexpr auto target_robot{"R2D2"};
 
     std::unique_ptr<Robot> R2D2 =
         std::make_unique<Marvin>(location, target_robot);
 
     // Place robot onto the grid
-	ASSERT_TRUE(simulate.place(std::move(R2D2)));
+    ASSERT_TRUE(simulate.place(std::move(R2D2)));
 
     std::unique_ptr<Robot> clone =
         std::make_unique<Marvin>(location, "trooper");
@@ -23,13 +23,13 @@ TEST(SimulateRobot, CreationAndMovement)
     // Don't allow robot on the same location
     ASSERT_FALSE(simulate.place(std::move(clone)));
 
-	EXPECT_TRUE(simulate.move(target_robot));
+    EXPECT_TRUE(simulate.move(target_robot));
     EXPECT_TRUE(simulate.rotate(target_robot, "RIGHT"));
     EXPECT_TRUE(simulate.rotate(target_robot, "LEFT"));
 
     simulate.rotate(target_robot, "LEFT");  // Facing East (0,1)
 
-    // Neo is at the edge and should NOT be able to move
+    // R2D2 is at the edge and should NOT be able to move
     EXPECT_FALSE(simulate.move(target_robot));
 
     EXPECT_TRUE(simulate.remove(target_robot));
