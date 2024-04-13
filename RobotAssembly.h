@@ -42,7 +42,7 @@ namespace RobotFactory {
 
     struct RobotAssembly {
 
-        static std::unique_ptr<RobotFactory::Robot> create(
+        [[nodiscard]] static std::unique_ptr<RobotFactory::Robot> create(
             const ROBOT_TYPE& type,
             const RobotFactory::RobotLocation& location, 
             const std::string& name) 
