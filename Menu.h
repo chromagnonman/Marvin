@@ -13,9 +13,9 @@ struct Menu {
         // TODO: Add choices of robot types
         std::cout << "\n\n  COMMANDS (case insensitive) (Default Grid size (10x10):";
         std::cout << "\n\n    Place  (Place <Robot> <X,Y> <North, South, West, East>) e.g. Place R2D2 1,1 North";
-        std::cout << "\n\n    Move   (Move <Robot> <number of units> or just MOVE, which moves all the robots)";
-        std::cout << "\n    Rotate (Rotate <Robot> <left/right> or Left/Right <Robot>; all robots will rotate if none is specified)";
-        std::cout << "\n    Remove (Remove <Robot> or just REMOVE)";
+        std::cout << "\n\n    Move   (Move <Robot> <number of units> or Move All, which moves all the robots)";
+        std::cout << "\n    Rotate (Rotate <Robot/All> <left/right> or Left/Right <Robot/All>; all robots will rotate if none is specified)";
+        std::cout << "\n    Remove (Remove <Robot/All>; all robots will be removed if none is specified )";
         std::cout << "\n\n    Report (Shows the current grid size and all the occypying robots)";
         std::cout << "\n    Resize (Expands the current grid. i.e. Resize 20 20)";
         std::cout << "\n\n    Menu   ";
