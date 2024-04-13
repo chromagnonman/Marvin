@@ -96,7 +96,7 @@ namespace Simulator {
 
         static  command_params getCommandParams(const std::string& input) noexcept 
         {
-            std::string com;
+            std::string command;
             std::string robot_model;
             std::string variant{"1"}; // set as one unit
 
@@ -104,7 +104,7 @@ namespace Simulator {
             // parameters
             {  // For commands such as Move R2D2 2 (units) or Rotate R2D2 Left
                 std::istringstream input_stream{input};
-                input_stream >> com >> robot_model >> variant;
+                input_stream >> command >> robot_model >> variant;
             }
 
             toUpper({robot_model, variant});

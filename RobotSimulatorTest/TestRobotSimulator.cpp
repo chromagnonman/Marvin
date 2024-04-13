@@ -9,19 +9,15 @@ TEST(SimulateRobot, CreationAndMovement)
     RobotSimulator simulate;
 
     RobotLocation location{ 0, 0, "NORTH" };
+
+    ROBOT_TYPE robot_type {RobotType::Ground_based::Bipedaled};
     constexpr auto target_robot{"R2D2"};
 
-    std::unique_ptr<Robot> R2D2 =
-        std::make_unique<Marvin>(location, target_robot);
-
-    // Place robot onto the grid
-    ASSERT_TRUE(simulate.place(std::move(R2D2)));
-
-    std::unique_ptr<Robot> clone =
-        std::make_unique<Marvin>(location, "trooper");
-
+    // Place robot into the grid
+    ASSERT_TRUE(simulate.place(robot_type, target_robot));
+    
     // Don't allow robot on the same location
-    ASSERT_FALSE(simulate.place(std::move(clone)));
+    ASSERT_FALSE(simulate.place(robot_type, "Clone"));
 
     EXPECT_TRUE(simulate.move(target_robot));
     EXPECT_TRUE(simulate.rotate(target_robot, "RIGHT"));

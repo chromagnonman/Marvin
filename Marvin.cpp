@@ -6,7 +6,9 @@ namespace RobotFactory {
 
     size_t Robot::m_serial_number{42};
 
-    Marvin::Marvin() = default;
+    Marvin::Marvin(const std::string& name) noexcept : Robot {name} 
+    {
+    }
 
     Marvin::Marvin(const RobotLocation& location) noexcept :
         Robot{ location }
@@ -16,28 +18,6 @@ namespace RobotFactory {
     Marvin::Marvin(const RobotLocation& location, std::string robot_name) noexcept :
         Robot{ location, std::move(robot_name)}
     {
-    }
-
-    Marvin::Marvin(const Marvin& marvin) noexcept
-    {
-        if (this != &marvin)
-        {
-            m_location = marvin.m_location;
-            m_robotID = marvin.m_robotID;
-            m_model = marvin.m_model;
-        }
-    }
-
-    Marvin& Marvin::operator=(const Marvin& marvin) noexcept
-    {
-        if (this != &marvin)
-        {
-            m_location = marvin.m_location;
-            m_robotID = marvin.m_robotID;
-            m_model = marvin.m_model;
-        }
-
-        return *this;
     }
 
     Marvin::~Marvin() = default;

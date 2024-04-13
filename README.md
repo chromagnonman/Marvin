@@ -30,7 +30,7 @@ Prerequisites:
 	![TestExplorer](TestExplorer.png)
 
 ## Potential Enhancements
-- Support for nonbipedaled robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
+- Support for nonbipedaled (aerial and submerged) robots that may move faster (more than one block at a time) and can rotate in 180 or 360 degrees.
 - Display the actual grid with all the robots mapped out.
 
 ## Caveats

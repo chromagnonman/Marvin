@@ -24,8 +24,7 @@ namespace Simulator {
         impl(GridSize&& grid) noexcept;
 
         void start() noexcept;
-        bool place(std::unique_ptr<RobotFactory::Robot>) noexcept;
-        
+        bool place(const ROBOT_TYPE&, const std::string&) noexcept;
         void moveAll() noexcept;
         void rotateAll(const std::string& direction) noexcept;
         void removeAll() noexcept;
@@ -43,6 +42,7 @@ namespace Simulator {
 
         bool isGridEmpty() const noexcept;
         void execute(std::string&& command) noexcept;
+        bool place(std::unique_ptr<RobotFactory::Robot>) noexcept;
 
     };
 
@@ -78,9 +78,11 @@ namespace Simulator {
 
     void RobotSimulator::impl::execute(std::string&& input) noexcept
     {
-        std::unique_ptr<RobotFactory::Robot> robot =
-            std::make_unique<RobotFactory::Marvin>();
 
+       // TODO: Create robot based on the type selected by the user
+        std::unique_ptr<RobotFactory::Robot> robot =
+            RobotAssembly::create(RobotType::Ground_based::Bipedaled, "Marvin");
+           
         std::string command;
 
         Utils::setCommand(input, robot, command);
@@ -99,66 +101,60 @@ namespace Simulator {
                 robot->setLocation(new_location);
             }
 
-            // Handle user error on not specifying a model
-            if (robot->model().empty()) 
-            {
-                robot->setModel("R2D2");
-            }
-
             place(std::move(robot));
         } 
         else if (command == "MOVE") 
         {
-          auto [robot_model, variant] = Utils::getCommandParams(input);
+            auto [target, variant] = Utils::getCommandParams(input);
 
-          if ((variant == "LEFT" || variant == "RIGHT")) 
-          {
-              rotate(robot->model(), variant);
-              variant = "1";
-          }
+            if ((variant == "LEFT" || variant == "RIGHT")) 
+            {
+                rotate(robot->model(), variant);
+                variant = "1";
+            }
 
-          if (!robot_model.empty()) 
-          {
-              move(robot->model(), std::stoi(variant));
-          } 
-          else 
-          {
-              moveAll();
-          }
+            if (!target.empty() && target != "ALL") 
+            {
+                move(robot->model(), std::stoi(variant));
+            } 
+            else 
+            {
+                moveAll();
+            }
         } 
         else if (command == "ROTATE")
         {
-            const auto [variant, direction] = Utils::getCommandParams(input);
+            const auto [target, direction] = Utils::getCommandParams(input);
 
-            if (variant.empty() || variant == "LEFT" || variant == "RIGHT") {
-                std::cout << "Usage: ROTATE <robot> <direction> or simply LEFT/RIGHT\n";
-                return;
+            if (!target.empty() && target != "LEFT" && target != "RIGHT" &&
+                target != "ALL") 
+            {
+                // rotate specific robot
+                rotate(robot->model(), direction);
             }
-
-            // if no robot is specified
-            if (variant == "LEFT" || variant == "RIGHT") 
+            else
             {
                 rotateAll(direction);
-            }
-            else // Rotate specified robot
-            {
-                rotate(robot->model(), direction);
             }
         } 
         else if (command == "LEFT" || command == "RIGHT") 
         {
-          if (!robot->model().empty()) 
-          {
-              rotate(robot->model(), command);
-          } 
-          else 
-          {
-              rotateAll(command);
-          }
+            const auto [target, _] = Utils::getCommandParams(input);
+
+            if (target == "ALL" || target.empty()) 
+            {
+                rotateAll(command);
+            } 
+            else 
+            {
+                rotate(robot->model(), command);
+            }
         }
         else if (command == "REMOVE") 
         {
-            if (!robot->model().empty()) 
+            const auto [target, _] = Utils::getCommandParams(input);
+
+            if (!target.empty() && target != "ALL") 
             {
                 remove(robot->model());
             } 
@@ -205,7 +201,17 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::place(std::unique_ptr<RobotFactory::Robot> new_robot) noexcept
+    bool RobotSimulator::impl::place(const ROBOT_TYPE& robot_type,
+                                     const std::string& name) noexcept
+    {
+        std::unique_ptr<RobotFactory::Robot> new_robot =
+            RobotFactory::RobotAssembly::create(robot_type, name);
+
+        return place(std::move(new_robot));
+    }
+
+    bool RobotSimulator::impl::place(
+        std::unique_ptr<RobotFactory::Robot> new_robot) noexcept 
     {
         if (!m_grid->addRobot(new_robot))
         {
@@ -441,9 +447,10 @@ namespace Simulator {
         m_pImpl->start();
     }
 
-    bool RobotSimulator::place(std::unique_ptr<RobotFactory::Robot> robot) noexcept
+    bool RobotSimulator::place(const ROBOT_TYPE& robot_type,
+                               const std::string& name) noexcept
     {
-        return m_pImpl->place(std::move(robot));
+        return m_pImpl->place(robot_type, name);
     }
 
     void RobotSimulator::report() const noexcept

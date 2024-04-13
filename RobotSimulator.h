@@ -3,8 +3,10 @@
 
 #include <memory>
 
+#include "RobotAssembly.h"
 #include "Marvin.h"
 #include "RobotGrid.h"
+
 
 namespace Simulator {
 
@@ -15,8 +17,8 @@ namespace Simulator {
         virtual ~RobotSimulator();
 
         void start() noexcept;
-        // TODO: Use robot type (enum value) as argument to create the robot
-        bool place(std::unique_ptr<RobotFactory::Robot>) noexcept;
+
+        bool place(const RobotFactory::ROBOT_TYPE&, const std::string& name) noexcept;
         void move() noexcept;
         void rotate(const std::string& direction) noexcept;
         void remove() noexcept;

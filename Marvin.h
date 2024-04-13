@@ -11,11 +11,11 @@ namespace RobotFactory {
     */
     class Marvin : public Robot {
     public:
-        Marvin();
+        Marvin(const std::string& name = "Marvin") noexcept;
         Marvin(const RobotLocation& location) noexcept;
         Marvin(const RobotLocation&, std::string robot_name) noexcept;
-        Marvin(const Marvin&) noexcept;
-        Marvin& operator=(const Marvin&) noexcept;
+        Marvin(const Marvin&) = default;
+        Marvin& operator=(const Marvin&) = default;
         virtual ~Marvin();
 
         void rotate(const ROBOT_ROTATION& rotate_direction = ROBOT_ROTATION::LEFT) noexcept override;

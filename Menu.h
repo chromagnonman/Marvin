@@ -10,6 +10,7 @@ struct Menu {
 
     static void showUsage() 
     {
+        // TODO: Add choices of robot types
         std::cout << "\n\n  COMMANDS (case insensitive) (Default Grid size (10x10):";
         std::cout << "\n\n    Place  (Place <Robot> <X,Y> <North, South, West, East>) e.g. Place R2D2 1,1 North";
         std::cout << "\n\n    Move   (Move <Robot> <number of units> or just MOVE, which moves all the robots)";

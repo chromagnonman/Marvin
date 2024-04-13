@@ -149,6 +149,7 @@
     <ClInclude Include="Marvin.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Robot.h" />
+    <ClInclude Include="RobotAssembly.h" />
     <ClInclude Include="RobotSimulator.h" />
     <ClInclude Include="RobotGrid.h" />
     <ClInclude Include="Utils.h" />
