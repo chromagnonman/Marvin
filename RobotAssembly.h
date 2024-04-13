@@ -26,11 +26,17 @@ namespace RobotFactory {
         {
             // TODO:
         };
+
+        enum class Subaquatic : size_t 
+        {
+            // TODO:
+        };
     }
 
     using ROBOT_TYPE = std::variant<RobotType::Ground_based, 
                                     RobotType::Aerial, 
-                                    RobotType::Submerged>;
+                                    RobotType::Submerged,
+                                    RobotType::Subaquatic>;
 
     using namespace RobotFactory::RobotType;
 
