@@ -43,12 +43,15 @@ namespace RobotFactory {
     struct RobotAssembly {
 
         static std::unique_ptr<RobotFactory::Robot> create(
-            const ROBOT_TYPE& type, const std::string& name) 
+            const ROBOT_TYPE& type,
+            const RobotFactory::RobotLocation& location, 
+            const std::string& name) 
         {
             const auto robot_type = std::get<0>(type);
+            
             switch (robot_type) {
                 case Ground_based::Bipedaled:
-                            return std::make_unique<RobotFactory::Marvin>(name);
+                            return std::make_unique<RobotFactory::Marvin>(location, name);
 
                 // TODO: Add support for the other robot types
             }

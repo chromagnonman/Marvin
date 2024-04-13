@@ -24,7 +24,10 @@ namespace Simulator {
         impl(GridSize&& grid) noexcept;
 
         void start() noexcept;
-        bool place(const ROBOT_TYPE&, const std::string&) noexcept;
+        bool place(
+            const ROBOT_TYPE&,
+            const RobotFactory::RobotLocation&, 
+            const std::string&) noexcept;
         void moveAll() noexcept;
         void rotateAll(const std::string& direction) noexcept;
         void removeAll() noexcept;
@@ -79,9 +82,11 @@ namespace Simulator {
     void RobotSimulator::impl::execute(std::string&& input) noexcept
     {
 
-       // TODO: Create robot based on the type selected by the user
+        // TODO: Create robot based on the type selected by the user
+        RobotLocation location{0, 0, "NORTH"};
+
         std::unique_ptr<RobotFactory::Robot> robot =
-            RobotAssembly::create(RobotType::Ground_based::Bipedaled, "Marvin");
+            RobotAssembly::create(RobotType::Ground_based::Bipedaled, location, "Marvin");
            
         std::string command;
 
@@ -201,11 +206,13 @@ namespace Simulator {
         }
     }
 
-    bool RobotSimulator::impl::place(const ROBOT_TYPE& robot_type,
-                                     const std::string& name) noexcept
+    bool RobotSimulator::impl::place(
+        const ROBOT_TYPE& robot_type,
+        const RobotFactory::RobotLocation& location,
+        const std::string& name) noexcept
     {
         std::unique_ptr<RobotFactory::Robot> new_robot =
-            RobotFactory::RobotAssembly::create(robot_type, name);
+            RobotFactory::RobotAssembly::create(robot_type, location, name);
 
         return place(std::move(new_robot));
     }
@@ -448,9 +455,10 @@ namespace Simulator {
     }
 
     bool RobotSimulator::place(const ROBOT_TYPE& robot_type,
+                               const RobotFactory::RobotLocation& location,
                                const std::string& name) noexcept
     {
-        return m_pImpl->place(robot_type, name);
+        return m_pImpl->place(robot_type, location, name);
     }
 
     void RobotSimulator::report() const noexcept

@@ -18,7 +18,9 @@ namespace Simulator {
 
         void start() noexcept;
 
-        bool place(const RobotFactory::ROBOT_TYPE&, const std::string& name) noexcept;
+        bool place(const RobotFactory::ROBOT_TYPE&,
+                   const RobotFactory::RobotLocation&,
+                   const std::string& name) noexcept;
         void move() noexcept;
         void rotate(const std::string& direction) noexcept;
         void remove() noexcept;

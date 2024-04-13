@@ -10,14 +10,15 @@ TEST(SimulateRobot, CreationAndMovement)
 
     RobotLocation location{ 0, 0, "NORTH" };
 
-    ROBOT_TYPE robot_type {RobotType::Ground_based::Bipedaled};
+    ROBOT_TYPE R2D2 {RobotType::Ground_based::Bipedaled};
     constexpr auto target_robot{"R2D2"};
 
     // Place robot into the grid
-    ASSERT_TRUE(simulate.place(robot_type, target_robot));
+    ASSERT_TRUE(simulate.place(R2D2, location, target_robot));
     
     // Don't allow robot on the same location
-    ASSERT_FALSE(simulate.place(robot_type, "Clone"));
+    ROBOT_TYPE Clone {RobotType::Ground_based::Bipedaled};
+    ASSERT_FALSE(simulate.place(Clone, location, "Trooper"));
 
     EXPECT_TRUE(simulate.move(target_robot));
     EXPECT_TRUE(simulate.rotate(target_robot, "RIGHT"));
