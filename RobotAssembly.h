@@ -50,10 +50,15 @@ namespace RobotFactory {
             const auto robot_type = std::get<0>(type);
             
             switch (robot_type) {
-                case Ground_based::Bipedaled:
-                            return std::make_unique<RobotFactory::Marvin>(location, name);
+                case Ground_based::Bipedaled: 
+                    return std::make_unique<RobotFactory::Marvin>(location, name);
 
                 // TODO: Add support for the other robot types
+
+                default:
+                    return nullptr;
+
+                
             }
         }
     };

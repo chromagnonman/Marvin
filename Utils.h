@@ -20,8 +20,8 @@ namespace Simulator {
            for (auto str : strings) 
            {
                 std::for_each(std::execution::par_unseq, str.get().begin(), str.get().end(),
-                    [](auto& c) { 
-                        c = std::toupper(c); 
+                    [](char& c) { 
+                        c = static_cast<char>(std::toupper(c)); 
                     });
            }
         }
