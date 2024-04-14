@@ -22,7 +22,7 @@ namespace RobotFactory {
             // TODO:
         };
 
-        enum class Submerged : size_t 
+        enum class Aquatic : size_t 
         {
             // TODO:
         };
@@ -35,7 +35,7 @@ namespace RobotFactory {
 
     using ROBOT_TYPE = std::variant<RobotType::Ground_based, 
                                     RobotType::Aerial, 
-                                    RobotType::Submerged,
+                                    RobotType::Aquatic,
                                     RobotType::Subaquatic>;
 
     using namespace RobotFactory::RobotType;
@@ -49,7 +49,8 @@ namespace RobotFactory {
         {
             const auto robot_type = std::get<0>(type);
             
-            switch (robot_type) {
+            switch (robot_type) 
+            {
                 case Ground_based::Bipedaled: 
                     return std::make_unique<RobotFactory::Marvin>(location, name);
 

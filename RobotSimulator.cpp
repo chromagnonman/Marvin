@@ -177,7 +177,7 @@ namespace Simulator {
            size_t width {0};
            size_t height {0};
            
-           {   // Extact the command parameters from the input stream
+           {   // Extract the command parameters from the input stream
                std::istringstream input_stream {input};
                input_stream >> command >> width >> height;
            }
@@ -314,7 +314,6 @@ namespace Simulator {
 
                     robot->second->move(blocks);
 
-                    // Checks if location is outside the grid or is occupied by another robot
                     if (!m_grid->isOffTheGrid(robot->second) && !m_grid->isOccupied(robot->second))
                     {
                         std::cout << '\n' << robot->second->model() << " moved " << blocks << " block(s) forward heading " 

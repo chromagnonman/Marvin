@@ -72,7 +72,7 @@ namespace Simulator {
             RobotFactory::RobotLocation location;
             std::string model;
             
-            {   // Extact the command parameters from the input stream
+            {   // Extract the command parameters from the input stream
                 std::istringstream input_stream {input};
                 input_stream >> command >> model >> location.x_coordinate >>
                     location.y_coordinate >> location.direction;
