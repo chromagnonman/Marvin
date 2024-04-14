@@ -115,7 +115,7 @@ namespace Simulator {
         m_pImpl->initialize();
     }
 
-    RobotGrid::~RobotGrid() = default;
+    RobotGrid::~RobotGrid() noexcept = default;
 
 
     bool RobotGrid::addRobot(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept
