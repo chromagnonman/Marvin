@@ -94,14 +94,13 @@ namespace Simulator {
             }
         }
 
-        static  command_params getCommandParams(const std::string& input) noexcept 
+        [[nodiscard]] static  command_params getCommandParams(const std::string& input) noexcept 
         {
             std::string command;
             std::string robot_model;
             std::string variant{"1"}; // set as one unit
 
-            // Extract the command from the input stream including the
-            // parameters
+            // Extract the command from the input stream including the parameters
             {  // For commands such as Move R2D2 2 (units) or Rotate R2D2 Left
                 std::istringstream input_stream{input};
                 input_stream >> command >> robot_model >> variant;
