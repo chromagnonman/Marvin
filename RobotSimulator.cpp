@@ -26,7 +26,7 @@ namespace Simulator {
         void start() noexcept;
         bool place(
             const ROBOT_TYPE&,
-            const RobotFactory::RobotLocation&, 
+            const RobotLocation&, 
             const std::string&) noexcept;
         void moveAll() noexcept;
         void rotateAll(const std::string& direction) noexcept;
@@ -208,7 +208,7 @@ namespace Simulator {
 
     bool RobotSimulator::impl::place(
         const ROBOT_TYPE& robot_type,
-        const RobotFactory::RobotLocation& location,
+        const RobotLocation& location,
         const std::string& name) noexcept
     {
         std::unique_ptr<RobotFactory::Robot> new_robot =
@@ -454,7 +454,7 @@ namespace Simulator {
     }
 
     bool RobotSimulator::place(const ROBOT_TYPE& robot_type,
-                               const RobotFactory::RobotLocation& location,
+                               const RobotLocation& location,
                                const std::string& name) noexcept
     {
         return m_pImpl->place(robot_type, location, name);
