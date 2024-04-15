@@ -17,7 +17,7 @@ namespace Simulator {
 
         static void toUpper(std::vector<std::reference_wrapper<std::string>> strings) noexcept
         {
-           for (auto str : strings) 
+           for (auto& str : strings) 
            {
                 std::for_each(std::execution::par_unseq, str.get().begin(), str.get().end(),
                     [](char& c) { 

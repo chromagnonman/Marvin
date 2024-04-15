@@ -85,8 +85,8 @@ namespace Simulator {
         // TODO: Create robot based on the type selected by the user
         RobotLocation location{0, 0, "NORTH"};
 
-        std::unique_ptr<RobotFactory::Robot> robot =
-            RobotAssembly::create(RobotType::Ground_based::Bipedaled, location, "Marvin");
+        auto robot = RobotAssembly::create(RobotType::Ground_based::Bipedaled,
+                                           location, "Marvin");
            
         std::string command;
 
@@ -211,8 +211,8 @@ namespace Simulator {
         const RobotLocation& location,
         const std::string& name) noexcept
     {
-        std::unique_ptr<RobotFactory::Robot> new_robot =
-            RobotFactory::RobotAssembly::create(robot_type, location, name);
+      auto new_robot =
+          RobotFactory::RobotAssembly::create(robot_type, location, name);
 
         return place(std::move(new_robot));
     }

@@ -57,7 +57,7 @@ namespace RobotFactory {
                 // TODO: Add support for the other robot types
 
                 default:
-                    return nullptr;
+                  return std::make_unique<RobotFactory::Marvin>(location, name);
 
                 
             }
