@@ -26,19 +26,19 @@ namespace RobotFactory {
     {
         if (m_location.direction == NORTH)
         {
-            m_location.y_coordinate+=unit;
+            m_location.y_coordinate += (m_default_move * unit);
         }
         else if (m_location.direction == SOUTH)
         {
-            m_location.y_coordinate-=unit;
+            m_location.y_coordinate -= (m_default_move * unit);
         }
         else if (m_location.direction == EAST)
         {
-            m_location.x_coordinate+=unit;
+            m_location.x_coordinate += (m_default_move * unit);
         }
         else if (m_location.direction == WEST)
         {
-            m_location.x_coordinate-=unit;
+            m_location.x_coordinate -= (m_default_move * unit);
         }
     }
 

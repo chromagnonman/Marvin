@@ -273,7 +273,7 @@ namespace Simulator {
             {
                 const auto current_location = robot->location();
                 
-                robot->move();
+                robot->move(1);
 
                 if (!m_grid->isOffTheGrid(robot))
                 {

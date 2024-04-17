@@ -78,8 +78,8 @@ namespace RobotFactory
             m_model = model;
         }
 
-        virtual void rotate(const ROBOT_ROTATION& rotate_direction = ROBOT_ROTATION::LEFT) = 0;
-        virtual void move(size_t pace = 1) = 0;
+        virtual void rotate(const ROBOT_ROTATION&) = 0;
+        virtual void move(size_t) = 0;
 
     protected:
         RobotLocation m_location;
