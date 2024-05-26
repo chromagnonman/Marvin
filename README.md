@@ -5,18 +5,18 @@ A simple robot simulator written in C++. The user can issue commands to create a
 
 ## Features
 
-- Place a robot onto the cartesian plane using X and Y coordinates in the direction that the robot will be facing. (e.g., North, South, West, and East).
+- Place a robot onto the cartesian plane using X and Y coordinates in the direction the robot will face. (e.g., North, South, West, and East).
 - Move the robot(s) one unit forward from its relative position to the direction the robot is currently facing.
 - Rotate the robot(s) at a 90-degree angle from left to right and vice versa.
 - Report the current grid size and all the robots' information: ID, name, direction, and position.
-- Move particular robot more than one block, e.g. `Move Marvin 2 (blocks)`
+- Move a particular robot more than one block, e.g. `Move Marvin 2 (blocks)`
 - Dynamically expand the grid (the default is 10x10).
 
 
 ## Getting started
 Prerequisites:
 - This is a Windows console application, your machine should be running on Windows 11 or newer.
-- Install the latest Visual Studio IDE available online with at least C++17 compiler. The community edition will suffice.
+- Install the latest Visual Studio IDE, available online with at least a C++17 compiler; the community edition should suffice.
 - Download or clone the repo:
 	```
 	git@github.com:chromagnonman/Marvin.git
