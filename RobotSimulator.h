@@ -4,8 +4,6 @@
 #include <memory>
 
 #include "RobotAssembly.h"
-#include "Marvin.h"
-#include "RobotGrid.h"
 
 
 namespace Simulator {

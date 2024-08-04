@@ -13,7 +13,7 @@ namespace Simulator {
 
     using command_params = std::tuple<std::string, std::string>;
 
-    struct Utils {
+    namespace Utils {
 
         static void toUpper(std::vector<std::reference_wrapper<std::string>> strings) noexcept
         {
