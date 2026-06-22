@@ -8,7 +8,8 @@ namespace
 
 TEST(Marvin, MovesAcrossSignedCoordinates)
 {
-    RobotFactory::Marvin robot{{.x = 0, .y = 0, .direction = RobotFactory::Direction::South}};
+    RobotFactory::Marvin robot{
+        RobotFactory::RobotLocation{.x = 0, .y = 0, .direction = RobotFactory::Direction::South}};
 
     robot.move(2);
     EXPECT_EQ(robot.location().y, -2);
