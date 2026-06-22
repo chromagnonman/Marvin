@@ -9,45 +9,48 @@ permissions:
   contents: read
 
 jobs:
-  build-and-test:
+  formatting:
     runs-on: windows-2022
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Set up NuGet
-        uses: NuGet/setup-nuget@v2
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
-          restore-keys: ${{ runner.os }}-nuget-
-
-      - name: Restore packages
-        run: nuget restore Marvin.sln -PackagesDirectory packages
-
+      - uses: actions/checkout@v4
       - name: Check formatting
         shell: pwsh
         run: |
           $files = git ls-files '*.cpp' '*.h'
           clang-format --dry-run --Werror $files
 
-      - name: Build and analyze
+  build-and-test:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure
         shell: pwsh
         run: |
-          $clangTidy = (Get-Command clang-tidy -ErrorAction Stop).Source
-          $llvmInstallDir = Split-Path (Split-Path $clangTidy -Parent) -Parent
-          msbuild Marvin.sln /m `
-            /p:Configuration=Debug `
-            /p:Platform=x64 `
-            /p:PlatformToolset=v143 `
-            "/p:LLVMInstallDir=$llvmInstallDir\"
+          $tidy = if ('${{ matrix.configuration }}' -eq 'Debug') { 'ON' } else { 'OFF' }
+          cmake -S . -B out/build/ci-${{ matrix.configuration }} -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ matrix.configuration }} `
+            -DMARVIN_ENABLE_CLANG_TIDY=$tidy
+      - name: Build
+        run: cmake --build out/build/ci-${{ matrix.configuration }}
+      - name: Test
+        run: ctest --test-dir out/build/ci-${{ matrix.configuration }} --output-on-failure
 
-      - name: Run tests
-        run: .\x64\Debug\RobotSimulatorTest.exe
+  address-sanitizer:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure
+        run: >-
+          cmake -S . -B out/build/ci-asan -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          -DMARVIN_ENABLE_ASAN=ON
+      - name: Build
+        run: cmake --build out/build/ci-asan
+      - name: Test
+        run: ctest --test-dir out/build/ci-asan --output-on-failure

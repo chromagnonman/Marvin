@@ -1,482 +1,338 @@
-#include <iostream>
-#include <cstddef>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <utility>
+#include "RobotSimulator.h"
 
+#include "Command.h"
 #include "Menu.h"
 #include "Robot.h"
 #include "RobotAssembly.h"
 #include "RobotGrid.h"
-#include "RobotSimulator.h"
-#include "Utils.h"
+
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <istream>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <variant>
 
 namespace Simulator
 {
-
-using namespace RobotFactory;
-
-class RobotSimulator::impl
+namespace
 {
-  public:
-    explicit impl(GridSize grid);
 
-    void start();
-    bool place(const ROBOT_TYPE &, const RobotLocation &, const std::string &);
-    void moveAll();
-    void rotateAll(const std::string &direction);
-    void removeAll();
-    void report() const;
-    void resize(GridSize grid);
-
-    bool move(const std::string &robot, size_t);
-    bool rotate(const std::string &robot, const std::string &direction);
-    bool remove(const std::string &robot);
-
-  private:
-    RobotGrid m_grid;
-    std::unordered_multimap<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
-
-    [[nodiscard]] bool isGridEmpty() const;
-    void execute(std::string input);
-    bool place(std::unique_ptr<RobotFactory::Robot>);
-};
-
-RobotSimulator::impl::impl(GridSize grid) : m_grid{grid}
+[[nodiscard]] std::string canonicalName(std::string_view name)
 {
-    m_robots.reserve(grid.height * grid.width);
+    std::string canonical{name};
+    std::ranges::transform(canonical, canonical.begin(), [](unsigned char character)
+                           { return static_cast<char>(std::toupper(character)); });
+    return canonical;
 }
 
-bool RobotSimulator::impl::isGridEmpty() const
+} // namespace
+
+class RobotSimulator::Impl
 {
-    if (m_robots.empty())
+  public:
+    explicit Impl(GridSize size) : grid{size} {}
+
+  private:
+    friend class RobotSimulator;
+
+    RobotGrid grid;
+    std::unordered_map<std::string, std::unique_ptr<RobotFactory::Robot>> robots_by_name;
+    std::unordered_map<RobotFactory::RobotId, RobotFactory::Robot *> robots_by_id;
+
+    [[nodiscard]] RobotFactory::Robot *find(std::string_view name)
     {
-        std::cout << "\nGrid is empty!\n\n";
+        const auto robot = robots_by_name.find(canonicalName(name));
+        return robot == robots_by_name.end() ? nullptr : robot->second.get();
+    }
+
+    [[nodiscard]] const RobotFactory::Robot *find(std::string_view name) const
+    {
+        const auto robot = robots_by_name.find(canonicalName(name));
+        return robot == robots_by_name.end() ? nullptr : robot->second.get();
+    }
+
+    [[nodiscard]] RobotFactory::Robot *find(RobotFactory::RobotId id)
+    {
+        const auto robot = robots_by_id.find(id);
+        return robot == robots_by_id.end() ? nullptr : robot->second;
+    }
+
+    [[nodiscard]] const RobotFactory::Robot *find(RobotFactory::RobotId id) const
+    {
+        const auto robot = robots_by_id.find(id);
+        return robot == robots_by_id.end() ? nullptr : robot->second;
+    }
+
+    [[nodiscard]] bool move(RobotFactory::Robot &robot, std::uint32_t blocks)
+    {
+        const auto previous = robot.location();
+        robot.move(blocks);
+        if (grid.isOffGrid(robot.location()) || grid.isOccupied(robot.location()))
+        {
+            robot.setLocation(previous);
+            return false;
+        }
+        grid.updateLocation(previous, robot);
         return true;
     }
 
-    return false;
-}
-
-void RobotSimulator::impl::start()
-{
-    Menu::showUsage();
-
-    while (true)
+    [[nodiscard]] bool erase(RobotFactory::Robot &robot)
     {
-        std::string input;
-        if (!std::getline(std::cin, input))
-        {
-            break;
-        }
-
-        execute(std::move(input));
+        const auto name = canonicalName(robot.model());
+        grid.remove(robot);
+        robots_by_id.erase(robot.id());
+        return robots_by_name.erase(name) == 1;
     }
-}
+};
 
-void RobotSimulator::impl::execute(std::string input)
-{
+RobotSimulator::RobotSimulator() : RobotSimulator{default_grid_size} {}
 
-    // TODO: Create robot based on the type selected by the user
-    const RobotLocation location{0, 0, "NORTH"};
-
-    auto robot = RobotAssembly::create(RobotType::Ground_based::Bipedaled, location, "Marvin");
-
-    std::string command;
-
-    Utils::setCommand(input, robot, command);
-
-    if (command == "PLACE")
-    {
-        if (robot->location().x_coordinate >= m_grid.getSize().width ||
-            robot->location().y_coordinate >= m_grid.getSize().height)
-        {
-            std::cout << "\nLocation is or off the grid! Current location is set to (0,0)\n";
-            RobotLocation new_location{robot->location()};
-
-            new_location.x_coordinate = 0;
-            new_location.y_coordinate = 0;
-
-            robot->setLocation(new_location);
-        }
-
-        place(std::move(robot));
-    }
-    else if (command == "MOVE")
-    {
-        auto [target, variant] = Utils::getCommandParams(input);
-
-        if ((variant == "LEFT" || variant == "RIGHT"))
-        {
-            rotate(robot->model(), variant);
-            variant = "1";
-        }
-
-        if (!target.empty() && target != "ALL")
-        {
-            move(robot->model(), std::stoi(variant));
-        }
-        else
-        {
-            moveAll();
-        }
-    }
-    else if (command == "ROTATE")
-    {
-        const auto [target, direction] = Utils::getCommandParams(input);
-
-        if (!target.empty() && target != "LEFT" && target != "RIGHT" && target != "ALL")
-        {
-            // rotate specific robot
-            rotate(robot->model(), direction);
-        }
-        else
-        {
-            rotateAll(direction);
-        }
-    }
-    else if (command == "LEFT" || command == "RIGHT")
-    {
-        const auto [target, _] = Utils::getCommandParams(input);
-
-        if (target == "ALL" || target.empty())
-        {
-            rotateAll(command);
-        }
-        else
-        {
-            rotate(robot->model(), command);
-        }
-    }
-    else if (command == "REMOVE")
-    {
-        const auto [target, _] = Utils::getCommandParams(input);
-
-        if (!target.empty() && target != "ALL")
-        {
-            remove(robot->model());
-        }
-        else
-        {
-            removeAll();
-        }
-    }
-    else if (command == "REPORT")
-    {
-        report();
-    }
-    else if (command == "RESIZE")
-    {
-        size_t width{0};
-        size_t height{0};
-
-        { // Extract the command parameters from the input stream
-            std::istringstream input_stream{input};
-            input_stream >> command >> width >> height;
-        }
-
-        if (m_grid.getSize().width < width || m_grid.getSize().height < height)
-        {
-            std::cout << "Grid resized from: (" << m_grid.getSize().width << "x"
-                      << m_grid.getSize().height << ") to: (" << width << "x" << height << ")\n";
-
-            resize(GridSize{.width = width, .height = height});
-        }
-        else
-        {
-            std::cerr << "\nError resizing; value must be larger than the current grid size.\n";
-        }
-    }
-    else if (command == "MENU")
-    {
-        Menu::showUsage();
-    }
-    else
-    {
-        std::cerr << "\nInvalid command!\n";
-        Menu::showUsage();
-    }
-}
-
-bool RobotSimulator::impl::place(const ROBOT_TYPE &robot_type, const RobotLocation &location,
-                                 const std::string &name)
-{
-    auto new_robot = RobotFactory::RobotAssembly::create(robot_type, location, name);
-
-    return place(std::move(new_robot));
-}
-
-bool RobotSimulator::impl::place(std::unique_ptr<RobotFactory::Robot> new_robot)
-{
-    if (!m_grid.addRobot(*new_robot))
-    {
-        std::cout << "\nLocation is occupied or off the grid!\n";
-
-        // Reset location to (0,0)
-        RobotLocation new_location{new_robot->location()};
-        new_location.x_coordinate = 0;
-        new_location.y_coordinate = 0;
-
-        new_robot->setLocation(new_location);
-
-        // Don't insert if location (0,0) is also occupied
-        if (!m_grid.addRobot(*new_robot))
-        {
-            return false;
-        }
-    }
-
-    std::cout << "\nRobot created. Info:";
-    Menu::showDetails(new_robot);
-    m_robots.emplace(new_robot->model(), std::move(new_robot));
-
-    return true;
-}
-
-void RobotSimulator::impl::report() const
-{
-    std::cout << "\nCurrent grid size: (" << m_grid.getSize().width << "x"
-              << m_grid.getSize().height << ")\n";
-
-    if (!isGridEmpty())
-    {
-        std::cout << "\nFound " << m_robots.size() << " robot(s) in the grid\n";
-        for (const auto &[_, robot] : m_robots)
-        {
-            Menu::showDetails(robot);
-        }
-    }
-}
-
-void RobotSimulator::impl::resize(GridSize grid)
-{
-    m_grid.resize(grid);
-}
-
-void RobotSimulator::impl::moveAll()
-{
-    if (!isGridEmpty())
-    {
-        for (auto &[model, robot] : m_robots)
-        {
-            const auto current_location = robot->location();
-
-            robot->move(1);
-
-            if (!m_grid.isOffTheGrid(*robot) && !m_grid.isOccupied(*robot))
-            {
-                std::cout << '\n'
-                          << model << " moved one unit forward heading "
-                          << robot->location().direction << "(" << robot->location().x_coordinate
-                          << "," << robot->location().y_coordinate << ")\n";
-
-                m_grid.updateLocation(current_location, *robot);
-            }
-            else
-            {
-                std::cout << '\n'
-                          << robot->model() << " is already at the edge of the grid, facing "
-                          << robot->location().direction << "(" << current_location.x_coordinate
-                          << "," << current_location.y_coordinate << ")\n";
-
-                // Revert to previous location
-                robot->setLocation(current_location);
-            }
-        }
-    }
-}
-
-bool RobotSimulator::impl::move(const std::string &target_robot, size_t blocks)
-{
-    bool result{false};
-
-    if (!isGridEmpty())
-    {
-        if (auto [robot, last] = m_robots.equal_range(target_robot); robot != m_robots.end())
-        {
-            for (; robot != last; ++robot)
-            {
-                const auto current_location = robot->second->location();
-
-                robot->second->move(blocks);
-
-                if (!m_grid.isOffTheGrid(*robot->second) && !m_grid.isOccupied(*robot->second))
-                {
-                    std::cout << '\n'
-                              << robot->second->model() << " moved " << blocks
-                              << " block(s) forward heading " << robot->second->location().direction
-                              << "(" << robot->second->location().x_coordinate << ","
-                              << robot->second->location().y_coordinate << ")\n";
-
-                    m_grid.updateLocation(current_location, *robot->second);
-                    result = true;
-                }
-                else
-                {
-                    std::cout << '\n'
-                              << robot->second->model()
-                              << " is unable to move. Area is occupied or outside the grid.\n";
-
-                    // Revert to previous location
-                    robot->second->setLocation(current_location);
-                }
-            }
-        }
-        else
-        {
-            std::cout << target_robot << " isn't on the grid!\n";
-        }
-    }
-
-    return result;
-}
-
-void RobotSimulator::impl::rotateAll(const std::string &direction)
-{
-    if (!isGridEmpty())
-    {
-        const auto dir = (direction == "LEFT") ? ROBOT_ROTATION::LEFT : ROBOT_ROTATION::RIGHT;
-        for (auto &[model, robot] : m_robots)
-        {
-            robot->rotate(dir);
-            std::cout << '\n'
-                      << model << " turned " << direction << " facing "
-                      << robot->location().direction << "(" << robot->location().x_coordinate << ","
-                      << robot->location().y_coordinate << ")\n";
-        }
-    }
-}
-
-bool RobotSimulator::impl::rotate(const std::string &target_robot, const std::string &direction)
-{
-    bool result{false};
-
-    if (!isGridEmpty())
-    {
-        const auto dir = (direction == "LEFT") ? ROBOT_ROTATION::LEFT : ROBOT_ROTATION::RIGHT;
-
-        if (auto [robot, last] = m_robots.equal_range(target_robot); robot != m_robots.end())
-        {
-            result = true;
-
-            for (; robot != last; ++robot)
-            {
-                robot->second->rotate(dir);
-
-                std::cout << '\n'
-                          << robot->second->model() << " turned " << direction << " facing "
-                          << robot->second->location().direction << "("
-                          << robot->second->location().x_coordinate << ","
-                          << robot->second->location().y_coordinate << ")\n";
-            }
-        }
-        else
-        {
-            std::cout << target_robot << " isn't on the grid!\n";
-        }
-    }
-
-    return result;
-}
-
-void RobotSimulator::impl::removeAll()
-{
-    if (!isGridEmpty())
-    {
-        for (auto robot = m_robots.begin(); robot != m_robots.end();)
-        {
-            m_grid.remove(*robot->second);
-            robot = m_robots.erase(robot);
-        }
-        std::cout << "\nAll robots were removed!\n";
-    }
-}
-
-bool RobotSimulator::impl::remove(const std::string &target_robot)
-{
-    bool result{false};
-
-    if (auto [robot, last] = m_robots.equal_range(target_robot); robot != m_robots.end())
-    {
-        result = true;
-
-        std::cout << "\nThe following robot(s) were removed. Info:";
-
-        while (robot != last)
-        {
-            Menu::showDetails(robot->second);
-
-            m_grid.remove(*robot->second);
-            robot = m_robots.erase(robot);
-        }
-    }
-    else
-    {
-        std::cout << target_robot << " isn't on the grid!\n";
-    }
-
-    return result;
-}
-
-RobotSimulator::RobotSimulator()
-    : m_pImpl{std::make_unique<impl>(GridSize{.width = DEFAULT_WIDTH, .height = DEFAULT_HEIGHT})}
-{
-}
-
-RobotSimulator::RobotSimulator(GridSize grid) : m_pImpl{std::make_unique<impl>(grid)} {}
+RobotSimulator::RobotSimulator(GridSize size) : m_impl{std::make_unique<Impl>(size)} {}
 
 RobotSimulator::~RobotSimulator() = default;
+RobotSimulator::RobotSimulator(RobotSimulator &&) noexcept = default;
+RobotSimulator &RobotSimulator::operator=(RobotSimulator &&) noexcept = default;
 
 void RobotSimulator::start()
 {
-    m_pImpl->start();
+    run(std::cin, std::cout, std::cerr);
 }
 
-bool RobotSimulator::place(const ROBOT_TYPE &robot_type, const RobotLocation &location,
-                           const std::string &name)
+void RobotSimulator::run(std::istream &input, std::ostream &output, std::ostream &errors)
 {
-    return m_pImpl->place(robot_type, location, name);
+    Menu::showUsage(output);
+    for (std::string line; std::getline(input, line);)
+    {
+        if (!executeLine(line, output, errors))
+        {
+            break;
+        }
+        output << "> ";
+    }
 }
 
-void RobotSimulator::report() const
+bool RobotSimulator::executeLine(std::string_view line, std::ostream &output, std::ostream &errors)
 {
-    m_pImpl->report();
+    const auto parsed = CommandParser::parse(line);
+    if (!parsed)
+    {
+        errors << "Error: " << parsed.error << '\n';
+        return true;
+    }
+
+    return std::visit(
+        [this, &output, &errors](const auto &command) -> bool
+        {
+            using Type = std::decay_t<decltype(command)>;
+            if constexpr (std::is_same_v<Type, PlaceCommand>)
+            {
+                if (!place(RobotFactory::GroundRobotType::Bipedal, command.location, command.name))
+                {
+                    errors << "Unable to place robot; name or location is already in use.\n";
+                }
+            }
+            else if constexpr (std::is_same_v<Type, MoveCommand>)
+            {
+                const auto moved = command.target
+                                       ? std::visit([this, &command](const auto &target)
+                                                    { return move(target, command.blocks); },
+                                                    command.target->value)
+                                       : moveAll(command.blocks) > 0;
+                if (!moved)
+                {
+                    errors << "No robot could be moved.\n";
+                }
+            }
+            else if constexpr (std::is_same_v<Type, RotateCommand>)
+            {
+                const auto rotated = command.target
+                                         ? std::visit([this, &command](const auto &target)
+                                                      { return rotate(target, command.rotation); },
+                                                      command.target->value)
+                                         : rotateAll(command.rotation) > 0;
+                if (!rotated)
+                {
+                    errors << "No matching robot was found.\n";
+                }
+            }
+            else if constexpr (std::is_same_v<Type, RemoveCommand>)
+            {
+                const auto removed =
+                    command.target ? std::visit([this](const auto &target)
+                                                { return remove(target); }, command.target->value)
+                                   : removeAll() > 0;
+                if (!removed)
+                {
+                    errors << "No matching robot was found.\n";
+                }
+            }
+            else if constexpr (std::is_same_v<Type, ResizeCommand>)
+            {
+                if (!resize(command.size))
+                {
+                    errors << "Grid dimensions cannot shrink.\n";
+                }
+            }
+            else if constexpr (std::is_same_v<Type, ReportCommand>)
+            {
+                report(output);
+            }
+            else if constexpr (std::is_same_v<Type, MenuCommand>)
+            {
+                Menu::showUsage(output);
+            }
+            else if constexpr (std::is_same_v<Type, QuitCommand>)
+            {
+                return false;
+            }
+            if constexpr (!std::is_same_v<Type, QuitCommand>)
+            {
+                return true;
+            }
+        },
+        *parsed.command);
 }
 
-void RobotSimulator::resize(GridSize grid)
+bool RobotSimulator::place(RobotFactory::GroundRobotType type, RobotFactory::RobotLocation location,
+                           std::string_view name)
 {
-    m_pImpl->resize(grid);
+    const std::string key = canonicalName(name);
+    if (key.empty() || m_impl->robots_by_name.contains(key))
+    {
+        return false;
+    }
+
+    auto robot = RobotFactory::RobotAssembly::create(type, location, key);
+    if (!robot || !m_impl->grid.addRobot(*robot))
+    {
+        return false;
+    }
+    auto *raw_robot = robot.get();
+    m_impl->robots_by_id.emplace(robot->id(), raw_robot);
+    m_impl->robots_by_name.emplace(key, std::move(robot));
+    return true;
 }
 
-void RobotSimulator::move()
+bool RobotSimulator::move(std::string_view name, std::uint32_t blocks)
 {
-    m_pImpl->moveAll();
+    auto *robot = m_impl->find(name);
+    return robot != nullptr && m_impl->move(*robot, blocks);
 }
 
-bool RobotSimulator::move(const std::string &robot, size_t blocks)
+bool RobotSimulator::move(RobotFactory::RobotId id, std::uint32_t blocks)
 {
-    return m_pImpl->move(robot, blocks);
+    auto *robot = m_impl->find(id);
+    return robot != nullptr && m_impl->move(*robot, blocks);
 }
 
-bool RobotSimulator::rotate(const std::string &robot, const std::string &direction)
+std::size_t RobotSimulator::moveAll(std::uint32_t blocks)
 {
-    return m_pImpl->rotate(robot, direction);
+    std::size_t moved{0};
+    for (auto &[name, robot] : m_impl->robots_by_name)
+    {
+        static_cast<void>(name);
+        moved += m_impl->move(*robot, blocks) ? 1U : 0U;
+    }
+    return moved;
 }
 
-void RobotSimulator::rotate(const std::string &direction)
+bool RobotSimulator::rotate(std::string_view name, RobotFactory::Rotation rotation)
 {
-    m_pImpl->rotateAll(direction);
+    auto *robot = m_impl->find(name);
+    if (robot == nullptr)
+    {
+        return false;
+    }
+    robot->rotate(rotation);
+    return true;
 }
 
-void RobotSimulator::remove()
+bool RobotSimulator::rotate(RobotFactory::RobotId id, RobotFactory::Rotation rotation)
 {
-    m_pImpl->removeAll();
+    auto *robot = m_impl->find(id);
+    if (robot == nullptr)
+    {
+        return false;
+    }
+    robot->rotate(rotation);
+    return true;
 }
 
-bool RobotSimulator::remove(const std::string &robot)
+std::size_t RobotSimulator::rotateAll(RobotFactory::Rotation rotation)
 {
-    return m_pImpl->remove(robot);
+    for (auto &[name, robot] : m_impl->robots_by_name)
+    {
+        static_cast<void>(name);
+        robot->rotate(rotation);
+    }
+    return m_impl->robots_by_name.size();
 }
+
+bool RobotSimulator::remove(std::string_view name)
+{
+    auto *robot = m_impl->find(name);
+    return robot != nullptr && m_impl->erase(*robot);
+}
+
+bool RobotSimulator::remove(RobotFactory::RobotId id)
+{
+    auto *robot = m_impl->find(id);
+    return robot != nullptr && m_impl->erase(*robot);
+}
+
+std::size_t RobotSimulator::removeAll()
+{
+    const auto count = m_impl->robots_by_name.size();
+    m_impl->robots_by_id.clear();
+    m_impl->robots_by_name.clear();
+    m_impl->grid = RobotGrid{m_impl->grid.size()};
+    return count;
+}
+
+bool RobotSimulator::resize(GridSize size)
+{
+    return m_impl->grid.resize(size);
+}
+
+void RobotSimulator::report(std::ostream &output) const
+{
+    const auto size = m_impl->grid.size();
+    output << "Grid: " << size.width << 'x' << size.height
+           << "\nRobots: " << m_impl->robots_by_name.size() << '\n';
+    for (const auto &[name, robot] : m_impl->robots_by_name)
+    {
+        static_cast<void>(name);
+        Menu::showDetails(*robot, output);
+    }
+}
+
+const RobotFactory::Robot *RobotSimulator::findRobot(std::string_view name) const
+{
+    return m_impl->find(name);
+}
+
+const RobotFactory::Robot *RobotSimulator::findRobot(RobotFactory::RobotId id) const
+{
+    return m_impl->find(id);
+}
+
+GridSize RobotSimulator::gridSize() const noexcept
+{
+    return m_impl->grid.size();
+}
+
+std::size_t RobotSimulator::robotCount() const noexcept
+{
+    return m_impl->robots_by_name.size();
+}
+
 } // namespace Simulator

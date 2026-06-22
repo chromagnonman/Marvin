@@ -1,6 +1,8 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#include <atomic>
+#include <cstdint>
 #include <ostream>
 #include <string>
 #include <string_view>
@@ -8,128 +10,77 @@
 namespace RobotFactory
 {
 
-enum class Direction : size_t
+using Coordinate = std::int64_t;
+using RobotId = std::uint64_t;
+
+enum class Direction : std::uint8_t
 {
-    NORTH = 0,
-    EAST,
-    SOUTH,
-    WEST
+    North,
+    East,
+    South,
+    West
+};
+
+enum class Rotation : std::uint8_t
+{
+    Left,
+    Right
 };
 
 [[nodiscard]] constexpr std::string_view toString(Direction direction) noexcept
 {
     switch (direction)
     {
-    case Direction::NORTH:
+    case Direction::North:
         return "NORTH";
-    case Direction::EAST:
+    case Direction::East:
         return "EAST";
-    case Direction::SOUTH:
+    case Direction::South:
         return "SOUTH";
-    case Direction::WEST:
+    case Direction::West:
         return "WEST";
     }
 
     return "NORTH";
 }
 
-inline std::ostream &operator<<(std::ostream &stream, Direction direction)
-{
-    return stream << toString(direction);
-}
-
-[[nodiscard]] inline Direction directionFromString(std::string_view direction) noexcept
-{
-    if (direction == "EAST")
-        return Direction::EAST;
-    if (direction == "SOUTH")
-        return Direction::SOUTH;
-    if (direction == "WEST")
-        return Direction::WEST;
-    return Direction::NORTH;
-}
+std::ostream &operator<<(std::ostream &stream, Direction direction);
 
 struct RobotLocation
 {
-    RobotLocation() = default;
-    RobotLocation(size_t x, size_t y, Direction heading) noexcept
-        : x_coordinate{x}, y_coordinate{y}, direction{heading}
-    {
-    }
-    RobotLocation(size_t x, size_t y, std::string_view heading) noexcept
-        : RobotLocation{x, y, directionFromString(heading)}
-    {
-    }
-
-    size_t x_coordinate{0};
-    size_t y_coordinate{0};
-    Direction direction{Direction::NORTH};
+    Coordinate x{0};
+    Coordinate y{0};
+    Direction direction{Direction::North};
 };
 
-enum class ROBOT_ROTATION : size_t
-{
-    LEFT = 0,
-    RIGHT
-};
-
-/**
- * @brief A Robot abstract class that provides a typical robot interface.
- */
 class Robot
 {
   public:
-    Robot(std::string name) : m_location{}, m_model{std::move(name)}, m_robotID{++m_serial_number}
-    {
-        // TODO: Use random generated number as robot id
-    }
-
-    Robot(const RobotLocation &location) noexcept
-        : m_location{location}, m_robotID{++m_serial_number}
-    {
-        // TODO: Use random generated number as robot id
-    }
-
-    Robot(const RobotLocation &location, std::string name)
-        : m_location{location}, m_model{std::move(name)}, m_robotID{++m_serial_number}
-    {
-    }
-
+    Robot(RobotLocation location, std::string model);
     virtual ~Robot() = default;
 
-    size_t Id() const noexcept
-    {
-        return m_robotID;
-    }
+    Robot(const Robot &) = delete;
+    Robot &operator=(const Robot &) = delete;
+    Robot(Robot &&) = delete;
+    Robot &operator=(Robot &&) = delete;
 
-    const std::string &model() const noexcept
-    {
-        return m_model;
-    }
+    [[nodiscard]] RobotId id() const noexcept;
+    [[nodiscard]] const std::string &model() const noexcept;
+    [[nodiscard]] RobotLocation location() const noexcept;
+    void setLocation(RobotLocation location) noexcept;
 
-    RobotLocation location() const noexcept
-    {
-        return m_location;
-    }
-
-    void setLocation(const RobotLocation &location) noexcept
-    {
-        m_location = location;
-    }
-
-    void setModel(const std::string &model)
-    {
-        m_model = model;
-    }
-
-    virtual void rotate(const ROBOT_ROTATION &) = 0;
-    virtual void move(size_t) = 0;
+    virtual void rotate(Rotation rotation) noexcept = 0;
+    virtual void move(std::uint32_t blocks) noexcept = 0;
 
   protected:
     RobotLocation m_location;
+
+  private:
     std::string m_model;
-    size_t m_robotID;
-    static size_t m_serial_number;
+    RobotId m_id;
+    static std::atomic<RobotId> s_next_id;
 };
+
 } // namespace RobotFactory
 
 #endif

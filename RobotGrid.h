@@ -1,52 +1,45 @@
-#ifndef ROBOTGRID_H
-#define ROBOTGRID_H
-
-#include <memory>
+#ifndef ROBOT_GRID_H
+#define ROBOT_GRID_H
 
 #include "Robot.h"
+
+#include <vector>
 
 namespace Simulator
 {
 
 struct GridSize
 {
-    size_t width;
-    size_t height;
+    RobotFactory::Coordinate width{10};
+    RobotFactory::Coordinate height{10};
 };
 
-static constexpr size_t DEFAULT_WIDTH = 10;
-static constexpr size_t DEFAULT_HEIGHT = 10;
+inline constexpr GridSize default_grid_size{};
 
-/**
- * @brief Provides a 2D grid environment for Marvin (the paranoid android) to explore.
- */
 class RobotGrid
 {
   public:
     RobotGrid();
-    explicit RobotGrid(GridSize grid);
+    explicit RobotGrid(GridSize size);
 
-    RobotGrid(const RobotGrid &) = delete;
-    RobotGrid &operator=(const RobotGrid &) = delete;
-
-    virtual ~RobotGrid() noexcept;
-
-    bool addRobot(const RobotFactory::Robot &);
-
-    void updateLocation(const RobotFactory::RobotLocation &, const RobotFactory::Robot &);
-
-    void resize(GridSize);
+    [[nodiscard]] bool addRobot(const RobotFactory::Robot &robot);
+    void updateLocation(RobotFactory::RobotLocation previous, const RobotFactory::Robot &robot);
+    [[nodiscard]] bool resize(GridSize size);
     void remove(const RobotFactory::Robot &robot);
 
-    [[nodiscard]] const GridSize &getSize() const noexcept;
-    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &) const;
-    [[nodiscard]] bool isOffTheGrid(const RobotFactory::Robot &) const noexcept;
-    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &) const;
+    [[nodiscard]] GridSize size() const noexcept;
+    [[nodiscard]] RobotFactory::RobotId robotIdAt(RobotFactory::RobotLocation location) const;
+    [[nodiscard]] bool isOffGrid(RobotFactory::RobotLocation location) const noexcept;
+    [[nodiscard]] bool isOccupied(RobotFactory::RobotLocation location) const;
 
   private:
-    class impl;
-    std::unique_ptr<impl> m_pImpl;
+    using Cell = RobotFactory::RobotId;
+    std::vector<Cell> m_cells;
+    GridSize m_size;
+
+    [[nodiscard]] std::size_t index(RobotFactory::RobotLocation location) const;
 };
+
 } // namespace Simulator
 
 #endif

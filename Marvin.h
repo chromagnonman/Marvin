@@ -1,32 +1,25 @@
 #ifndef MARVIN_H
 #define MARVIN_H
 
-#include <string>
-
 #include "Robot.h"
+
+#include <cstdint>
+#include <string>
 
 namespace RobotFactory
 {
 
-/**
- * @brief Defines a type called Marvin - a chronically depressed robot.
- */
-class Marvin : public Robot
+class Marvin final : public Robot
 {
   public:
-    Marvin(const std::string &name = "Marvin");
-    Marvin(const RobotLocation &location) noexcept;
-    Marvin(const RobotLocation &, std::string robot_name);
-    Marvin(const Marvin &) = default;
-    Marvin &operator=(const Marvin &) = default;
-    virtual ~Marvin();
+    explicit Marvin(std::string name = "Marvin");
+    Marvin(RobotLocation location, std::string name = "Marvin");
+    ~Marvin() override = default;
 
-    void rotate(const ROBOT_ROTATION &) noexcept override;
-    void move(size_t) noexcept override;
-
-  protected:
-    const size_t m_default_move = 1;
+    void rotate(Rotation rotation) noexcept override;
+    void move(std::uint32_t blocks) noexcept override;
 };
+
 } // namespace RobotFactory
 
 #endif

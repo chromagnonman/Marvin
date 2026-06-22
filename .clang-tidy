@@ -31,4 +31,5 @@ HeaderFilterRegex: '^(?!.*[\\/]packages[\\/]).*$'
 FormatStyle: file
 ExtraArgs:
   - '-Wno-unused-command-line-argument'
+  - '/EHsc'
 ...

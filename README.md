@@ -3,100 +3,104 @@
 [![CI](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml/badge.svg)](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml)
 
 Marvin is a C++20 console application for creating and controlling robots in a two-dimensional
-grid. It supports multiple named robots, collision detection, movement and rotation, reporting,
-and dynamic grid expansion.
+grid. It supports typed command parsing, collision detection, signed coordinates, unique robot
+identity, movement and rotation, reporting, and dynamic grid expansion.
 
-![Simulator menu](SimulatorMenu.png)
+![Current Marvin simulator command menu](SimulatorMenu.png)
 
 ## Features
 
-- Place multiple named robots at grid coordinates facing north, east, south, or west.
-- Move one robot by a chosen number of blocks or move every robot by one block.
+- Place uniquely named robots facing north, east, south, or west.
+- Target robots case-insensitively by name or explicitly by ID with `@<id>`.
+- Move one robot by a chosen number of blocks or move every robot.
 - Rotate one or all robots left or right by 90 degrees.
 - Prevent robots from leaving the grid or moving into occupied cells.
-- Report the grid size and each robot's ID, name, direction, and position.
-- Expand rectangular or square grids while preserving existing robot positions.
+- Expand rectangular or square grids while preserving robot positions.
+- Reject malformed commands without terminating the simulator.
 
 The default grid is `10x10`. Commands are case-insensitive.
 
 ## Requirements
 
-- Windows 11 or a compatible Windows build environment.
-- Visual Studio or Visual Studio Build Tools with:
-  - Desktop development with C++
-  - MSVC v145 for the checked-in project configuration
-  - A Windows 10 or newer SDK
-  - C++ Clang tools for Windows (clang-format and clang-tidy)
-- NuGet package restore enabled for the Google Test dependency.
+- Windows with Visual Studio or Visual Studio Build Tools.
+- Desktop development with C++, CMake, Ninja, and a Windows SDK.
+- C++ Clang tools for Windows for clang-format and clang-tidy.
+- CMake 3.24 or newer.
+- Internet access during the first configure to fetch the pinned GoogleTest dependency.
 
-The CI build uses the compatible MSVC v143 toolset available on the `windows-2022` GitHub-hosted
-runner.
+GoogleTest 1.17.0 is checksum-pinned through CMake FetchContent. No system-wide test framework or
+NuGet restore is required.
 
 ## Getting Started
-
-Clone the repository:
 
 ```powershell
 git clone https://github.com/chromagnonman/Marvin.git
 cd Marvin
 ```
 
-Open `Marvin.sln` in Visual Studio. Select `Debug` and `x64`, then press `Ctrl+F5` to build and run
-the simulator.
+In Visual Studio, select **File > Open > Folder** and open the repository. Visual Studio recognizes
+`CMakePresets.json`; select the `debug`, `release`, or `asan` preset and build normally.
 
-Visual Studio should restore the NuGet dependency automatically. If it does not, right-click the
-solution and select **Restore NuGet Packages**.
+From a Developer PowerShell with Ninja on `PATH`:
+
+```powershell
+cmake --preset debug
+cmake --build --preset debug
+.\out\build\debug\Marvin.exe
+```
 
 ## Commands
-
-Examples of supported commands:
 
 ```text
 PLACE R2D2 1,1 NORTH
 MOVE R2D2 2
+MOVE @43 2
 MOVE ALL
 ROTATE R2D2 LEFT
-RIGHT ALL
+RIGHT @43
 REMOVE R2D2
 REMOVE ALL
 REPORT
 RESIZE 20 15
 MENU
+QUIT
 ```
 
-Press `Ctrl+C` or send end-of-file to exit.
+Robot names must be unique, are stored canonically, and cannot begin with `@`. Grid coordinates
+are signed internally, while placement accepts only non-negative coordinates. Grids can expand
+but cannot shrink.
 
-## Build From The Command Line
+## Architecture
 
-Run these commands from a Developer PowerShell for Visual Studio:
-
-```powershell
-nuget restore Marvin.sln -PackagesDirectory packages
-msbuild Marvin.sln /m /p:Configuration=Debug /p:Platform=x64
-```
-
-The application is written to `x64\Debug\Marvin.exe`.
+- `marvin_core` is a reusable static library containing the model, parser, grid, menu, and
+  simulator logic.
+- `Marvin` is a thin console executable linked to `marvin_core`.
+- `RobotSimulatorTest` links to `marvin_core` through CMake rather than raw object files.
+- `CommandParser` converts input into a typed `std::variant` command before execution.
+- `RobotSimulator` maintains case-insensitive unique-name and ID indexes.
 
 ## Tests
 
-The `RobotSimulatorTest` project uses Google Test and covers robot movement, rotation, placement,
-grid boundaries, rectangular grids, resizing, and occupancy preservation.
-
-Run the tests through Visual Studio Test Explorer or execute the test binary after building:
+The GoogleTest suite covers parsing, malformed input, signed movement, rotation, identity,
+case-insensitive uniqueness, ID targeting, collisions, boundaries, rectangular grids, resizing,
+and command-loop integration.
 
 ```powershell
-.\x64\Debug\RobotSimulatorTest.exe
+ctest --preset debug
+ctest --preset release
+ctest --preset asan
 ```
+
+Use `--output-on-failure` when invoking CTest without the presets.
 
 ## Code Quality
 
-The repository includes shared configuration for both tools:
-
-- `.clang-format` enforces the C++20 Microsoft-based formatting style used by the project.
+- `.clang-format` defines the shared C++20 formatting style.
 - `.clang-tidy` enables Clang Analyzer, C++ Core Guidelines, CERT, HICPP, concurrency, bug-prone,
-  miscellaneous, modernization, performance, portability, and readability checks. Subjective
-  naming, magic-number, function-length, and mandatory-auto rules are excluded. All enabled
-  findings are treated as errors.
+  miscellaneous, modernization, performance, portability, and readability checks.
+- All compiler and enabled clang-tidy findings are treated as errors for project-owned code.
+- The `debug` preset runs clang-tidy while compiling.
+- The `asan` preset instruments Marvin and GoogleTest consistently with AddressSanitizer.
 
 Check formatting without modifying files:
 
@@ -105,18 +109,14 @@ $files = git ls-files '*.cpp' '*.h'
 clang-format --dry-run --Werror $files
 ```
 
-clang-tidy runs automatically as part of the `Debug|x64` project build. Formatting is not applied
-automatically when a file is saved; in Visual Studio, use **Format Document** (`Ctrl+K, Ctrl+D`).
+Formatting is not applied automatically on save. In Visual Studio, use **Format Document**
+(`Ctrl+K, Ctrl+D`).
 
 ## Continuous Integration
 
-The [GitHub Actions workflow](.github/workflows/ci.yml) runs for every pull request and every push
-to `master`. It:
-
-1. Restores and caches NuGet packages.
-2. Verifies clang-format compliance.
-3. Builds the `Debug|x64` solution with MSVC v143 and runs clang-tidy.
-4. Runs the complete Google Test suite.
+The [GitHub Actions workflow](.github/workflows/ci.yml) runs for pull requests and pushes to
+`master`. It enforces formatting, builds and tests Debug with clang-tidy, builds and tests Release,
+and runs the full suite under MSVC AddressSanitizer.
 
 ## Potential Enhancements
 

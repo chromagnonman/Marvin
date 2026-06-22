@@ -1,171 +1,115 @@
-#include <algorithm>
-#include <cstddef>
-#include <memory>
-#include <utility>
-#include <vector>
+#include "RobotGrid.h"
 
 #include "Robot.h"
-#include "RobotGrid.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 
 namespace Simulator
 {
 
-class RobotGrid::impl
+namespace
 {
-  public:
-    explicit impl(GridSize gridSz);
-
-    bool addRobot(const RobotFactory::Robot &robot);
-
-    void updateLocation(const RobotFactory::RobotLocation &location,
-                        const RobotFactory::Robot &robot);
-
-    [[nodiscard]] const GridSize &getSize() const noexcept;
-
-    void resize(GridSize gridSz);
-
-    void remove(const RobotFactory::Robot &robot);
-
-    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &location) const;
-    [[nodiscard]] bool isOffTheGrid(const RobotFactory::Robot &robot) const noexcept;
-    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &robot) const;
-
-  private:
-    using ROBOT_ID = size_t;
-    std::vector<std::vector<ROBOT_ID>> m_grid;
-    GridSize m_gridSz;
-
-    [[nodiscard]] ROBOT_ID &cell(const RobotFactory::RobotLocation &location);
-    [[nodiscard]] const ROBOT_ID &cell(const RobotFactory::RobotLocation &location) const;
-};
-
-void RobotGrid::impl::resize(GridSize gridSz)
+[[nodiscard]] std::size_t cellCount(GridSize size)
 {
-    std::vector<std::vector<ROBOT_ID>> resized(gridSz.height, std::vector<ROBOT_ID>(gridSz.width));
-
-    const auto rows = std::min(m_gridSz.height, gridSz.height);
-    const auto columns = std::min(m_gridSz.width, gridSz.width);
-    for (size_t y = 0; y < rows; ++y)
+    if (size.width <= 0 || size.height <= 0)
     {
-        std::copy_n(m_grid.at(y).begin(), columns, resized.at(y).begin());
+        throw std::invalid_argument{"Grid dimensions must be positive."};
     }
-
-    m_grid = std::move(resized);
-    m_gridSz = gridSz;
-}
-
-RobotGrid::impl::ROBOT_ID &RobotGrid::impl::cell(const RobotFactory::RobotLocation &location)
-{
-    return m_grid.at(location.y_coordinate).at(location.x_coordinate);
-}
-
-const RobotGrid::impl::ROBOT_ID &RobotGrid::impl::cell(
-    const RobotFactory::RobotLocation &location) const
-{
-    return m_grid.at(location.y_coordinate).at(location.x_coordinate);
-}
-
-RobotGrid::impl::impl(GridSize gridSz)
-    : m_grid(gridSz.height, std::vector<ROBOT_ID>(gridSz.width)), m_gridSz{gridSz}
-{
-}
-
-bool RobotGrid::impl::addRobot(const RobotFactory::Robot &robot)
-{
-    if (!isOffTheGrid(robot) && !isOccupied(robot))
+    const auto width = static_cast<std::size_t>(size.width);
+    const auto height = static_cast<std::size_t>(size.height);
+    if (width > std::numeric_limits<std::size_t>::max() / height)
     {
-        cell(robot.location()) = robot.Id();
-
-        return true;
+        throw std::length_error{"Grid dimensions are too large."};
     }
-
-    return false;
+    return width * height;
 }
+} // namespace
 
-void RobotGrid::impl::updateLocation(const RobotFactory::RobotLocation &location,
-                                     const RobotFactory::Robot &robot)
-{
-    cell(location) = 0;
-    cell(robot.location()) = robot.Id();
-}
+RobotGrid::RobotGrid() : RobotGrid{default_grid_size} {}
 
-size_t RobotGrid::impl::getRobotID(const RobotFactory::RobotLocation &location) const
-{
-    return cell(location);
-}
-
-const GridSize &RobotGrid::impl::getSize() const noexcept
-{
-    return m_gridSz;
-}
-
-bool RobotGrid::impl::isOffTheGrid(const RobotFactory::Robot &robot) const noexcept
-{
-    return robot.location().x_coordinate >= m_gridSz.width ||
-           robot.location().y_coordinate >= m_gridSz.height;
-}
-
-bool RobotGrid::impl::isOccupied(const RobotFactory::Robot &robot) const
-{
-    return !isOffTheGrid(robot) && cell(robot.location()) != 0;
-}
-
-void RobotGrid::impl::remove(const RobotFactory::Robot &robot)
-{
-    if (!isOffTheGrid(robot))
-    {
-        cell(robot.location()) = 0;
-    }
-}
-
-RobotGrid::RobotGrid(GridSize grid) : m_pImpl{std::make_unique<impl>(grid)} {}
-
-RobotGrid::RobotGrid()
-    : m_pImpl{std::make_unique<impl>(GridSize{.width = DEFAULT_WIDTH, .height = DEFAULT_HEIGHT})}
-{
-}
-
-RobotGrid::~RobotGrid() noexcept = default;
+RobotGrid::RobotGrid(GridSize size) : m_cells(cellCount(size)), m_size{size} {}
 
 bool RobotGrid::addRobot(const RobotFactory::Robot &robot)
 {
-    return m_pImpl->addRobot(robot);
+    const auto location = robot.location();
+    if (isOffGrid(location) || isOccupied(location))
+    {
+        return false;
+    }
+    m_cells.at(index(location)) = robot.id();
+    return true;
 }
 
-void RobotGrid::updateLocation(const RobotFactory::RobotLocation &location,
+void RobotGrid::updateLocation(RobotFactory::RobotLocation previous,
                                const RobotFactory::Robot &robot)
 {
-    m_pImpl->updateLocation(location, robot);
+    m_cells.at(index(previous)) = 0;
+    m_cells.at(index(robot.location())) = robot.id();
 }
 
-const GridSize &RobotGrid::getSize() const noexcept
+bool RobotGrid::resize(GridSize size)
 {
-    return m_pImpl->getSize();
-}
+    if (size.width < m_size.width || size.height < m_size.height)
+    {
+        return false;
+    }
 
-void RobotGrid::resize(GridSize grid)
-{
-    m_pImpl->resize(grid);
+    std::vector<Cell> resized(cellCount(size));
+    for (RobotFactory::Coordinate y = 0; y < m_size.height; ++y)
+    {
+        const auto old_offset = static_cast<std::size_t>(y * m_size.width);
+        const auto new_offset = static_cast<std::size_t>(y * size.width);
+        std::copy_n(m_cells.begin() + static_cast<std::ptrdiff_t>(old_offset),
+                    static_cast<std::size_t>(m_size.width),
+                    resized.begin() + static_cast<std::ptrdiff_t>(new_offset));
+    }
+    m_cells = std::move(resized);
+    m_size = size;
+    return true;
 }
 
 void RobotGrid::remove(const RobotFactory::Robot &robot)
 {
-    m_pImpl->remove(robot);
+    const auto location = robot.location();
+    if (!isOffGrid(location))
+    {
+        m_cells.at(index(location)) = 0;
+    }
 }
 
-size_t RobotGrid::getRobotID(const RobotFactory::RobotLocation &location) const
+GridSize RobotGrid::size() const noexcept
 {
-    return m_pImpl->getRobotID(location);
+    return m_size;
 }
 
-bool RobotGrid::isOffTheGrid(const RobotFactory::Robot &robot) const noexcept
+RobotFactory::RobotId RobotGrid::robotIdAt(RobotFactory::RobotLocation location) const
 {
-    return m_pImpl->isOffTheGrid(robot);
+    return m_cells.at(index(location));
 }
 
-bool RobotGrid::isOccupied(const RobotFactory::Robot &robot) const
+bool RobotGrid::isOffGrid(RobotFactory::RobotLocation location) const noexcept
 {
-    return m_pImpl->isOccupied(robot);
+    return location.x < 0 || location.y < 0 || location.x >= m_size.width ||
+           location.y >= m_size.height;
+}
+
+bool RobotGrid::isOccupied(RobotFactory::RobotLocation location) const
+{
+    return !isOffGrid(location) && m_cells.at(index(location)) != 0;
+}
+
+std::size_t RobotGrid::index(RobotFactory::RobotLocation location) const
+{
+    if (isOffGrid(location))
+    {
+        throw std::out_of_range{"Grid location is outside the grid."};
+    }
+    return static_cast<std::size_t>((location.y * m_size.width) + location.x);
 }
 
 } // namespace Simulator

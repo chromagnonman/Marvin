@@ -1,66 +1,42 @@
-#ifndef ROBOTASSEMBLY_H
-#define ROBOTASSEMBLY_H
-
-#include <memory>
-#include <variant>
+#ifndef ROBOT_ASSEMBLY_H
+#define ROBOT_ASSEMBLY_H
 
 #include "Marvin.h"
+#include "Robot.h"
+
+#include <memory>
+#include <string>
+#include <utility>
 
 namespace RobotFactory
 {
 
-namespace RobotType
+enum class GroundRobotType
 {
-
-enum class Ground_based : size_t
-{
-    Bipedaled,
-    Quadrupedaled,
-    Wheeled
+    Bipedal
 };
 
-enum class Aerial : size_t
-{
-    // TODO:
-};
-
-enum class Aquatic : size_t
-{
-    // TODO:
-};
-
-enum class Subaquatic : size_t
-{
-    // TODO:
-};
-} // namespace RobotType
-
-using ROBOT_TYPE = std::variant<RobotType::Ground_based, RobotType::Aerial, RobotType::Aquatic,
-                                RobotType::Subaquatic>;
-
-using namespace RobotFactory::RobotType;
+// Future enhancements:
+// - Ground-based: Quadrupedal, Wheeled
+// - Aerial robot types
+// - Aquatic robot types
+// - Subaquatic robot types
 
 struct RobotAssembly
 {
-
-    [[nodiscard]] static std::unique_ptr<RobotFactory::Robot> create(
-        const ROBOT_TYPE &type, const RobotFactory::RobotLocation &location,
-        const std::string &name)
+    [[nodiscard]] static std::unique_ptr<Robot> create(GroundRobotType type, RobotLocation location,
+                                                       std::string name)
     {
-        const auto robot_type = std::get<0>(type);
-
-        switch (robot_type)
+        switch (type)
         {
-        case Ground_based::Bipedaled:
-            return std::make_unique<RobotFactory::Marvin>(location, name);
-
-            // TODO: Add support for the other robot types
-
-        default:
-            return std::make_unique<RobotFactory::Marvin>(location, name);
+        case GroundRobotType::Bipedal:
+            return std::make_unique<Marvin>(location, std::move(name));
         }
+
+        return nullptr;
     }
 };
+
 } // namespace RobotFactory
 
 #endif

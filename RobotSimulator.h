@@ -1,10 +1,16 @@
-#ifndef ROBOTSIMULATOR_H
-#define ROBOTSIMULATOR_H
+#ifndef ROBOT_SIMULATOR_H
+#define ROBOT_SIMULATOR_H
 
-#include <memory>
-
+#include "Command.h"
+#include "Robot.h"
 #include "RobotAssembly.h"
 #include "RobotGrid.h"
+
+#include <cstdint>
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <string_view>
 
 namespace Simulator
 {
@@ -13,28 +19,43 @@ class RobotSimulator
 {
   public:
     RobotSimulator();
-    explicit RobotSimulator(GridSize grid);
-    virtual ~RobotSimulator();
+    explicit RobotSimulator(GridSize size);
+    ~RobotSimulator();
+
+    RobotSimulator(const RobotSimulator &) = delete;
+    RobotSimulator &operator=(const RobotSimulator &) = delete;
+    RobotSimulator(RobotSimulator &&) noexcept;
+    RobotSimulator &operator=(RobotSimulator &&) noexcept;
 
     void start();
+    void run(std::istream &input, std::ostream &output, std::ostream &errors);
+    [[nodiscard]] bool executeLine(std::string_view line, std::ostream &output,
+                                   std::ostream &errors);
 
-    bool place(const RobotFactory::ROBOT_TYPE &, const RobotFactory::RobotLocation &,
-               const std::string &name);
-    void move();
-    void rotate(const std::string &direction);
-    void remove();
-    void report() const;
-    void resize(GridSize);
+    [[nodiscard]] bool place(RobotFactory::GroundRobotType type,
+                             RobotFactory::RobotLocation location, std::string_view name);
+    [[nodiscard]] bool move(std::string_view name, std::uint32_t blocks = 1);
+    [[nodiscard]] bool move(RobotFactory::RobotId id, std::uint32_t blocks = 1);
+    [[nodiscard]] std::size_t moveAll(std::uint32_t blocks = 1);
+    [[nodiscard]] bool rotate(std::string_view name, RobotFactory::Rotation rotation);
+    [[nodiscard]] bool rotate(RobotFactory::RobotId id, RobotFactory::Rotation rotation);
+    [[nodiscard]] std::size_t rotateAll(RobotFactory::Rotation rotation);
+    [[nodiscard]] bool remove(std::string_view name);
+    [[nodiscard]] bool remove(RobotFactory::RobotId id);
+    [[nodiscard]] std::size_t removeAll();
+    [[nodiscard]] bool resize(GridSize size);
+    void report(std::ostream &output) const;
 
-    // Individual robot commands
-    bool move(const std::string &robot, size_t blocks = 1);
-    bool rotate(const std::string &robot, const std::string &direction);
-    bool remove(const std::string &robot);
+    [[nodiscard]] const RobotFactory::Robot *findRobot(std::string_view name) const;
+    [[nodiscard]] const RobotFactory::Robot *findRobot(RobotFactory::RobotId id) const;
+    [[nodiscard]] GridSize gridSize() const noexcept;
+    [[nodiscard]] std::size_t robotCount() const noexcept;
 
   private:
-    class impl;
-    std::unique_ptr<impl> m_pImpl;
+    class Impl;
+    std::unique_ptr<Impl> m_impl;
 };
+
 } // namespace Simulator
 
 #endif
