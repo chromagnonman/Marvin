@@ -1,6 +1,10 @@
 # Marvin (The Paranoid Android)
 
-[![CI](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml/badge.svg)](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml)
+[![linux](https://github.com/chromagnonman/Marvin/actions/workflows/linux.yml/badge.svg?branch=master)](https://github.com/chromagnonman/Marvin/actions/workflows/linux.yml)
+[![windows](https://github.com/chromagnonman/Marvin/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/chromagnonman/Marvin/actions/workflows/windows.yml)
+[![macos](https://github.com/chromagnonman/Marvin/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/chromagnonman/Marvin/actions/workflows/macos.yml)
+[![build](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/chromagnonman/Marvin/actions/workflows/ci.yml)
+[![release](https://img.shields.io/badge/release-v2.0.0-blue)](CMakeLists.txt)
 
 Marvin is a C++20 console application for creating and controlling robots in a two-dimensional
 grid. It supports typed command parsing, collision detection, signed coordinates, unique robot
@@ -114,9 +118,16 @@ Formatting is not applied automatically on save. In Visual Studio, use **Format 
 
 ## Continuous Integration
 
-The [GitHub Actions workflow](.github/workflows/ci.yml) runs for pull requests and pushes to
-`master`. It enforces formatting, builds and tests Debug with clang-tidy, builds and tests Release,
-and runs the full suite under MSVC AddressSanitizer.
+The GitHub Actions workflows run for pull requests and pushes to `master`:
+
+- [Linux](.github/workflows/linux.yml), [Windows](.github/workflows/windows.yml), and
+  [macOS](.github/workflows/macos.yml) independently build and test a Release configuration on
+  their native runners.
+- The stricter [build](.github/workflows/ci.yml) workflow enforces formatting, builds and tests
+  Debug with clang-tidy, builds and tests Release, and runs the full suite under MSVC
+  AddressSanitizer.
+
+The release badge reflects the project version declared in `CMakeLists.txt`.
 
 ## Potential Enhancements
 

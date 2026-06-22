@@ -1,0 +1,24 @@
+name: windows
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure
+        run: >-
+          cmake -S . -B out/build/windows -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build out/build/windows --parallel
+      - name: Test
+        run: ctest --test-dir out/build/windows --output-on-failure

@@ -1,0 +1,21 @@
+name: linux
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B out/build/linux -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build out/build/linux --parallel
+      - name: Test
+        run: ctest --test-dir out/build/linux --output-on-failure

@@ -1,0 +1,21 @@
+name: macos
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B out/build/macos -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build out/build/macos --parallel
+      - name: Test
+        run: ctest --test-dir out/build/macos --output-on-failure
