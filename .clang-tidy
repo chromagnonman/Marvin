@@ -8,7 +8,9 @@ Checks: >
   portability-*,
   modernize-use-nullptr,
   modernize-use-override
-WarningsAsErrors: ''
+WarningsAsErrors: '*'
 HeaderFilterRegex: '^(?!.*[\\/]packages[\\/]).*$'
 FormatStyle: file
+ExtraArgs:
+  - '-Wno-unused-command-line-argument'
 ...

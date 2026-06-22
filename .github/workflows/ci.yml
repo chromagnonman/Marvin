@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-2022
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.config') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore packages
+        run: nuget restore Marvin.sln -PackagesDirectory packages
+
+      - name: Check formatting
+        shell: pwsh
+        run: |
+          $files = git ls-files '*.cpp' '*.h'
+          clang-format --dry-run --Werror $files
+
+      - name: Build and analyze
+        shell: pwsh
+        run: |
+          $clangTidy = (Get-Command clang-tidy -ErrorAction Stop).Source
+          $llvmInstallDir = Split-Path (Split-Path $clangTidy -Parent) -Parent
+          msbuild Marvin.sln /m `
+            /p:Configuration=Debug `
+            /p:Platform=x64 `
+            /p:PlatformToolset=v143 `
+            "/p:LLVMInstallDir=$llvmInstallDir\"
+
+      - name: Run tests
+        run: .\x64\Debug\RobotSimulatorTest.exe
