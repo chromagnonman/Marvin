@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "RobotAssembly.h"
+#include "RobotGrid.h"
 
 namespace Simulator
 {
@@ -31,7 +32,7 @@ class RobotSimulator
     bool remove(const std::string &robot);
 
   private:
-    struct impl;
+    class impl;
     std::unique_ptr<impl> m_pImpl;
 };
 } // namespace Simulator

@@ -93,8 +93,10 @@ Run the tests through Visual Studio Test Explorer or execute the test binary aft
 The repository includes shared configuration for both tools:
 
 - `.clang-format` enforces the C++20 Microsoft-based formatting style used by the project.
-- `.clang-tidy` enables analyzer, bug-prone, performance, portability, and selected modernization
-  checks. Findings are treated as errors.
+- `.clang-tidy` enables Clang Analyzer, C++ Core Guidelines, CERT, HICPP, concurrency, bug-prone,
+  miscellaneous, modernization, performance, portability, and readability checks. Subjective
+  naming, magic-number, function-length, and mandatory-auto rules are excluded. All enabled
+  findings are treated as errors.
 
 Check formatting without modifying files:
 

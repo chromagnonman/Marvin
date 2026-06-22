@@ -1,10 +1,16 @@
 #include <iostream>
-#include <vector>
-#include <csignal>
+#include <cstddef>
+#include <memory>
+#include <sstream>
+#include <string>
 #include <unordered_map>
+#include <utility>
 
-#include "RobotSimulator.h"
 #include "Menu.h"
+#include "Robot.h"
+#include "RobotAssembly.h"
+#include "RobotGrid.h"
+#include "RobotSimulator.h"
 #include "Utils.h"
 
 namespace Simulator
@@ -12,16 +18,9 @@ namespace Simulator
 
 using namespace RobotFactory;
 
-volatile std::sig_atomic_t signal_status;
-
-void signal_handler(int signal)
+class RobotSimulator::impl
 {
-    signal_status = signal;
-}
-
-struct RobotSimulator::impl
-{
-
+  public:
     explicit impl(GridSize grid);
 
     void start();
@@ -36,12 +35,12 @@ struct RobotSimulator::impl
     bool rotate(const std::string &robot, const std::string &direction);
     bool remove(const std::string &robot);
 
-    // Private
+  private:
     RobotGrid m_grid;
     std::unordered_multimap<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots;
 
-    bool isGridEmpty() const;
-    void execute(std::string &&command);
+    [[nodiscard]] bool isGridEmpty() const;
+    void execute(std::string input);
     bool place(std::unique_ptr<RobotFactory::Robot>);
 };
 
@@ -63,23 +62,25 @@ bool RobotSimulator::impl::isGridEmpty() const
 
 void RobotSimulator::impl::start()
 {
-    std::signal(SIGINT, signal_handler);
-
-    std::string input;
     Menu::showUsage();
 
-    while (std::getline(std::cin, input))
+    while (true)
     {
+        std::string input;
+        if (!std::getline(std::cin, input))
+        {
+            break;
+        }
 
         execute(std::move(input));
     }
 }
 
-void RobotSimulator::impl::execute(std::string &&input)
+void RobotSimulator::impl::execute(std::string input)
 {
 
     // TODO: Create robot based on the type selected by the user
-    RobotLocation location{0, 0, "NORTH"};
+    const RobotLocation location{0, 0, "NORTH"};
 
     auto robot = RobotAssembly::create(RobotType::Ground_based::Bipedaled, location, "Marvin");
 
@@ -181,7 +182,7 @@ void RobotSimulator::impl::execute(std::string &&input)
             std::cout << "Grid resized from: (" << m_grid.getSize().width << "x"
                       << m_grid.getSize().height << ") to: (" << width << "x" << height << ")\n";
 
-            resize(GridSize{width, height});
+            resize(GridSize{.width = width, .height = height});
         }
         else
         {
@@ -403,14 +404,13 @@ bool RobotSimulator::impl::remove(const std::string &target_robot)
 
         std::cout << "\nThe following robot(s) were removed. Info:";
 
-        do
+        while (robot != last)
         {
             Menu::showDetails(robot->second);
 
             m_grid.remove(*robot->second);
             robot = m_robots.erase(robot);
-
-        } while (robot != last);
+        }
     }
     else
     {
@@ -421,7 +421,7 @@ bool RobotSimulator::impl::remove(const std::string &target_robot)
 }
 
 RobotSimulator::RobotSimulator()
-    : m_pImpl{std::make_unique<impl>(GridSize{DEFAULT_HEIGHT, DEFAULT_WIDTH})}
+    : m_pImpl{std::make_unique<impl>(GridSize{.width = DEFAULT_WIDTH, .height = DEFAULT_HEIGHT})}
 {
 }
 
@@ -455,9 +455,9 @@ void RobotSimulator::move()
     m_pImpl->moveAll();
 }
 
-bool RobotSimulator::move(const std::string &robot, size_t paces)
+bool RobotSimulator::move(const std::string &robot, size_t blocks)
 {
-    return m_pImpl->move(robot, paces);
+    return m_pImpl->move(robot, blocks);
 }
 
 bool RobotSimulator::rotate(const std::string &robot, const std::string &direction)
@@ -467,7 +467,7 @@ bool RobotSimulator::rotate(const std::string &robot, const std::string &directi
 
 void RobotSimulator::rotate(const std::string &direction)
 {
-    return m_pImpl->rotateAll(direction);
+    m_pImpl->rotateAll(direction);
 }
 
 void RobotSimulator::remove()

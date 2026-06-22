@@ -4,10 +4,28 @@ Checks: >
   clang-analyzer-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
+  cert-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  hicpp-*,
+  -hicpp-function-size,
+  -hicpp-named-parameter,
+  -hicpp-use-auto,
+  misc-*,
+  modernize-*,
+  -modernize-use-auto,
+  -modernize-use-trailing-return-type,
   performance-*,
   portability-*,
-  modernize-use-nullptr,
-  modernize-use-override
+  readability-*,
+  -readability-function-cognitive-complexity,
+  -readability-function-size,
+  -readability-identifier-length,
+  -readability-identifier-naming,
+  -readability-magic-numbers,
+  -readability-named-parameter
 WarningsAsErrors: '*'
 HeaderFilterRegex: '^(?!.*[\\/]packages[\\/]).*$'
 FormatStyle: file

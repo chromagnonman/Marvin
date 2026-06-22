@@ -2,6 +2,9 @@
 #define MENU_H
 
 #include <iostream>
+#include <memory>
+
+#include "Robot.h"
 
 namespace Simulator
 {

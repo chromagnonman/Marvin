@@ -1,5 +1,9 @@
 #include "Marvin.h"
-#include <array>
+#include "Robot.h"
+
+#include <cstddef>
+#include <string>
+#include <utility>
 
 namespace RobotFactory
 {
@@ -40,19 +44,11 @@ void Marvin::move(size_t unit) noexcept
 
 void Marvin::rotate(const ROBOT_ROTATION &rotate_direction) noexcept
 {
-    // Rotation table: [current_direction][rotation_type] = new_direction
-    static constexpr std::array<std::array<Direction, 2>, 4> rotation_table{
-        {// NORTH
-         {{Direction::WEST, Direction::EAST}},
-         // EAST
-         {{Direction::NORTH, Direction::SOUTH}},
-         // SOUTH
-         {{Direction::EAST, Direction::WEST}},
-         // WEST
-         {{Direction::SOUTH, Direction::NORTH}}}};
-
-    const auto current_dir_idx = static_cast<size_t>(m_location.direction);
-    const auto rotation_idx = static_cast<size_t>(rotate_direction);
-    m_location.direction = rotation_table[current_dir_idx][rotation_idx];
+    constexpr size_t direction_count{4};
+    constexpr size_t left_offset{direction_count - 1};
+    constexpr size_t right_offset{1};
+    const size_t offset = rotate_direction == ROBOT_ROTATION::LEFT ? left_offset : right_offset;
+    const auto direction = (static_cast<size_t>(m_location.direction) + offset) % direction_count;
+    m_location.direction = static_cast<Direction>(direction);
 }
 } // namespace RobotFactory

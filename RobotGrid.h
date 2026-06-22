@@ -31,20 +31,20 @@ class RobotGrid
 
     virtual ~RobotGrid() noexcept;
 
-    bool addRobot(const RobotFactory::Robot &) noexcept;
+    bool addRobot(const RobotFactory::Robot &);
 
-    void updateLocation(const RobotFactory::RobotLocation &, const RobotFactory::Robot &) noexcept;
+    void updateLocation(const RobotFactory::RobotLocation &, const RobotFactory::Robot &);
 
     void resize(GridSize);
-    void remove(const RobotFactory::Robot &robot) noexcept;
+    void remove(const RobotFactory::Robot &robot);
 
     [[nodiscard]] const GridSize &getSize() const noexcept;
-    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &) const noexcept;
+    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &) const;
     [[nodiscard]] bool isOffTheGrid(const RobotFactory::Robot &) const noexcept;
-    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &) const noexcept;
+    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &) const;
 
   private:
-    struct impl;
+    class impl;
     std::unique_ptr<impl> m_pImpl;
 };
 } // namespace Simulator

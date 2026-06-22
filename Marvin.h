@@ -1,7 +1,9 @@
 #ifndef MARVIN_H
 #define MARVIN_H
 
-#include "RobotGrid.h"
+#include <string>
+
+#include "Robot.h"
 
 namespace RobotFactory
 {

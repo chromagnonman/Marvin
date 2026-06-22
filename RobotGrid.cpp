@@ -1,38 +1,42 @@
 #include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <utility>
 #include <vector>
 
+#include "Robot.h"
 #include "RobotGrid.h"
 
 namespace Simulator
 {
 
-struct RobotGrid::impl
+class RobotGrid::impl
 {
-
+  public:
     explicit impl(GridSize gridSz);
 
-    bool addRobot(const RobotFactory::Robot &robot) noexcept;
+    bool addRobot(const RobotFactory::Robot &robot);
 
     void updateLocation(const RobotFactory::RobotLocation &location,
-                        const RobotFactory::Robot &robot) noexcept;
+                        const RobotFactory::Robot &robot);
 
-    const GridSize &getSize() const noexcept;
+    [[nodiscard]] const GridSize &getSize() const noexcept;
 
     void resize(GridSize gridSz);
 
-    void remove(const RobotFactory::Robot &robot) noexcept;
+    void remove(const RobotFactory::Robot &robot);
 
-    size_t getRobotID(const RobotFactory::RobotLocation &location) const noexcept;
-    bool isOffTheGrid(const RobotFactory::Robot &robot) const noexcept;
-    bool isOccupied(const RobotFactory::Robot &robot) const noexcept;
+    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &location) const;
+    [[nodiscard]] bool isOffTheGrid(const RobotFactory::Robot &robot) const noexcept;
+    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &robot) const;
 
-    // Private data
+  private:
     using ROBOT_ID = size_t;
     std::vector<std::vector<ROBOT_ID>> m_grid;
     GridSize m_gridSz;
 
-    [[nodiscard]] ROBOT_ID &cell(const RobotFactory::RobotLocation &location) noexcept;
-    [[nodiscard]] const ROBOT_ID &cell(const RobotFactory::RobotLocation &location) const noexcept;
+    [[nodiscard]] ROBOT_ID &cell(const RobotFactory::RobotLocation &location);
+    [[nodiscard]] const ROBOT_ID &cell(const RobotFactory::RobotLocation &location) const;
 };
 
 void RobotGrid::impl::resize(GridSize gridSz)
@@ -43,23 +47,22 @@ void RobotGrid::impl::resize(GridSize gridSz)
     const auto columns = std::min(m_gridSz.width, gridSz.width);
     for (size_t y = 0; y < rows; ++y)
     {
-        std::copy_n(m_grid[y].begin(), columns, resized[y].begin());
+        std::copy_n(m_grid.at(y).begin(), columns, resized.at(y).begin());
     }
 
     m_grid = std::move(resized);
     m_gridSz = gridSz;
 }
 
-RobotGrid::impl::ROBOT_ID &RobotGrid::impl::cell(
-    const RobotFactory::RobotLocation &location) noexcept
+RobotGrid::impl::ROBOT_ID &RobotGrid::impl::cell(const RobotFactory::RobotLocation &location)
 {
-    return m_grid[location.y_coordinate][location.x_coordinate];
+    return m_grid.at(location.y_coordinate).at(location.x_coordinate);
 }
 
 const RobotGrid::impl::ROBOT_ID &RobotGrid::impl::cell(
-    const RobotFactory::RobotLocation &location) const noexcept
+    const RobotFactory::RobotLocation &location) const
 {
-    return m_grid[location.y_coordinate][location.x_coordinate];
+    return m_grid.at(location.y_coordinate).at(location.x_coordinate);
 }
 
 RobotGrid::impl::impl(GridSize gridSz)
@@ -67,7 +70,7 @@ RobotGrid::impl::impl(GridSize gridSz)
 {
 }
 
-bool RobotGrid::impl::addRobot(const RobotFactory::Robot &robot) noexcept
+bool RobotGrid::impl::addRobot(const RobotFactory::Robot &robot)
 {
     if (!isOffTheGrid(robot) && !isOccupied(robot))
     {
@@ -80,13 +83,13 @@ bool RobotGrid::impl::addRobot(const RobotFactory::Robot &robot) noexcept
 }
 
 void RobotGrid::impl::updateLocation(const RobotFactory::RobotLocation &location,
-                                     const RobotFactory::Robot &robot) noexcept
+                                     const RobotFactory::Robot &robot)
 {
     cell(location) = 0;
     cell(robot.location()) = robot.Id();
 }
 
-size_t RobotGrid::impl::getRobotID(const RobotFactory::RobotLocation &location) const noexcept
+size_t RobotGrid::impl::getRobotID(const RobotFactory::RobotLocation &location) const
 {
     return cell(location);
 }
@@ -102,12 +105,12 @@ bool RobotGrid::impl::isOffTheGrid(const RobotFactory::Robot &robot) const noexc
            robot.location().y_coordinate >= m_gridSz.height;
 }
 
-bool RobotGrid::impl::isOccupied(const RobotFactory::Robot &robot) const noexcept
+bool RobotGrid::impl::isOccupied(const RobotFactory::Robot &robot) const
 {
     return !isOffTheGrid(robot) && cell(robot.location()) != 0;
 }
 
-void RobotGrid::impl::remove(const RobotFactory::Robot &robot) noexcept
+void RobotGrid::impl::remove(const RobotFactory::Robot &robot)
 {
     if (!isOffTheGrid(robot))
     {
@@ -117,17 +120,20 @@ void RobotGrid::impl::remove(const RobotFactory::Robot &robot) noexcept
 
 RobotGrid::RobotGrid(GridSize grid) : m_pImpl{std::make_unique<impl>(grid)} {}
 
-RobotGrid::RobotGrid() : m_pImpl{std::make_unique<impl>(GridSize{DEFAULT_WIDTH, DEFAULT_HEIGHT})} {}
+RobotGrid::RobotGrid()
+    : m_pImpl{std::make_unique<impl>(GridSize{.width = DEFAULT_WIDTH, .height = DEFAULT_HEIGHT})}
+{
+}
 
 RobotGrid::~RobotGrid() noexcept = default;
 
-bool RobotGrid::addRobot(const RobotFactory::Robot &robot) noexcept
+bool RobotGrid::addRobot(const RobotFactory::Robot &robot)
 {
     return m_pImpl->addRobot(robot);
 }
 
 void RobotGrid::updateLocation(const RobotFactory::RobotLocation &location,
-                               const RobotFactory::Robot &robot) noexcept
+                               const RobotFactory::Robot &robot)
 {
     m_pImpl->updateLocation(location, robot);
 }
@@ -142,12 +148,12 @@ void RobotGrid::resize(GridSize grid)
     m_pImpl->resize(grid);
 }
 
-void RobotGrid::remove(const RobotFactory::Robot &robot) noexcept
+void RobotGrid::remove(const RobotFactory::Robot &robot)
 {
     m_pImpl->remove(robot);
 }
 
-size_t RobotGrid::getRobotID(const RobotFactory::RobotLocation &location) const noexcept
+size_t RobotGrid::getRobotID(const RobotFactory::RobotLocation &location) const
 {
     return m_pImpl->getRobotID(location);
 }
@@ -157,7 +163,7 @@ bool RobotGrid::isOffTheGrid(const RobotFactory::Robot &robot) const noexcept
     return m_pImpl->isOffTheGrid(robot);
 }
 
-bool RobotGrid::isOccupied(const RobotFactory::Robot &robot) const noexcept
+bool RobotGrid::isOccupied(const RobotFactory::Robot &robot) const
 {
     return m_pImpl->isOccupied(robot);
 }
