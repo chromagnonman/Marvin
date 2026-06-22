@@ -1,6 +1,6 @@
-#include "Marvin.h"
-#include "Robot.h"
-#include "RobotGrid.h"
+#include "marvin/robot/Marvin.h"
+#include "marvin/robot/Robot.h"
+#include "marvin/simulator/RobotGrid.h"
 
 #include <gtest/gtest.h>
 

@@ -1,5 +1,5 @@
-#include "Command.h"
-#include "Robot.h"
+#include "marvin/command/Command.h"
+#include "marvin/robot/Robot.h"
 
 #include <gtest/gtest.h>
 

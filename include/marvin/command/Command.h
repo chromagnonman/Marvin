@@ -1,8 +1,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "Robot.h"
-#include "RobotGrid.h"
+#include "marvin/robot/Robot.h"
+#include "marvin/simulator/RobotGrid.h"
 
 #include <cstdint>
 #include <optional>

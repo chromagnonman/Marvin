@@ -1,6 +1,6 @@
-#include "Robot.h"
-#include "RobotAssembly.h"
-#include "RobotSimulator.h"
+#include "marvin/robot/Robot.h"
+#include "marvin/robot/RobotAssembly.h"
+#include "marvin/simulator/RobotSimulator.h"
 
 #include <gtest/gtest.h>
 

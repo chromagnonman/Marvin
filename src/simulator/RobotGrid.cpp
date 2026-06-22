@@ -1,6 +1,6 @@
-#include "RobotGrid.h"
+#include "marvin/simulator/RobotGrid.h"
 
-#include "Robot.h"
+#include "marvin/robot/Robot.h"
 
 #include <algorithm>
 #include <cstddef>

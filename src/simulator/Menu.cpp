@@ -1,6 +1,6 @@
-#include "Menu.h"
+#include "marvin/simulator/Menu.h"
 
-#include "Robot.h"
+#include "marvin/robot/Robot.h"
 
 #include <ostream>
 

@@ -1,7 +1,7 @@
 #ifndef MARVIN_H
 #define MARVIN_H
 
-#include "Robot.h"
+#include "marvin/robot/Robot.h"
 
 #include <cstdint>
 #include <string>

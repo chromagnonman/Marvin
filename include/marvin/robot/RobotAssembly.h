@@ -1,8 +1,8 @@
 #ifndef ROBOT_ASSEMBLY_H
 #define ROBOT_ASSEMBLY_H
 
-#include "Marvin.h"
-#include "Robot.h"
+#include "marvin/robot/Marvin.h"
+#include "marvin/robot/Robot.h"
 
 #include <memory>
 #include <string>

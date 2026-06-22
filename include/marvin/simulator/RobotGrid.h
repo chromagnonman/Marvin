@@ -1,7 +1,7 @@
 #ifndef ROBOT_GRID_H
 #define ROBOT_GRID_H
 
-#include "Robot.h"
+#include "marvin/robot/Robot.h"
 
 #include <vector>
 

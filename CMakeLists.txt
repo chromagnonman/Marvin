@@ -48,26 +48,31 @@ function(marvin_enable_asan target)
 endfunction()
 
 add_library(marvin_core STATIC
-    Command.cpp
-    Command.h
-    Marvin.cpp
-    Marvin.h
-    Menu.cpp
-    Menu.h
-    Robot.cpp
-    Robot.h
-    RobotAssembly.h
-    RobotGrid.cpp
-    RobotGrid.h
-    RobotSimulator.cpp
-    RobotSimulator.h
+    src/command/Command.cpp
+    src/robot/Marvin.cpp
+    src/robot/Robot.cpp
+    src/simulator/Menu.cpp
+    src/simulator/RobotGrid.cpp
+    src/simulator/RobotSimulator.cpp
 )
-target_include_directories(marvin_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_sources(marvin_core
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS include
+        FILES
+            include/marvin/command/Command.h
+            include/marvin/robot/Marvin.h
+            include/marvin/robot/Robot.h
+            include/marvin/robot/RobotAssembly.h
+            include/marvin/simulator/Menu.h
+            include/marvin/simulator/RobotGrid.h
+            include/marvin/simulator/RobotSimulator.h
+)
 marvin_enable_strict_warnings(marvin_core)
 marvin_enable_asan(marvin_core)
 marvin_enable_clang_tidy(marvin_core)
 
-add_executable(Marvin main.cpp)
+add_executable(Marvin src/main.cpp)
 target_link_libraries(Marvin PRIVATE marvin_core)
 marvin_enable_strict_warnings(Marvin)
 marvin_enable_asan(Marvin)
@@ -84,10 +89,10 @@ if(BUILD_TESTING)
     FetchContent_MakeAvailable(googletest)
 
     add_executable(RobotSimulatorTest
-        RobotSimulatorTest/TestCommandParser.cpp
-        RobotSimulatorTest/TestRobotGrid.cpp
-        RobotSimulatorTest/TestRobotMarvin.cpp
-        RobotSimulatorTest/TestRobotSimulator.cpp
+        tests/TestCommandParser.cpp
+        tests/TestRobotGrid.cpp
+        tests/TestRobotMarvin.cpp
+        tests/TestRobotSimulator.cpp
     )
     target_link_libraries(RobotSimulatorTest PRIVATE marvin_core GTest::gtest_main)
     marvin_enable_strict_warnings(RobotSimulatorTest)

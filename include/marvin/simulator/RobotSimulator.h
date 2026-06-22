@@ -1,10 +1,10 @@
 #ifndef ROBOT_SIMULATOR_H
 #define ROBOT_SIMULATOR_H
 
-#include "Command.h"
-#include "Robot.h"
-#include "RobotAssembly.h"
-#include "RobotGrid.h"
+#include "marvin/command/Command.h"
+#include "marvin/robot/Robot.h"
+#include "marvin/robot/RobotAssembly.h"
+#include "marvin/simulator/RobotGrid.h"
 
 #include <cstdint>
 #include <iosfwd>

@@ -1,5 +1,5 @@
-#include "Marvin.h"
-#include "Robot.h"
+#include "marvin/robot/Marvin.h"
+#include "marvin/robot/Robot.h"
 
 #include <cstdint>
 #include <string>

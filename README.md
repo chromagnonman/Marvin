@@ -83,6 +83,13 @@ but cannot shrink.
 - `CommandParser` converts input into a typed `std::variant` command before execution.
 - `RobotSimulator` maintains case-insensitive unique-name and ID indexes.
 
+```text
+include/marvin/   Public headers grouped by command, robot, and simulator domains
+src/              Implementations grouped by the same domains, plus the console entry point
+tests/            GoogleTest unit and integration tests
+.github/workflows Cross-platform and code-quality CI workflows
+```
+
 ## Tests
 
 The GoogleTest suite covers parsing, malformed input, signed movement, rotation, identity,

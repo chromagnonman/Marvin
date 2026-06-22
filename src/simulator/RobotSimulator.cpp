@@ -1,10 +1,10 @@
-#include "RobotSimulator.h"
+#include "marvin/simulator/RobotSimulator.h"
 
-#include "Command.h"
-#include "Menu.h"
-#include "Robot.h"
-#include "RobotAssembly.h"
-#include "RobotGrid.h"
+#include "marvin/command/Command.h"
+#include "marvin/robot/Robot.h"
+#include "marvin/robot/RobotAssembly.h"
+#include "marvin/simulator/Menu.h"
+#include "marvin/simulator/RobotGrid.h"
 
 #include <algorithm>
 #include <cctype>
