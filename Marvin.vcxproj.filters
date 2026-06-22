@@ -32,8 +32,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".clang-format" />
+    <None Include=".clang-tidy" />
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include=".github\upgrades\scenarios\cppbuildtoolsupgrade_a6e392\assessment.md" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Robot.h">

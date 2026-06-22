@@ -6,63 +6,61 @@
 
 #include "Marvin.h"
 
-namespace RobotFactory {
+namespace RobotFactory
+{
 
-    namespace RobotType {
+namespace RobotType
+{
 
-        enum class Ground_based : size_t 
+enum class Ground_based : size_t
+{
+    Bipedaled,
+    Quadrupedaled,
+    Wheeled
+};
+
+enum class Aerial : size_t
+{
+    // TODO:
+};
+
+enum class Aquatic : size_t
+{
+    // TODO:
+};
+
+enum class Subaquatic : size_t
+{
+    // TODO:
+};
+} // namespace RobotType
+
+using ROBOT_TYPE = std::variant<RobotType::Ground_based, RobotType::Aerial, RobotType::Aquatic,
+                                RobotType::Subaquatic>;
+
+using namespace RobotFactory::RobotType;
+
+struct RobotAssembly
+{
+
+    [[nodiscard]] static std::unique_ptr<RobotFactory::Robot> create(
+        const ROBOT_TYPE &type, const RobotFactory::RobotLocation &location,
+        const std::string &name)
+    {
+        const auto robot_type = std::get<0>(type);
+
+        switch (robot_type)
         {
-            Bipedaled,
-            Quadrupedaled,
-            Wheeled
-        };
+        case Ground_based::Bipedaled:
+            return std::make_unique<RobotFactory::Marvin>(location, name);
 
-        enum class Aerial : size_t 
-        {
-            // TODO:
-        };
+            // TODO: Add support for the other robot types
 
-        enum class Aquatic : size_t 
-        {
-            // TODO:
-        };
-
-        enum class Subaquatic : size_t 
-        {
-            // TODO:
-        };
-    }
-
-    using ROBOT_TYPE = std::variant<RobotType::Ground_based, 
-                                    RobotType::Aerial, 
-                                    RobotType::Aquatic,
-                                    RobotType::Subaquatic>;
-
-    using namespace RobotFactory::RobotType;
-
-    struct RobotAssembly {
-
-        [[nodiscard]] static std::unique_ptr<RobotFactory::Robot> create(
-            const ROBOT_TYPE& type,
-            const RobotFactory::RobotLocation& location, 
-            const std::string& name) 
-        {
-            const auto robot_type = std::get<0>(type);
-            
-            switch (robot_type) 
-            {
-                case Ground_based::Bipedaled: 
-                    return std::make_unique<RobotFactory::Marvin>(location, name);
-
-                // TODO: Add support for the other robot types
-
-                default:
-                  return std::make_unique<RobotFactory::Marvin>(location, name);
-
-                
-            }
+        default:
+            return std::make_unique<RobotFactory::Marvin>(location, name);
         }
-    };
-}
+    }
+};
+} // namespace RobotFactory
 
 #endif

@@ -1,65 +1,58 @@
 #include "Marvin.h"
+#include <array>
 
-namespace RobotFactory {
+namespace RobotFactory
+{
 
-    using namespace RobotFactory::ROBOT_DIRECTION;
+size_t Robot::m_serial_number{42};
 
-    size_t Robot::m_serial_number{42};
+Marvin::Marvin(const std::string &name) : Robot{name} {}
 
-    Marvin::Marvin(const std::string& name) noexcept : Robot {name} 
+Marvin::Marvin(const RobotLocation &location) noexcept : Robot{location} {}
+
+Marvin::Marvin(const RobotLocation &location, std::string robot_name)
+    : Robot{location, std::move(robot_name)}
+{
+}
+
+Marvin::~Marvin() = default;
+
+void Marvin::move(size_t unit) noexcept
+{
+    const size_t distance = m_default_move * unit;
+
+    switch (m_location.direction)
     {
-    }
-
-    Marvin::Marvin(const RobotLocation& location) noexcept :
-        Robot{ location }
-    {
-    }
-
-    Marvin::Marvin(const RobotLocation& location, std::string robot_name) noexcept :
-        Robot{ location, std::move(robot_name)}
-    {
-    }
-
-    Marvin::~Marvin() = default;
-
-    void Marvin::move(size_t unit) noexcept
-    {
-        if (m_location.direction == NORTH)
-        {
-            m_location.y_coordinate += (m_default_move * unit);
-        }
-        else if (m_location.direction == SOUTH)
-        {
-            m_location.y_coordinate -= (m_default_move * unit);
-        }
-        else if (m_location.direction == EAST)
-        {
-            m_location.x_coordinate += (m_default_move * unit);
-        }
-        else if (m_location.direction == WEST)
-        {
-            m_location.x_coordinate -= (m_default_move * unit);
-        }
-    }
-
-    void Marvin::rotate(const ROBOT_ROTATION& rotate_direction) noexcept
-    {
-        if (m_location.direction == NORTH)
-        {
-            m_location.direction = (rotate_direction == ROBOT_ROTATION::LEFT) ? WEST : EAST;
-        }
-        else if (m_location.direction == SOUTH)
-        {
-            m_location.direction = (rotate_direction == ROBOT_ROTATION::LEFT) ? EAST : WEST;
-        }
-        else if (m_location.direction == EAST)
-        {
-            m_location.direction = (rotate_direction == ROBOT_ROTATION::LEFT) ? NORTH : SOUTH;
-        }
-        else if (m_location.direction == WEST)
-        {
-            m_location.direction = (rotate_direction == ROBOT_ROTATION::LEFT) ?  SOUTH : NORTH;
-        }
+    case Direction::NORTH:
+        m_location.y_coordinate += distance;
+        break;
+    case Direction::SOUTH:
+        m_location.y_coordinate -= distance;
+        break;
+    case Direction::EAST:
+        m_location.x_coordinate += distance;
+        break;
+    case Direction::WEST:
+        m_location.x_coordinate -= distance;
+        break;
     }
 }
 
+void Marvin::rotate(const ROBOT_ROTATION &rotate_direction) noexcept
+{
+    // Rotation table: [current_direction][rotation_type] = new_direction
+    static constexpr std::array<std::array<Direction, 2>, 4> rotation_table{
+        {// NORTH
+         {{Direction::WEST, Direction::EAST}},
+         // EAST
+         {{Direction::NORTH, Direction::SOUTH}},
+         // SOUTH
+         {{Direction::EAST, Direction::WEST}},
+         // WEST
+         {{Direction::SOUTH, Direction::NORTH}}}};
+
+    const auto current_dir_idx = static_cast<size_t>(m_location.direction);
+    const auto rotation_idx = static_cast<size_t>(rotate_direction);
+    m_location.direction = rotation_table[current_dir_idx][rotation_idx];
+}
+} // namespace RobotFactory

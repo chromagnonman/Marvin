@@ -3,50 +3,50 @@
 
 #include <memory>
 
-#include "RobotGrid.h"
 #include "Robot.h"
 
-namespace Simulator{
-    
-    struct GridSize {
-        size_t width;
-        size_t height;
-    };
+namespace Simulator
+{
 
-    static constexpr size_t DEFAULT_WIDTH = 10;
-    static constexpr size_t DEFAULT_HEIGHT = 10;
+struct GridSize
+{
+    size_t width;
+    size_t height;
+};
 
-    /**
-    * @brief Provides a 2D grid environment for Marvin (the paranoid android) to explore.
-    */
-    class RobotGrid {
-    public:
-        RobotGrid() noexcept;
-        RobotGrid(GridSize grid) noexcept;
+static constexpr size_t DEFAULT_WIDTH = 10;
+static constexpr size_t DEFAULT_HEIGHT = 10;
 
-        RobotGrid(const RobotGrid&) = delete;
-        RobotGrid& operator=(const RobotGrid&) = delete;
-        
-        virtual ~RobotGrid() noexcept;
+/**
+ * @brief Provides a 2D grid environment for Marvin (the paranoid android) to explore.
+ */
+class RobotGrid
+{
+  public:
+    RobotGrid();
+    explicit RobotGrid(GridSize grid);
 
-        bool addRobot(const std::unique_ptr<RobotFactory::Robot>&) noexcept;
+    RobotGrid(const RobotGrid &) = delete;
+    RobotGrid &operator=(const RobotGrid &) = delete;
 
-        void updateLocation(
-            const RobotFactory::RobotLocation&,
-            const std::unique_ptr<RobotFactory::Robot>&) noexcept;
+    virtual ~RobotGrid() noexcept;
 
-        void resize(GridSize&&) noexcept;
-        void remove(const std::unique_ptr<RobotFactory::Robot>& robot) noexcept;
+    bool addRobot(const RobotFactory::Robot &) noexcept;
 
-        [[nodiscard]] const GridSize& getSize() const noexcept;
-        [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation&) const noexcept;
-        [[nodiscard]] bool isOffTheGrid(const std::unique_ptr<RobotFactory::Robot>&) const noexcept;
-        [[nodiscard]] bool isOccupied(const std::unique_ptr<RobotFactory::Robot>&) const noexcept;
+    void updateLocation(const RobotFactory::RobotLocation &, const RobotFactory::Robot &) noexcept;
 
-    private:
-        struct impl;
-        std::unique_ptr<impl> m_pImpl;
-    };
-}
+    void resize(GridSize);
+    void remove(const RobotFactory::Robot &robot) noexcept;
+
+    [[nodiscard]] const GridSize &getSize() const noexcept;
+    [[nodiscard]] size_t getRobotID(const RobotFactory::RobotLocation &) const noexcept;
+    [[nodiscard]] bool isOffTheGrid(const RobotFactory::Robot &) const noexcept;
+    [[nodiscard]] bool isOccupied(const RobotFactory::Robot &) const noexcept;
+
+  private:
+    struct impl;
+    std::unique_ptr<impl> m_pImpl;
+};
+} // namespace Simulator
 
 #endif

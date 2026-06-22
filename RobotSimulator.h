@@ -5,35 +5,35 @@
 
 #include "RobotAssembly.h"
 
+namespace Simulator
+{
 
-namespace Simulator {
+class RobotSimulator
+{
+  public:
+    RobotSimulator();
+    explicit RobotSimulator(GridSize grid);
+    virtual ~RobotSimulator();
 
-    class RobotSimulator {
-    public:
-        RobotSimulator() noexcept;
-        RobotSimulator(GridSize&& grid) noexcept;
-        virtual ~RobotSimulator();
+    void start();
 
-        void start() noexcept;
+    bool place(const RobotFactory::ROBOT_TYPE &, const RobotFactory::RobotLocation &,
+               const std::string &name);
+    void move();
+    void rotate(const std::string &direction);
+    void remove();
+    void report() const;
+    void resize(GridSize);
 
-        bool place(const RobotFactory::ROBOT_TYPE&,
-                   const RobotFactory::RobotLocation&,
-                   const std::string& name) noexcept;
-        void move() noexcept;
-        void rotate(const std::string& direction) noexcept;
-        void remove() noexcept;
-        void report() const noexcept;
-        void resize(GridSize&&) noexcept;
+    // Individual robot commands
+    bool move(const std::string &robot, size_t blocks = 1);
+    bool rotate(const std::string &robot, const std::string &direction);
+    bool remove(const std::string &robot);
 
-        // Individual robot commands
-        bool move(const std::string& robot, size_t blocks=1) noexcept;
-        bool rotate(const std::string& robot, const std::string& direction) noexcept;
-        bool remove(const std::string& robot) noexcept;
-
-    private:
-        struct impl;
-        std::unique_ptr<impl> m_pImpl;
-    };
-}
+  private:
+    struct impl;
+    std::unique_ptr<impl> m_pImpl;
+};
+} // namespace Simulator
 
 #endif
