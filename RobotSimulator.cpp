@@ -144,7 +144,7 @@ bool RobotSimulator::executeLine(std::string_view line, std::ostream &output, st
             {
                 const auto moved = command.target
                                        ? std::visit([this, &command](const auto &target)
-                                                    { return move(target, command.blocks); },
+                                                    { return this->move(target, command.blocks); },
                                                     command.target->value)
                                        : moveAll(command.blocks) > 0;
                 if (!moved)
@@ -154,11 +154,11 @@ bool RobotSimulator::executeLine(std::string_view line, std::ostream &output, st
             }
             else if constexpr (std::is_same_v<Type, RotateCommand>)
             {
-                const auto rotated = command.target
-                                         ? std::visit([this, &command](const auto &target)
-                                                      { return rotate(target, command.rotation); },
-                                                      command.target->value)
-                                         : rotateAll(command.rotation) > 0;
+                const auto rotated =
+                    command.target ? std::visit([this, &command](const auto &target)
+                                                { return this->rotate(target, command.rotation); },
+                                                command.target->value)
+                                   : rotateAll(command.rotation) > 0;
                 if (!rotated)
                 {
                     errors << "No matching robot was found.\n";
@@ -166,10 +166,10 @@ bool RobotSimulator::executeLine(std::string_view line, std::ostream &output, st
             }
             else if constexpr (std::is_same_v<Type, RemoveCommand>)
             {
-                const auto removed =
-                    command.target ? std::visit([this](const auto &target)
-                                                { return remove(target); }, command.target->value)
-                                   : removeAll() > 0;
+                const auto removed = command.target ? std::visit([this](const auto &target)
+                                                                 { return this->remove(target); },
+                                                                 command.target->value)
+                                                    : removeAll() > 0;
                 if (!removed)
                 {
                     errors << "No matching robot was found.\n";
