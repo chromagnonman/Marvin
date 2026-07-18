@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace
 {
@@ -38,6 +39,24 @@ TEST(RobotSimulator, SupportsIdTargeting)
     EXPECT_EQ(simulator.findRobot(id)->location().y, 2);
     EXPECT_TRUE(simulator.remove(id));
     EXPECT_EQ(simulator.findRobot(id), nullptr);
+}
+
+TEST(RobotSimulator, PreservesIndexesWhenMoved)
+{
+    Simulator::RobotSimulator source;
+    ASSERT_TRUE(source.place(RobotFactory::GroundRobotType::Bipedal,
+                             {.x = 0, .y = 0, .direction = RobotFactory::Direction::North},
+                             "R2D2"));
+    const auto id = source.findRobot("R2D2")->id();
+
+    Simulator::RobotSimulator moved{std::move(source)};
+    ASSERT_NE(moved.findRobot(id), nullptr);
+    EXPECT_TRUE(moved.move(id));
+
+    Simulator::RobotSimulator assigned;
+    assigned = std::move(moved);
+    ASSERT_NE(assigned.findRobot(id), nullptr);
+    EXPECT_EQ(assigned.findRobot(id)->location().y, 1);
 }
 
 TEST(RobotSimulator, PreventsCollisionsDuringMoveAll)

@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 namespace Simulator
 {
@@ -20,12 +21,11 @@ class RobotSimulator
   public:
     RobotSimulator();
     explicit RobotSimulator(GridSize size);
-    ~RobotSimulator();
 
     RobotSimulator(const RobotSimulator &) = delete;
     RobotSimulator &operator=(const RobotSimulator &) = delete;
-    RobotSimulator(RobotSimulator &&) noexcept;
-    RobotSimulator &operator=(RobotSimulator &&) noexcept;
+    RobotSimulator(RobotSimulator &&) noexcept = default;
+    RobotSimulator &operator=(RobotSimulator &&) noexcept = default;
 
     void start();
     void run(std::istream &input, std::ostream &output, std::ostream &errors);
@@ -52,8 +52,16 @@ class RobotSimulator
     [[nodiscard]] std::size_t robotCount() const noexcept;
 
   private:
-    class Impl;
-    std::unique_ptr<Impl> m_impl;
+    RobotGrid m_grid;
+    std::unordered_map<std::string, std::unique_ptr<RobotFactory::Robot>> m_robots_by_name;
+    std::unordered_map<RobotFactory::RobotId, RobotFactory::Robot *> m_robots_by_id;
+
+    [[nodiscard]] RobotFactory::Robot *find(std::string_view name);
+    [[nodiscard]] const RobotFactory::Robot *find(std::string_view name) const;
+    [[nodiscard]] RobotFactory::Robot *find(RobotFactory::RobotId id);
+    [[nodiscard]] const RobotFactory::Robot *find(RobotFactory::RobotId id) const;
+    [[nodiscard]] bool move(RobotFactory::Robot &robot, std::uint32_t blocks);
+    [[nodiscard]] bool erase(RobotFactory::Robot &robot);
 };
 
 } // namespace Simulator
