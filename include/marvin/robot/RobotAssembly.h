@@ -11,7 +11,7 @@
 namespace RobotFactory
 {
 
-enum class GroundRobotType
+enum class GroundRobotType : std::uint8_t
 {
     Bipedal
 };
